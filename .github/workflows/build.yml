@@ -18,7 +18,7 @@ jobs:
         run: |
           for d in android/app/src/main/res/mipmap-*dpi; do
             for f in ic_launcher ic_launcher_round ic_launcher_foreground; do
-              convert resources/icon.png -resize 192x192 "$d/$f.png"
+              cp resources/icon.png "$d/$f.png"
             done
           done
       - run: npx cap sync android
