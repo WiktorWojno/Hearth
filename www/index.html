@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hearth</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#3f4ccf"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<style>
+:root{--bg:#eef0f5;--sf:#fff;--ink:#1d2133;--mut:#6b7188;--ac:#3f4ccf;--acT:#fff;--ln:#d9dde8;--me:#dfe3fb;--bot:#fff;--dg:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14151f;--sf:#1e2030;--ink:#e8eaf6;--mut:#8f95b2;--ac:#8e9bff;--acT:#12142a;--ln:#2d3047;--me:#2a2f55;--bot:#1e2030;--dg:#ff8a80}}
+:root[data-theme="dark"]{--bg:#14151f;--sf:#1e2030;--ink:#e8eaf6;--mut:#8f95b2;--ac:#8e9bff;--acT:#12142a;--ln:#2d3047;--me:#2a2f55;--bot:#1e2030;--dg:#ff8a80}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,sans-serif}
+#app{height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto}
+header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--ln);background:var(--sf)}
+header h1{font:600 19px Literata,Georgia,serif;margin:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{flex:1;overflow-y:auto;padding:12px 14px}
+nav{display:flex;border-top:1px solid var(--ln);background:var(--sf)}
+nav button{flex:1;padding:13px 0;border:0;background:none;color:var(--mut);font:500 15px inherit;font-family:inherit}
+nav button.on{color:var(--ac);box-shadow:inset 0 2px 0 var(--ac)}
+button{font-family:inherit;cursor:pointer}
+.ib{border:0;background:none;color:var(--ac);font-size:15px;padding:6px 8px}
+.btn{background:var(--ac);color:var(--acT);border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:600}
+.btn.s{background:none;color:var(--ac);border:1px solid var(--ln)}.btn.d{background:none;color:var(--dg);border:1px solid var(--ln)}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln)}
+.row .t{flex:1;min-width:0}.row b{display:block}.row small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--ln);flex:none;display:grid;place-items:center;color:var(--mut);font-weight:600}
+.empty{color:var(--mut);text-align:center;padding:40px 20px}
+.msg{display:flex;gap:8px;margin:12px 0;align-items:flex-end}.msg.u{flex-direction:row-reverse}
+.msg .av{width:32px;height:32px;font-size:13px}
+.bub{max-width:82%;padding:10px 13px;border-radius:16px;background:var(--bot);border:1px solid var(--ln);font:16px/1.55 Literata,Georgia,serif;white-space:pre-wrap;overflow-wrap:anywhere}
+.u .bub{background:var(--me);border-color:transparent}
+.tools{display:flex;gap:6px;margin-top:6px}.tools button{font-size:13px;padding:4px 10px;border-radius:8px;border:1px solid var(--ln);background:var(--sf);color:var(--ink)}
+.comp{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--ln);background:var(--sf);align-items:flex-end}
+textarea,input,select{width:100%;font:16px inherit;font-family:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:10px}
+textarea{resize:none}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:20}
+.sheet>div{background:var(--sf);width:100%;max-width:640px;margin:0 auto;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:85%;overflow-y:auto}
+.sheet h2{font:600 18px Literata,Georgia,serif;margin:0 0 12px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+.chk{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:16px;color:var(--ink);margin:0}.chk input{width:20px;height:20px}
+.acts{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.note{font-size:13px;color:var(--mut);margin:8px 0}
+.bub img{max-width:100%;height:auto;border-radius:8px;vertical-align:middle}.bub a{color:var(--ac)}.bub table{border-collapse:collapse}.bub td,.bub th{border:1px solid var(--ln);padding:2px 6px}.bub code{font-size:.9em;background:var(--bg);padding:1px 4px;border-radius:4px}.bub pre{white-space:pre-wrap;margin:.4em 0}.bub p,.bub blockquote{margin:.4em 0}.bub blockquote{border-left:3px solid var(--ln);padding-left:10px;color:var(--mut)}
+.dots::after{content:"…";animation:b 1s infinite}@keyframes b{50%{opacity:.2}}
+</style></head><body><div id="app"></div>
+<input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+let S={chars:[],books:[],personas:[],chats:{},links:{},persona:null};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem('hearth')||'{}'))}catch(e){}
+let saveErr=false;
+const save=()=>{try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false}catch(e){saveErr=true}};
+let V={tab:'chars',chat:null,sheet:null,busy:false,edit:null,ctl:null};
+S.cfg=Object.assign({html:true,prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:''},S.cfg);
+const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
+const dl=(n,t)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t]));a.download=n;a.click()};
+const OK=new Set('img span b i em strong u s del br p div a font center small big sub sup code pre hr blockquote ul ol li h1 h2 h3 h4 h5 h6 table thead tbody tr td th details summary mark q cite abbr'.split(' '));
+const AT=new Set('style alt width height color size title align colspan rowspan open'.split(' '));
+const DROP=/^(script|style|iframe|object|embed|link|meta|svg|math|form|textarea|select|button|input|video|audio|base|template|noscript)$/;
+const BAD=/url\s*\(|expression|@import|javascript:|behavior|position\s*:\s*(fixed|absolute|sticky)|z-index/i;
+function clean(n){for(const c of [...n.childNodes]){if(c.nodeType===3)continue;if(c.nodeType!==1){c.remove();continue}
+ const t=c.tagName.toLowerCase();
+ if(DROP.test(t)){c.remove();continue}
+ if(!OK.has(t)){clean(c);c.replaceWith(...c.childNodes);continue}
+ for(const a of [...c.attributes]){const k=a.name.toLowerCase(),v=a.value.trim();
+  const ok=k==='src'?t==='img'&&/^(https?:|data:image\/(png|jpe?g|gif|webp|avif);)/i.test(v):k==='href'?t==='a'&&/^https?:/i.test(v):k==='style'?!BAD.test(v):AT.has(k);
+  if(!ok)c.removeAttribute(a.name)}
+ if(t==='a'){c.target='_blank';c.rel='noopener noreferrer nofollow'}
+ if(t==='img'){c.loading='lazy';c.referrerPolicy='no-referrer'}
+ clean(c)}}
+function md(n){for(const c of [...n.childNodes]){if(c.nodeType===3){if(/[*`]/.test(c.data)){const s=document.createElement('span');
+  s.innerHTML=esc(c.data).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\*([^*\n]+)\*/g,'<i>$1</i>');c.replaceWith(...s.childNodes)}}
+  else if(c.nodeType===1&&!/^(code|pre)$/i.test(c.tagName))md(c)}}
+function rich(t){if(S.cfg.html===false)return esc(t);
+ const b=new DOMParser().parseFromString('<body>'+t,'text/html').body;clean(b);md(b);return b.innerHTML}
+const readCfg=()=>{if(!$('#g_url'))return;const g=S.cfg;g.prov=$('#prov').value;g.url=$('#g_url').value.trim();g.key=$('#g_key').value.trim();g.model=$('#g_model').value.trim();g.temp=+$('#g_temp').value;g.max=+$('#g_max').value||600;g.top=+$('#g_top').value||1;g.sys=$('#g_sys').value;g.html=$('#g_html').checked};
+
+/* ---------- import ---------- */
+const lat=b=>{let s='';for(const x of b)s+=String.fromCharCode(x);return s};
+function pngText(buf){const d=new DataView(buf),u=new Uint8Array(buf),o={};let p=8;
+ while(p<buf.byteLength-8){const n=d.getUint32(p),t=lat(u.slice(p+4,p+8));
+  if(t==='tEXt'){const b=u.slice(p+8,p+8+n),z=b.indexOf(0);o[lat(b.slice(0,z))]=lat(b.slice(z+1))}
+  p+=12+n;if(t==='IEND')break}return o}
+const b64json=s=>JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0))));
+function thumb(file){return new Promise(r=>{const i=new Image(),url=URL.createObjectURL(file);
+ i.onload=()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),m=Math.min(i.width,i.height);
+  x.drawImage(i,(i.width-m)/2,(i.height-m)/4>0?(i.height-m)/4:0,m,m,0,0,256,256);URL.revokeObjectURL(url);r(c.toDataURL('image/jpeg',.8))};
+ i.onerror=()=>r('');i.src=url})}
+function normBook(j,name){const raw=j.entries||[],list=Array.isArray(raw)?raw:Object.values(raw);
+ return{id:uid(),name:j.name||name||'Lorebook',entries:list.map(e=>({
+  name:e.comment||e.name||'',keys:[].concat(e.keys||e.key||[]).filter(Boolean),content:e.content||'',
+  constant:!!e.constant,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
+function addChar(j,img,fname){const d=j.data||j;if(!d.name)throw Error('No character data found');
+ const c={id:uid(),name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',
+  first:d.first_mes||'',alts:d.alternate_greetings||[],ex:d.mes_example||'',sys:d.system_prompt||'',img};
+ S.chars.push(c);
+ if(d.character_book&&(d.character_book.entries||[]).length){const b=normBook(d.character_book,d.name+' lore');S.books.push(b);S.links[c.id]=[b.id]}
+ return c.name}
+async function importFiles(files){const msg=[];
+ for(const f of files){try{
+  if(/png$/i.test(f.name)||f.type==='image/png'){const t=pngText(await f.arrayBuffer()),k=t.ccv3||t.chara;
+   if(!k)throw Error('no character data in this PNG');msg.push('Added '+addChar(b64json(k),await thumb(f)))}
+  else{const j=JSON.parse(await f.text());if(j.chars&&j.books){S=Object.assign(S,j);msg.push('Restored backup');continue}
+   if(j.entries||j.character_book===undefined&&j.data?.entries){const b=normBook(j,f.name.replace(/\.json$/i,''));S.books.push(b);msg.push('Added lorebook '+b.name)}
+   else msg.push('Added '+addChar(j,''))}
+ }catch(e){msg.push(f.name+': '+e.message)}}
+ save();V.tab=S.books.length&&!S.chars.length?'lore':V.tab;render();
+ V.sheet={t:'info',m:msg.join('\n')+(saveErr?'\nStorage is full. Delete something to keep new imports.':'')};render()}
+$('#f').onchange=e=>{importFiles([...e.target.files]);e.target.value=''};
+const pick=()=>$('#f').click();
+
+/* ---------- chat ---------- */
+const P=()=>S.personas.find(p=>p.id===S.persona)||{name:'You',desc:''};
+const C=()=>S.chars.find(c=>c.id===V.chat);
+const rep=(s,c)=>(s||'').replace(/{{char}}/gi,c.name).replace(/{{user}}/gi,P().name);
+function lore(c,msgs){const text=msgs.slice(-6).map(m=>m.t).join('\n').toLowerCase(),out=[];
+ for(const id of S.links[c.id]||[]){const b=S.books.find(b=>b.id===id);if(!b)continue;
+  for(const e of b.entries){if(!e.on)continue;
+   const hit=e.constant||e.keys.some(k=>{try{const m=/^\/(.+)\/([a-z]*)$/.exec(k);return m?new RegExp(m[1],m[2]||'i').test(text):text.includes(k.toLowerCase())}catch(x){return false}});
+   if(hit)out.push(rep(e.content,c))}}
+ return out.slice(0,8).join('\n\n').slice(0,3000)}
+function build(c,h,cont){const u=P().name,L=lore(c,h);
+ const head=rep(S.cfg.sys,c)||`You are roleplaying as ${c.name} in an ongoing chat with ${u}. Stay in character and write only ${c.name}’s next reply. Never write ${u}’s words or actions.`;
+ const sys=head+'\n\n'+(c.sys?rep(c.sys,c)+'\n\n':'')+`[${c.name}]\n${rep(c.desc,c)}\n`+(c.pers?`Personality: ${rep(c.pers,c)}\n`:'')+(c.scen?`Scenario: ${rep(c.scen,c)}\n`:'')+
+ `\n[${u}]\n${rep(P().desc,c)||'(no description)'}\n`+(L?`\n[World info]\n${L}\n`:'')+(c.ex?`\n[Example dialogue]\n${rep(c.ex,c)}\n`:'');
+ const m=[];for(const x of h.slice(-40)){const r=x.r==='u'?'user':'assistant';if(m.length&&m[m.length-1].role===r)m[m.length-1].content+='\n\n'+x.t;else m.push({role:r,content:x.t})}
+ if(cont)m.push({role:'user',content:`[Continue ${c.name}’s last message from exactly where it stopped. Do not repeat it.]`});
+ if(!m.length||m[0].role!=='user')m.unshift({role:'user',content:'[Start of roleplay]'});
+ return{sys,msgs:m}}
+async function llm(sys,msgs,on,signal){const g=S.cfg,an=g.prov==='anthropic',base=(g.url||'').replace(/\/$/,'');
+ const res=await fetch(base+(an?'/messages':'/chat/completions'),{method:'POST',signal,
+  headers:an?{'content-type':'application/json','x-api-key':g.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}:{'content-type':'application/json',...(g.key?{authorization:'Bearer '+g.key}:{})},
+  body:JSON.stringify(an?{model:g.model,max_tokens:g.max,temperature:g.temp,system:sys,messages:msgs,stream:true}:{model:g.model,messages:[{role:'system',content:sys},...msgs],temperature:g.temp,top_p:g.top,max_tokens:g.max,stream:true})});
+ if(!res.ok)throw Error(res.status+' '+(await res.text()).slice(0,200));
+ const rd=res.body.getReader(),dec=new TextDecoder();let buf='',out='';
+ for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+  for(const l of ls){if(!l.startsWith('data:'))continue;const d=l.slice(5).trim();if(d==='[DONE]')continue;
+   try{const j=JSON.parse(d),t=an?(j.delta?.text||''):(j.choices?.[0]?.delta?.content||'');if(t){out+=t;on(out)}}catch(e){}}}
+ return out}
+function openChat(id){V.chat=id;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0}]:[];save()}render(true)}
+async function gen(mode='new'){const c=C(),h=S.chats[c.id],g=S.cfg;
+ if(!g.model||!g.url){V.sheet={t:'api'};return render()}
+ let m,base='',hist;
+ if(mode==='new'){m={r:'c',t:'',s:[''],i:0};h.push(m);hist=h.slice(0,-1)}
+ else if(mode==='swipe'){m=h[h.length-1];m.s=m.s||[m.t];m.s.push('');m.i=m.s.length-1;m.t='';hist=h.slice(0,-1)}
+ else{m=h[h.length-1];base=m.t;hist=h}
+ V.busy=true;V.ctl=new AbortController();render(true);
+ const set=t=>{m.t=base+(t.startsWith(c.name+':')?t.slice(c.name.length+1).trimStart():t);m.s&&(m.s[m.i||0]=m.t)};
+ try{const{sys,msgs}=build(c,hist,mode==='cont');await llm(sys,msgs,t=>{set(t);upd()},V.ctl.signal)}
+ catch(e){if(e.name!=='AbortError')V.sheet={t:'info',m:'Request failed: '+e.message+(/Failed to fetch|Load failed/.test(e.message)?'\nCheck the URL and key, and that the server allows browser (CORS) requests.':'')}}
+ if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
+ V.busy=false;V.ctl=null;save();render(true)}
+function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
+ if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
+const swb=x=>`<div class="tools"><button data-a="sl">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">▶</button><button data-a="cont">Continue</button></div>`;
+function upd(){const b=document.querySelector('.msg:last-child .bub');if(b){b.innerHTML=rich(S.chats[V.chat].slice(-1)[0].t);const m=$('main');m.scrollTop=m.scrollHeight}}
+function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t});i.value='';save();gen()}
+
+/* ---------- views ---------- */
+const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc((c.name||'?')[0])}</div>`;
+function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
+ if(s.t==='info')h=`<p style="white-space:pre-wrap;margin:0 0 4px">${esc(s.m)}</p><div class="acts"><button class="btn" data-a="close">OK</button></div>`;
+ if(s.t==='edit')h=`<h2>Edit message</h2><textarea id="em" rows="8">${esc(S.chats[V.chat][s.i].t)}</textarea><div class="acts"><button class="btn" data-a="savem">Save</button><button class="btn s" data-a="close">Cancel</button></div>`;
+ if(s.t==='api'){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`;
+  h=`<h2>API</h2><label>Provider</label><select id="prov">${[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']].map(([v,n])=>`<option value="${v}" ${g.prov===v?'selected':''}>${n}</option>`).join('')}</select>`+
+  f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'placeholder="e.g. gpt-4o-mini"')+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('max','Max reply tokens',g.max,'type="number"')+f('top','Top P',g.top,'type="number" step="0.05"')+
+  `<label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label><label>System prompt (optional)</label><textarea id="g_sys" rows="4" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea><p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>
+  <div class="acts"><button class="btn" data-a="savecfg">Save</button><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button><button class="btn s" data-a="close">Cancel</button></div>`}
+ if(s.t==='char'){const c=C(),f=(k,l,r)=>`<label>${l}</label><textarea id="c_${k}" rows="${r}">${esc(c[k])}</textarea>`;
+  h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="close">Cancel</button></div>`}
+ if(s.t==='set'){const c=C();h=`<h2>${esc(c.name)}</h2><label>Persona</label><select id="ps"><option value="">You (default)</option>${S.personas.map(p=>`<option value="${p.id}" ${p.id===S.persona?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
+  <label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
+  <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="reset">Restart</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
+ if(s.t==='persona'){const p=s.p;h=`<h2>${p.id?'Edit':'New'} persona</h2><label>Name</label><input id="pn" value="${esc(p.name)}"><label>Description</label><textarea id="pd" rows="5" placeholder="Who are you in the story?">${esc(p.desc)}</textarea>
+  <div class="acts"><button class="btn" data-a="savep">Save</button><button class="btn s" data-a="close">Cancel</button>${p.id?'<button class="btn d" data-a="delp">Delete</button>':''}</div>`}
+ if(s.t==='book'){const b=S.books.find(b=>b.id===s.id);h=`<h2>${esc(b.name)}</h2>`+b.entries.map((e,i)=>`<label class="chk"><input type="checkbox" data-e="${i}" ${e.on?'checked':''}><span><b>${esc(e.name||e.keys[0]||'Entry')}</b><small class="note" style="display:block">${e.constant?'Always on':esc(e.keys.join(', '))}</small></span></label>`).join('')+
+  `<div class="acts"><button class="btn" data-a="close">Done</button><button class="btn d" data-a="delbook">Delete lorebook</button></div>`}
+ return`<div class="sheet" data-a="bg"><div>${h}</div></div>`}
+function render(scroll){const a=$('#app');let h='';
+ if(V.chat){const c=C(),m=S.chats[c.id]||[];
+  h=`<header><button class="ib" data-a="back">Back</button><h1>${esc(c.name)}</h1><button class="ib" data-a="set">Options</button></header><main>`+
+  m.map((x,i)=>`<div class="msg ${x.r}">${x.r==='c'?av(c):''}<div style="max-width:82%"><div class="bub ${V.busy&&i===m.length-1&&!x.t?'dots':''}" style="max-width:100%">${rich(x.t)}</div>${i===m.length-1&&x.r==='c'&&!V.busy?swb(x):''}${V.edit===i?`<div class="tools"><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button></div>`:''}</div></div>`.replace('data-a="bub"','')).join('')+
+  `</main><div class="comp"><textarea id="in" rows="1" placeholder="Message ${esc(c.name)}"></textarea>${V.busy?'<button class="btn" data-a="stop">Stop</button>':'<button class="btn s" data-a="regen">Retry</button><button class="btn" data-a="send">Send</button>'}</div>`}
+ else{const T=V.tab;
+  h=`<header><h1>${{chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T]}</h1><button class="ib" data-a="api">API</button><button class="ib" data-a="${T==='pers'?'newp':'imp'}">${T==='pers'?'New':'Import'}</button></header><main>`;
+  if(T==='chars')h+=S.chars.length?S.chars.map(c=>`<div class="row" data-a="open" data-id="${c.id}">${av(c)}<div class="t"><b>${esc(c.name)}</b><small>${esc((S.chats[c.id]||[]).slice(-1)[0]?.t||c.desc||'')}</small></div></div>`).join(''):`<div class="empty">Import a SillyTavern character card (.png or .json) to start chatting.<div class="acts" style="justify-content:center"><button class="btn" data-a="imp">Import cards</button></div></div>`;
+  if(T==='lore')h+=S.books.length?S.books.map(b=>`<div class="row" data-a="book" data-id="${b.id}"><div class="av">${b.entries.length}</div><div class="t"><b>${esc(b.name)}</b><small>${b.entries.filter(e=>e.on).length} active entries</small></div></div>`).join('')+'<p class="note">Attach lorebooks to a character from its chat Options.</p>':`<div class="empty">Import a lorebook (.json) or a character card with an embedded one.</div>`;
+  if(T==='pers')h+=S.personas.length?S.personas.map(p=>`<div class="row" data-a="editp" data-id="${p.id}"><div class="av">${esc(p.name[0]||'?')}</div><div class="t"><b>${esc(p.name)}${p.id===S.persona?' (active)':''}</b><small>${esc(p.desc)}</small></div>${p.id===S.persona?'':`<button class="ib" data-a="use" data-id="${p.id}">Use</button>`}</div>`).join(''):`<div class="empty">Personas tell characters who you are. Create one and pick it in any chat.</div>`;
+  if(!S.cfg.model)h+='<p class="note">Tap API to connect a model before chatting.</p>';
+  h+=`</main><nav>${[['chars','Characters'],['lore','Lorebooks'],['pers','Personas']].map(([k,n])=>`<button class="${T===k?'on':''}" data-a="tab" data-id="${k}">${n}</button>`).join('')}</nav>`}
+ const keep=$('#in')?.value||'';a.innerHTML=h+sheetHtml();
+ const i=$('#in');if(i){i.value=keep;i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
+ if(scroll){const m=$('main');if(m)m.scrollTop=m.scrollHeight}
+ document.querySelectorAll('.msg .bub').forEach((b,i)=>b.onclick=()=>{V.edit=V.edit===i?null:i;render()})}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,id=t.dataset.id,i=+t.dataset.i;
+ if(a==='bg'&&e.target!==t)return;if(a==='bg'||a==='close'){V.sheet=null;return render()}
+ if(V.busy&&!['stop','back'].includes(a)&&!['info'].includes(V.sheet?.t))return;
+ const c=V.chat&&C();
+ ({imp:pick,tab:()=>{V.tab=id;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
+  set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.sheet={t:'api'};render()},
+  savecfg:()=>{readCfg();save();V.sheet=null;render()},editc:()=>{V.sheet={t:'char'};render()},
+  savec:()=>{for(const k of['name','desc','pers','scen','first','ex','sys'])c[k]=$('#c_'+k).value;save();V.sheet=null;render()},
+  exp:()=>dl(c.name+' chat.txt',S.chats[c.id].map(m=>(m.r==='u'?P().name:c.name)+': '+m.t).join('\n\n')),
+  bak:()=>dl('hearth-backup.json',JSON.stringify(S)),rest:pick,
+  regen:()=>{const h=S.chats[c.id],l=h[h.length-1];gen(l&&l.r==='c'?'swipe':'new')},
+  del:()=>{S.chats[c.id].splice(i,1);V.edit=null;save();render()},
+  edit:()=>{V.sheet={t:'edit',i};V.edit=null;render()},
+  savem:()=>{const v=$('#em').value.trim();if(v){const m=S.chats[c.id][V.sheet.i];m.t=v;if(m.s)m.s[m.i||0]=v;save()}V.sheet=null;render()},
+  reset:()=>{delete S.chats[c.id];V.sheet=null;save();openChat(c.id)},
+  delchar:()=>{S.chars=S.chars.filter(x=>x.id!==c.id);delete S.chats[c.id];delete S.links[c.id];V.chat=null;V.sheet=null;save();render()},
+  book:()=>{V.sheet={t:'book',id};render()},
+  delbook:()=>{S.books=S.books.filter(b=>b.id!==V.sheet.id);for(const k in S.links)S.links[k]=S.links[k].filter(x=>x!==V.sheet.id);V.sheet=null;save();render()},
+  newp:()=>{V.sheet={t:'persona',p:{name:'',desc:''}};render()},
+  editp:()=>{V.sheet={t:'persona',p:S.personas.find(p=>p.id===id)};render()},
+  use:()=>{S.persona=id;save();render()},
+  savep:()=>{const p=V.sheet.p,n=$('#pn').value.trim();if(!n)return;p.name=n;p.desc=$('#pd').value;if(!p.id){p.id=uid();S.personas.push(p);if(!S.persona)S.persona=p.id}V.sheet=null;save();render()},
+  delp:()=>{const p=V.sheet.p;S.personas=S.personas.filter(x=>x!==p);if(S.persona===p.id)S.persona=null;V.sheet=null;save();render()}
+ })[a]?.()});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.id==='ps'){S.persona=t.value||null;save()}
+ if(t.id==='prov'){readCfg();if(PRE[t.value])S.cfg.url=PRE[t.value];V.sheet={t:'api'};render()}
+ if(t.dataset.b){const c=C(),l=new Set(S.links[c.id]||[]);t.checked?l.add(t.dataset.b):l.delete(t.dataset.b);S.links[c.id]=[...l];save()}
+ if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+</script></body></html>
