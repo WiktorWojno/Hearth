@@ -78,9 +78,22 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 5px}
 code{font-family:ui-monospace,monospace;font-size:13px;color:var(--mut);overflow-wrap:anywhere}.card2.act{border-color:var(--ac)}
 .lnk{background:none;border:0;color:var(--mut);font-size:15px}.dg{color:var(--dg)}details summary{cursor:pointer;color:var(--mut);margin-top:10px}
 .step{display:flex;align-items:center;gap:8px}.step button{background:none;border:0;color:var(--mut);font-size:26px;width:34px}.step b{background:var(--bg);border-radius:12px;padding:8px 16px;min-width:64px;text-align:center}
+.ph2{position:relative;margin-bottom:64px}.bx{height:190px;border:2px dashed var(--ln);border-radius:24px;display:grid;place-items:center;overflow:hidden;color:var(--mut)}
+.cr{position:absolute;left:28px;bottom:-52px;width:112px;height:112px;border-radius:50%;border:2px dashed var(--ln);background:var(--bg);display:grid;place-items:center;overflow:hidden;color:var(--mut)}
+.bx img,.cr img{width:100%;height:100%;object-fit:cover}.bx i,.cr i{font-style:normal;font-size:38px}.cov{width:100%;height:170px;object-fit:cover;border-radius:24px;border:1px solid var(--ln)}
+.lc{display:flex;justify-content:space-between}.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.chip{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:6px 12px;font-size:15px;color:var(--mut)}.chip b{margin-left:8px;cursor:pointer}
+.dash{background:none;border:1.5px dashed var(--ln);color:var(--ink);border-radius:14px;padding:12px 16px;margin-top:12px;font-size:15px}
+.foot{display:flex;align-items:center;gap:12px;margin-top:26px}.lnk.big{flex:1;font-size:17px;color:var(--mut)}.btn.wide{flex:1.4;background:var(--ink);color:var(--bg);border-radius:14px;padding:15px}
+.chk2{flex-direction:row!important;align-items:center;margin-top:16px}.chk2 input{width:24px;height:24px;flex:none;accent-color:var(--ac)}.chk2 b{flex:none}
+.lbk{display:flex;align-items:center;gap:12px;padding:10px;margin-bottom:10px}.lbk input{width:24px;height:24px;accent-color:var(--ac);flex:none}.lbk img,.lph{width:56px;height:56px;border-radius:12px;object-fit:cover;background:var(--bg);display:grid;place-items:center;flex:none}.lbk small{display:block;color:var(--mut)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.three label{margin-top:0}
+.lock{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;max-width:420px;margin:0 auto}
+.brand{font:800 34px system-ui;letter-spacing:-1px;margin:0}.lock h2{font:700 26px system-ui;margin:0}.av.xl{width:120px;height:120px;font-size:44px;border:3px solid var(--ink)}
+.pw{position:relative;width:100%}.pw input{padding-right:48px}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:20px;filter:grayscale(1)}.btn.danger{background:#e5484d;color:#fff}
 </style></head><body><div id="app"></div>
-<input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden>
-<script>var VER=5;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
+<script>var VER=7;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -92,7 +105,7 @@ const idbGet=async()=>{const d=await idb();return new Promise((res,rej)=>{const 
 const idbSet=async v=>{const d=await idb();return new Promise((res,rej)=>{const t=d.transaction('k','readwrite');t.objectStore('k').put(v,'S');t.oncomplete=res;t.onerror=()=>rej(t.error)})};
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false}catch(e){saveErr=true}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false}).catch(()=>{saveErr=true}),250)};
-let V={stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null};
+let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null};
 const CFG0={repo:'WiktorWojno/Hearth',gh:'',html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40,mem:{on:false,every:10,per:10,keep:100,model:''}};S.cfg=Object.assign({},CFG0,S.cfg);
 S.old=S.old||{};
 const fix=()=>{S.cfg=Object.assign({},CFG0,S.cfg);S.old=S.old||{};S.provs=S.provs||[];S.models=S.models||[];
@@ -100,7 +113,7 @@ const fix=()=>{S.cfg=Object.assign({},CFG0,S.cfg);S.old=S.old||{};S.provs=S.prov
 const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
 let M=[],hd=0,pop=false;
 const BG={dusk:'linear-gradient(160deg,rgba(90,80,220,.2),rgba(220,80,160,.15))',forest:'linear-gradient(160deg,rgba(40,170,110,.2),rgba(40,120,200,.14))',ember:'linear-gradient(160deg,rgba(240,140,60,.22),rgba(220,60,90,.15))'};
-const bgOf=c=>c.bg==='avatar'&&c.img?`linear-gradient(color-mix(in srgb,var(--bg) 86%,transparent),color-mix(in srgb,var(--bg) 86%,transparent)),url(${c.img}) center/cover`:BG[c.bg]?BG[c.bg]+',var(--bg)':'';
+const bgOf=c=>(c.bg==='avatar'&&c.img||c.bg==='img'&&c.bgimg)?`linear-gradient(color-mix(in srgb,var(--bg) 86%,transparent),color-mix(in srgb,var(--bg) 86%,transparent)),url(${c.bg==='img'?c.bgimg:c.img}) center/cover`:BG[c.bg]?BG[c.bg]+',var(--bg)':'';
 const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
 const strip=t=>t.replace(/<[^>]*>/g,'').replace(/[*`]/g,'');
 const applyTheme=()=>{const t=S.cfg.theme;if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;const st=document.documentElement.style;st.setProperty('--fs',(S.cfg.fs||16)+'px');st.setProperty('--ff',S.cfg.ff==='sans'?'system-ui,sans-serif':'Literata,Georgia,serif')};
@@ -153,9 +166,9 @@ function thumb(file){return new Promise(r=>{const i=new Image(),url=URL.createOb
   x.drawImage(i,(i.width-m)/2,(i.height-m)/4>0?(i.height-m)/4:0,m,m,0,0,256,256);URL.revokeObjectURL(url);r(c.toDataURL('image/jpeg',.8))};
  i.onerror=()=>r('');i.src=url})}
 function normBook(j,name){const raw=j.entries||[],list=Array.isArray(raw)?raw:Object.values(raw);
- return{id:uid(),name:j.name||name||'Lorebook',entries:list.map(e=>({
+ return{id:uid(),name:j.name||name||'Lorebook',desc:j.description||'',tags:j.tags||[],cover:'',entries:list.map(e=>({
   name:e.comment||e.name||'',keys:[].concat(e.keys||e.key||[]).filter(Boolean),content:e.content||'',
-  constant:!!e.constant,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
+  constant:!!e.constant,sticky:e.sticky||0,delay:e.delay||0,cooldown:e.cooldown||0,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
 function addChar(j,img,fname){const d=j.data||j;if(!d.name)throw Error('No character data found');
  const c={id:uid(),name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',
   first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',ex:d.mes_example||'',sys:d.system_prompt||'',img};
@@ -174,28 +187,44 @@ async function importFiles(files){const msg=[];
  V.sheet={t:'info',m:msg.join('\n')+(saveErr?'\nStorage is full. Delete something to keep new imports.':'')};render()}
 $('#f').onchange=e=>{importFiles([...e.target.files]);e.target.value=''};
 const pick=()=>$('#f').click();
+$('#fi').onchange=async e=>{const f=e.target.files[0];if(f&&V.ed){const d={banner:[720,320],img:[256,256],bgimg:[540,960],cover:[720,360]}[V.pt]||[256,256];V.ed.o[V.pt]=await img2(f,d[0],d[1]);render()}e.target.value=''};
 $('#fa').onchange=async e=>{const c=C(),f=e.target.files[0];if(c&&f){c.img=await thumb(f);save();render()}e.target.value=''};
 
 /* ---------- chat ---------- */
 const P=()=>S.personas.find(p=>p.id===S.persona)||{name:'You',desc:''};
 const C=()=>S.chars.find(c=>c.id===V.chat);
 const rep=(s,c)=>(s||'').replace(/{{char}}/gi,c.name).replace(/{{user}}/gi,P().name);
-function lore(c,msgs){const text=msgs.slice(-6).map(m=>m.t).join('\n').toLowerCase(),out=[];
+let LF=[];
+function lore(c,msgs){LF=[];const out=[],turns=i=>msgs.slice(i+1).filter(x=>x.r==='u').length;
+ const hitIn=(e,ms)=>{const tx=ms.map(m=>m.t.toLowerCase()).join('\n');return e.keys.some(k=>{try{const m=/^\/(.+)\/([a-z]*)$/.exec(k);return m?new RegExp(m[1],m[2]||'i').test(tx):tx.includes(k.toLowerCase())}catch(x){return false}})};
  for(const id of S.links[c.id]||[]){const b=S.books.find(b=>b.id===id);if(!b)continue;
-  for(const e of b.entries){if(!e.on)continue;
-   const hit=e.constant||e.keys.some(k=>{try{const m=/^\/(.+)\/([a-z]*)$/.exec(k);return m?new RegExp(m[1],m[2]||'i').test(text):text.includes(k.toLowerCase())}catch(x){return false}});
-   if(hit)out.push(rep(e.content,c))}}
+  b.entries.forEach((e,ei)=>{if(!e.on)return;const fid=id+':'+ei;let hit=!!e.constant;
+   if(!hit&&e.keys.length&&hitIn(e,msgs.slice(-(6+2*(e.sticky||0))))){hit=true;if(e.delay){const f=msgs.findIndex(m=>hitIn(e,[m]));hit=f>=0&&turns(f)>=e.delay}}
+   if(hit&&e.cooldown&&msgs.filter(x=>x.r==='c').slice(-e.cooldown).some(x=>x.fl?.includes(fid)))hit=false;
+   if(hit){out.push(rep(e.content,c));LF.push(fid)}})}
  return out.slice(0,8).join('\n\n').slice(0,3000)}
+function rag(t,h){if(!t)return'';const w=x=>x.toLowerCase().match(/[a-z0-9']{4,}/g)||[],q=new Set(w(h.slice(-6).map(m=>strip(m.t)).join(' ')));
+ return t.split(/\n\s*\n/).map(p=>[p,w(p).filter(x=>q.has(x)).length]).filter(x=>x[1]>=2).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0].trim()).join('\n\n')}
+const hs=t=>{let h=0;for(let i=0;i<t.length;i++)h=(Math.imul(31,h)+t.charCodeAt(i))|0;return h};
+const cos=(a,b)=>{let d=0,x=0,y=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i]}return d/Math.sqrt(x*y||1)};
+async function embed(g,texts){const r=await fetch(g.url.replace(/\/$/,'')+'/embeddings',{method:'POST',headers:{'content-type':'application/json',...(g.key?{authorization:'Bearer '+g.key}:{})},body:JSON.stringify({model:g.model,input:texts})});if(!r.ok)throw Error(r.status);return(await r.json()).data.map(d=>d.embedding)}
+async function sem(c,h){const em=S.models.find(m=>m.id===S.cfg.emb),p=em&&S.provs.find(x=>x.id===em.pid);if(!p||p.fmt==='anthropic')return null;const g={url:p.url,key:p.key,model:em.mid},K=[];
+ const add=(t,k)=>(t||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean).forEach(x=>K.push({k,t:x}));add(c.rag,'r');add(P().rag,'r');
+ for(const id of S.links[c.id]||[])S.books.find(x=>x.id===id)?.entries.forEach(e=>{if(e.on&&!e.constant&&!e.keys.length)K.push({k:'l',t:e.content})});
+ if(!K.length)return null;S.emb=S.emb||{};const key=t=>em.mid+':'+t.length+':'+hs(t),need=[...new Set(K.map(x=>x.t))].filter(t=>!S.emb[key(t)]);
+ for(let i=0;i<need.length;i+=32){const v=await embed(g,need.slice(i,i+32));need.slice(i,i+32).forEach((t,j)=>S.emb[key(t)]=v[j])}
+ if(need.length)save();const qv=(await embed(g,[h.slice(-3).map(m=>strip(m.t)).join(' ').slice(-1000)||'.']))[0],sc=K.map(x=>({...x,s:cos(qv,S.emb[key(x.t)])})).sort((a,b)=>b.s-a.s);
+ return{rag:sc.filter(x=>x.k==='r'&&x.s>=.3).slice(0,3).map(x=>x.t).join('\n\n'),lore:sc.filter(x=>x.k==='l'&&x.s>=.35).slice(0,2).map(x=>rep(x.t,c))}}
 function resolve(c){const m=S.models.find(x=>x.id===(c?.model||S.cfg.am)),p=m&&S.provs.find(x=>x.id===m.pid);return m&&p?{url:p.url,key:p.key,fmt:p.fmt,model:m.mid,temp:m.temp??S.cfg.temp,top:m.top??S.cfg.top,max:m.max??S.cfg.max}:null}
 async function summarize(c){const mc=S.cfg.mem,h=S.chats[c.id];if(!mc.on||!h)return;
  const live=h.filter(x=>!x.mm),wait=live.slice(0,Math.max(0,live.length-(S.cfg.hist||40)));if(wait.length<mc.every)return;
  const batch=wait.slice(0,mc.per),g=resolve({model:mc.model||c.model});if(!g)return;
  try{const t=await llm('You write concise memory notes for a roleplay. Summarize the messages in 3 to 5 sentences, third person, keeping names, facts, promises and relationship changes. Output only the summary.',[{role:'user',content:batch.map(x=>(x.r==='u'?P().name:c.name)+': '+strip(x.t)).join('\n')}],()=>{},undefined,{...g,max:300});
   if(t.trim()){batch.forEach(x=>x.mm=1);batch[batch.length-1].mt=t.trim();save();toast('Memory saved')}}catch(e){}}
-function build(c,h,cont){const u=P().name,L=lore(c,h),mm=h.filter(x=>x.mt).slice(-(S.cfg.mem.keep||1e9)).map(x=>'- '+x.mt);
+function build(c,h,cont){const u=P().name,L=lore(c,h)+(V.sem?.lore?.length?'\n\n'+V.sem.lore.join('\n\n'):''),mm=h.filter(x=>x.mt).slice(-(S.cfg.mem.keep||1e9)).map(x=>'- '+x.mt),rg=V.sem?V.sem.rag:[rag(c.rag,h),rag(P().rag,h)].filter(Boolean).join('\n\n');
  const head=rep(S.cfg.sys,c)||`You are roleplaying as ${c.name} in an ongoing chat with ${u}. Stay in character and write only ${c.name}’s next reply. Never write ${u}’s words or actions.`;
  const sys=head+'\n\n'+(c.sys?rep(c.sys,c)+'\n\n':'')+`[${c.name}]\n${rep(c.desc,c)}\n`+(c.pers?`Personality: ${rep(c.pers,c)}\n`:'')+(c.scen?`Scenario: ${rep(c.scen,c)}\n`:'')+
- `\n[${u}]\n${rep(P().desc,c)||'(no description)'}\n`+(L?`\n[World info]\n${L}\n`:'')+(mm.length?`\n[Earlier in the story]\n${mm.join('\n')}\n`:'')+(c.ex?`\n[Example dialogue]\n${rep(c.ex,c)}\n`:'');
+ `\n[${u}]\n${rep(P().desc,c)||'(no description)'}${P().lore?'\n'+rep(P().lore,c):''}\n`+(L?`\n[World info]\n${L}\n`:'')+(rg?`\n[Relevant background]\n${rg}\n`:'')+(mm.length?`\n[Earlier in the story]\n${mm.join('\n')}\n`:'')+(c.ex?`\n[Example dialogue]\n${rep(c.ex,c)}\n`:'');
  const m=[];for(const x of h.filter(y=>!y.mm).slice(-(S.cfg.hist||40))){const r=x.r==='u'?'user':'assistant';if(m.length&&m[m.length-1].role===r)m[m.length-1].content+='\n\n'+x.t;else m.push({role:r,content:x.t})}
  if(cont)m.push({role:'user',content:`[Continue ${c.name}’s last message from exactly where it stopped. Do not repeat it.]`});
  if(!m.length||m[0].role!=='user')m.unshift({role:'user',content:'[Start of roleplay]'});
@@ -219,7 +248,7 @@ async function gen(mode='new'){const c=C(),h=S.chats[c.id],g=resolve(c);
  else{m=h[h.length-1];base=m.t;hist=h}
  V.busy=true;V.stick=true;V.ctl=new AbortController();render(true);
  const set=t=>{m.t=base+(t.startsWith(c.name+':')?t.slice(c.name.length+1).trimStart():t);m.s&&(m.s[m.i||0]=m.t)};
- try{const{sys,msgs}=build(c,hist,mode==='cont');await llm(sys,msgs,t=>{set(t);upd()},V.ctl.signal,g)}
+ try{V.sem=await sem(c,hist).catch(()=>null);const{sys,msgs}=build(c,hist,mode==='cont');m.fl=LF.slice();await llm(sys,msgs,t=>{set(t);upd()},V.ctl.signal,g)}
  catch(e){if(e.name!=='AbortError')V.sheet={t:'info',m:'Request failed: '+e.message+(/Failed to fetch|Load failed/.test(e.message)?'\nCheck the URL and key, and that the server allows browser (CORS) requests.':'')}}
  if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
  V.busy=false;V.ctl=null;save();render(V.stick);summarize(c)}
@@ -231,24 +260,24 @@ function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V
 
 /* ---------- views ---------- */
 const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc((c.name||'?')[0])}</div>`;
-function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
- if(s.t==='info')h=`<p style="white-space:pre-wrap;margin:0 0 4px">${esc(s.m)}</p><div class="acts"><button class="btn" data-a="close">OK</button></div>`;
- if(s.t==='edit')h=`<h2>Edit message</h2><textarea id="em" rows="8">${esc(S.chats[V.chat][s.i].t)}</textarea><div class="acts"><button class="btn" data-a="savem">Save</button><button class="btn s" data-a="close">Cancel</button></div>`;
- if(['appr','prov','instr','lim','upd','data'].includes(s.t)){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`,sel=(i,l,o,v)=>`<label>${l}</label><select id="g_${i}">${o.map(x=>`<option ${String(v)===String(x)?'selected':''}>${x}</option>`).join('')}</select>`;
+function cfgForm(t){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`,sel=(i,l,o,v)=>`<label>${l}</label><select id="g_${i}">${o.map(x=>`<option ${String(v)===String(x)?'selected':''}>${x}</option>`).join('')}</select>`;
   const T={appr:['Appearance',sel('theme','Theme',['auto','light','dark'],g.theme)+sel('fs','Text size (px)',[14,16,18,20],g.fs)+sel('ff','Font',['serif','sans'],g.ff)+`<label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label>`],
    prov:['Providers',`<label>Provider</label><select id="prov">${[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']].map(([v,n])=>`<option value="${v}" ${g.prov===v?'selected':''}>${n}</option>`).join('')}</select>`+f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('top','Top P',g.top,'type="number" step="0.05"')+`<p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>`],
    instr:['Instructions',`<label>System prompt</label><textarea id="g_sys" rows="9" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea>`],
    lim:['Limits',f('hist','Messages sent as history',g.hist,'type="number"')+f('max','Max reply tokens',g.max,'type="number"')],
    upd:['Updates',f('repo','GitHub owner/repo',g.repo)+f('gh','GitHub token (private repos only)',g.gh,'type="password"')+`<button class="btn s" data-a="upd" style="margin-top:8px">Check for updates (v${VER})</button>`],
-   data:['Backup',`<p class="note">Backups include avatars, chats, and your API key.</p><div class="acts"><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button></div>`]}[s.t];
-  h=`<h2>${T[0]}</h2>${T[1]}<div class="acts"><button class="btn" data-a="savecfg">${s.t==='data'?'Done':'Save'}</button><button class="btn s" data-a="close">Cancel</button></div>`}
+   data:['Backup',`<p class="note">Backups include avatars, chats, and your API key.</p><div class="acts"><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button></div>`]}[t];
+ return T}
+function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
+ if(s.t==='info')h=`<p style="white-space:pre-wrap;margin:0 0 4px">${esc(s.m)}</p><div class="acts"><button class="btn" data-a="close">OK</button></div>`;
+ if(s.t==='edit')h=`<h2>Edit message</h2><textarea id="em" rows="8">${esc(S.chats[V.chat][s.i].t)}</textarea><div class="acts"><button class="btn" data-a="savem">Save</button><button class="btn s" data-a="close">Cancel</button></div>`;
  if(s.t==='char'){const c=C(),f=(k,l,r)=>`<label>${l}</label><textarea id="c_${k}" rows="${r}">${esc(c[k])}</textarea>`;
   h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="avp">Avatar</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='add')h=`<h2>Add</h2><div class="acts" style="flex-direction:column;margin-top:0"><button class="btn" data-a="imp2">Import cards or lorebooks</button><button class="btn s" data-a="newc">Create a character</button></div>`;
  if(s.t==='find')h=`<h2>Search chat</h2><input id="fq" placeholder="Search messages" autocomplete="off"><div id="fr" style="margin-top:8px"></div><div class="acts"><button class="btn s" data-a="close">Close</button></div>`;
  if(s.t==='chats'){const c=C(),o=S.old[c.id]||[];h=`<h2>Chats with ${esc(c.name)}</h2>`+(o.length?o.map(x=>`<div class="row" data-a="sw" data-id="${x.id}"><div class="t"><b>${esc(strip(x.msgs.find(m=>m.r==='u')?.t||'Chat').slice(0,50))}</b><small>${new Date(x.t).toLocaleDateString()} · ${x.msgs.length} messages</small></div><button class="ib" data-a="delold" data-id="${x.id}">Delete</button></div>`).join(''):'<p class="note">No other chats yet. Use New chat to start another one; this chat is kept here.</p>')+`<div class="acts"><button class="btn" data-a="close">Done</button></div>`}
  if(s.t==='set'){const c=C();h=`<h2>${esc(c.name)}</h2><label>Persona</label><select id="ps"><option value="">You (default)</option>${S.personas.map(p=>`<option value="${p.id}" ${p.id===S.persona?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
-  <label>Reply model</label><select id="rm"><option value="">Default</option>${S.models.map(m=>`<option value="${m.id}" ${c.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select><label>Chat background</label><select id="bgs">${[['','None'],['dusk','Dusk'],['forest','Forest'],['ember','Ember'],['avatar','Avatar blur']].map(([v,n])=>`<option value="${v}" ${(c.bg||'')===v?'selected':''}>${n}</option>`).join('')}</select><label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
+  <label>Reply model</label><select id="rm"><option value="">Default</option>${S.models.map(m=>`<option value="${m.id}" ${c.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select><label>Chat background</label><select id="bgs">${[['','None'],['dusk','Dusk'],['forest','Forest'],['ember','Ember'],['avatar','Avatar blur'],['img','Custom image']].map(([v,n])=>`<option value="${v}" ${(c.bg||'')===v?'selected':''}>${n}</option>`).join('')}</select><label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
   <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="find">Search</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="newchat">New chat</button><button class="btn s" data-a="chats">Chats (${(S.old[c.id]||[]).length})</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
  if(s.t==='persona'){const p=s.p;h=`<h2>${p.id?'Edit':'New'} persona</h2><label>Name</label><input id="pn" value="${esc(p.name)}"><label>Description</label><textarea id="pd" rows="5" placeholder="Who are you in the story?">${esc(p.desc)}</textarea>
   <div class="acts"><button class="btn" data-a="savep">Save</button><button class="btn s" data-a="close">Cancel</button>${p.id?'<button class="btn s" data-a="usep">Use</button><button class="btn d" data-a="delp">Delete</button>':''}</div>`}
@@ -257,37 +286,76 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
  return`<div class="sheet" data-a="bg"><div><i class="grab"></i>${h}</div></div>`}
 const msgHtml=(x,i,m,c)=>{const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
  return `<div class="msg ${x.r}">${x.r==='c'?av(c):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${last&&x.r==='c'&&!V.busy?swb(x):''}${V.edit===i?`<div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">▶</button>`:''}</div>`:''}</div></div>`};
-const PG2=['providers','import','memory'];
-const PG={prov:'providers',imp:'import',mem:'memory'};
+async function img2(file,w,h){const an=file.size<1.5e6&&(/gif|webp/.test(file.type)||(file.type==='image/png'&&new TextDecoder('latin1').decode(new Uint8Array(await file.arrayBuffer())).includes('acTL')));if(an)return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});return new Promise(r=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/i.width,h/i.height),dw=i.width*k,dh=i.height*k;x.drawImage(i,(w-dw)/2,(h-dh)/2,dw,dh);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.8))};i.onerror=()=>r('');i.src=u})}
+function syncEd(){if(!V.ed)return;const o=V.ed.o;document.querySelectorAll('[id^="f_"]').forEach(e=>{const k=e.id.slice(2);o[k]=e.type==='checkbox'?e.checked:e.type==='number'?(+e.value||0):e.value});
+ const g=[...document.querySelectorAll('[id^="gr_"]')];if(g.length)o.greets=g.map(e=>e.value)}
+function addTag(el){syncEd();const k=el.dataset.tag,v=el.value.trim().replace(/^#/,''),a=V.ed.o[k];if(v&&!a.includes(v)&&a.length<(k==='keys'?24:10))a.push(v);render();setTimeout(()=>$('#tag_'+k)?.focus(),30)}
+function edit(k,id){const back={tab:V.tab,chat:V.chat};V.sheet=null;let o;
+ if(k==='c'){const c=S.chars.find(x=>x.id===id);o=c?{...c,tags:[...(c.tags||[])],greets:[c.first||'',...(c.alts||[])],links:[...(S.links[c.id]||[])]}:{name:'',desc:'',pers:'',scen:'',ex:'',sys:'',rag:'',tags:[],greets:[''],links:[],img:'',banner:'',bgimg:''}}
+ if(k==='p'){const p=S.personas.find(x=>x.id===id);o=p?{...p,active:p.id===S.persona}:{name:'',desc:'',lore:'',rag:'',img:'',banner:'',active:false}}
+ if(k==='l'){const b=S.books.find(x=>x.id===id);o=b?{name:b.name,desc:b.desc||'',tags:[...(b.tags||[])],cover:b.cover||''}:{name:'',desc:'',tags:[],cover:''}}
+ if(k==='e'){const e=S.books.find(x=>x.id===V.bk).entries[id];o=e?{...e,keys:[...e.keys]}:{name:'',keys:[],content:'',constant:false,delay:0,cooldown:0,sticky:0,on:true}}
+ V.ed={k,id,o,isNew:k==='e'?id==null:!id,back};V.chat=null;V.tab='editor';render()}
+function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook',e:'Entry'}[k];
+ const lab=(t,key)=>`<label class="lc"><span>${t}</span><span>${(o[key]||'').length}</span></label>`,
+  ta=(key,t,ph,r=4)=>lab(t,key)+`<textarea id="f_${key}" rows="${r}" placeholder="${ph}">${esc(o[key])}</textarea>`,
+  inp=(key,t,ph)=>`<label>${t}</label><input id="f_${key}" value="${esc(o[key])}" placeholder="${ph}">`,
+  tags=(key,t,d,ph)=>`<label>${t}</label><p class="ps" style="margin:0 0 8px">${d}</p><div class="tags">${o[key].map((x,i)=>`<span class="chip">${key==='tags'?'#':''}${esc(x)}<b data-a="rmtag" data-k="${key}" data-i="${i}">×</b></span>`).join('')}</div><input id="tag_${key}" data-tag="${key}" placeholder="${ph}" autocomplete="off" enterkeyhint="done">`,
+  box=(t,key)=>`<label>${t}</label><div class="bx" data-a="pimg" data-t="${key}">${o[key]?`<img src="${o[key]}" alt="">`:'<i>+</i>'}</div>`,
+  photos=`<label>Photos</label><div class="ph2"><div class="bx" data-a="pimg" data-t="banner">${o.banner?`<img src="${o.banner}" alt="">`:'<i>+</i>'}</div><div class="cr" data-a="pimg" data-t="img">${o.img?`<img src="${o.img}" alt="">`:'<i>+</i>'}</div></div>`,
+  chk=(key,t,d)=>`<label class="card2 pad chk2"><input type="checkbox" id="f_${key}" ${o[key]?'checked':''}><b>${t}</b><span class="ps" style="margin:0;font-size:15px">${d}</span></label>`;
+ let h=`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="edback" aria-label="Back">‹</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main><h1 class="pt">${isNew?'Build a':'Edit'} ${N}</h1>`;
+ if(k==='c')h+=photos+box('Chat background','bgimg')+'<p class="ps">Shown behind the messages of every chat with this character.</p>'+inp('name','Character Name','Enter character name...')+ta('desc','Description','Who this character is',4)+ta('pers','Personality','Traits and temperament',3)+ta('scen','Scenario','Where and when this takes place',3)+tags('tags','Tags','What is this character into? Press Enter to add.','Add a tag...')
+  +`<label>Greeting Messages</label><p class="ps" style="margin:0 0 8px">Users can swipe between these alternative greetings on the first message.</p>`+o.greets.map((g,i)=>`<div class="rowh"><label style="margin:12px 0 5px">Greeting Variation #${i+1}</label><span><button class="ib" data-a="gmv" data-i="${i}" data-d="-1">▲</button><button class="ib" data-a="gmv" data-i="${i}" data-d="1">▼</button><button class="ib" data-a="grm" data-i="${i}">✕</button></span></div><textarea id="gr_${i}" rows="4" placeholder="Greeting Variation #${i+1}...">${esc(g)}</textarea>`).join('')+`<button class="dash" data-a="gadd">+ Add Greeting Variation</button>`
+  +ta('ex','Definition','Describe your character’s voice, syntax, rules, behaviors, and example dialogue.',8)+`<details><summary>System prompt override</summary><textarea id="f_sys" rows="3">${esc(o.sys)}</textarea></details>`+ta('rag','RAG Definition','World facts, history, and relationships, one paragraph per topic. Retrieved as needed.',8)
+  +`<label>Lorebooks</label><p class="ps" style="margin:0 0 8px">Attach worlds you wrote once and reuse everywhere. Entries only enter a chat when the conversation calls for them.</p><p class="ps"><b>${o.links.length} attached</b></p>`+S.books.map(b=>`<label class="card2 lbk"><input type="checkbox" data-lk="${b.id}" ${o.links.includes(b.id)?'checked':''}>${b.cover?`<img src="${b.cover}" alt="">`:'<span class="lph">📖</span>'}<span><b>${esc(b.name)}</b><small>${b.entries.length} entries</small></span></label>`).join('');
+ if(k==='p')h+=photos+inp('name','Name','Who are you in this story?')+ta('desc','Description','How this persona talks and acts.',4)+ta('lore','Lore','Backstory and facts the AI should know about you.',8)+ta('rag','RAG lore','Facts to look up mid-chat, one paragraph per topic.',8)+chk('active','Use this persona','Sets it as your active persona.');
+ if(k==='l')h+=box('Cover','cover')+inp('name','Name','The Ashfall Reaches')+ta('desc','Description','What world does this cover?',4)+tags('tags','Tags','Up to 10 tags.','Add a tag...');
+ if(k==='e')h+=inp('name','Title','The Iron Citadel')+tags('keys','Keywords',`${o.keys.length} of 24. A keyword in the conversation forces this entry in.`,'Add a keyword...')+ta('content','Content','What the AI should know when this entry fires.',10)+chk('constant','Always on','Injects this entry every turn without needing a keyword.')
+  +`<div class="three"><div><label>Delay</label><input id="f_delay" type="number" value="${o.delay||0}"></div><div><label>Cooldown</label><input id="f_cooldown" type="number" value="${o.cooldown||0}"></div><div><label>Sticky</label><input id="f_sticky" type="number" value="${o.sticky||0}"></div></div><p class="ps" style="margin-top:10px">Delay: turns to wait after keyword first appears. Cooldown: turns it stays silent after firing. Sticky: turns it lingers after keyword disappears.</p>`+chk('on','Enabled','Disabled entries never fire.');
+ return h+`<div class="foot"><button class="lnk big" data-a="edback">Cancel</button><button class="btn wide" data-a="edsave">${isNew?'Create':'Save'} ${N}</button></div>${isNew?'':'<button class="btn d" style="width:100%;margin-top:12px" data-a="eddel">Delete</button>'}<div style="height:40px"></div></main>`}
+function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab='lore';return listHtml()}
+ return `<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">‹</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">✎ Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">▲</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">▼</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
+const PG2=['providers','import','memory','appr','instr','lim','upd','sec'];
+async function hsh(p,salt){if(!crypto.subtle)return btoa(unescape(encodeURIComponent(salt+p)));return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+p)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function lockHtml(){const pn=S.persona?P().name:'',ini=esc((pn||'H')[0]),br='<h1 class="brand">Hearth</h1>';
+ if(V.loading)return`<div class="lock">${br}</div>`;
+ if(V.forgot)return`<div class="lock">${br}<h2>Forgot password?</h2><p class="ps" style="text-align:center">There is no recovery. Erasing deletes every chat, character, lorebook and key on this device.</p><input id="er" placeholder="Type ERASE to confirm" autocomplete="off"><button class="btn wide danger" data-a="erase" style="width:100%">Erase everything</button><button class="lnk" data-a="unforgot">Back</button></div>`;
+ return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="av xl">${ini}</div><b style="font-size:20px">${esc(pn||'Hearth')}</b><label style="align-self:flex-start;margin:6px 0 0">Password</label><div class="pw"><input id="lk" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="lk">👁</button></div><button class="btn wide" data-a="unlock" style="width:100%">Unlock</button><button class="lnk" data-a="forgot">Forgot password?</button></div>`}
+const PG={prov:'providers',imp:'import',mem:'memory',appr:'appr',instr:'instr',lim:'lim',upd:'upd',sec:'sec'};
 const mask=k=>k?(k.length>9?k.slice(0,4)+'…'+k.slice(-4):'••••'):'no key';
 const pill=(a,l)=>`<button class="pill" data-a="${a}">+ ${l}</button>`;
+const SUB={appr:'Theme, text size and font. Changes save automatically.',instr:'How the AI is told to roleplay.',lim:'History length and reply size.',upd:'Check for a new release from the update source.'};
 function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="tab" data-id="settings" aria-label="Back">‹</button></header><main>`,
  title=(t,d)=>`<h1 class="pt">${t}</h1><p class="ps">${d}</p>`;
+ if(SUB[T]){const f=cfgForm(T);return hd+title(f[0],SUB[T])+f[1]+'</main>'}
  if(T==='import'){const ic=(t,d,a,l)=>`<div class="card2 pad"><div class="rowh" style="align-items:flex-start;gap:14px"><div><b>${t}</b><p class="ps" style="margin:6px 0 0;font-size:15px">${d}</p></div><button class="btn s" data-a="${a}" style="flex:none">${l}</button></div></div>`;
   return hd+title('Import','Bring characters and lorebooks from other apps.')+ic('Back up this device','Save everything to one file. API keys are never included.','bak','Save backup')+ic('Restore a backup','Load a file saved with Save backup. Your keys stay as they are.','rest','Choose file')+ic('SillyTavern characters','Character cards: JSON or PNG (V2, V3). Embedded lorebooks are imported too.','imp','Choose file')+ic('SillyTavern lorebooks','World Info JSON files.','imp','Choose file')+'</main>'}
  if(T==='memory'){const mc=S.cfg.mem,stp=(k,t,d)=>`<h2 class="h2">${t}</h2><div class="card2 pad"><div class="rowh"><p class="ps" style="margin:0;font-size:15px;flex:1">${d}</p><div class="step"><button data-a="st" data-k="${k}" data-d="-1">−</button><b>${mc[k]}</b><button data-a="st" data-k="${k}" data-d="1">+</button></div></div></div>`;
-  return hd+title('Memory','Older messages are summarized into memories so long chats stay coherent.')+`<h2 class="h2">Long-term memory</h2><select id="mem_on"><option ${mc.on?'':'selected'}>Off</option><option ${mc.on?'selected':''}>On</option></select><h2 class="h2">Summary model</h2><p class="ps" style="margin-top:-4px">Empty means each chat’s own reply model.</p><select id="mem_m"><option value="">Chat’s own reply model</option>${S.models.map(m=>`<option value="${m.id}" ${mc.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select>`+stp('every','Messages per memory run','New memories are written after this many older messages pile up.')+stp('per','Messages summarized per run','How many of the oldest waiting messages each run summarizes.')+stp('keep','Memories kept per chat','Older memories are dropped past this. Zero keeps everything.')+'</main>'}
+  return hd+title('Memory','Older messages are summarized into memories so long chats stay coherent.')+`<h2 class="h2">Embedding model</h2><p class="ps" style="margin-top:-4px">Retrieves RAG paragraphs and keyword-less lorebook entries by meaning. Mark a model as an embedding model in Providers. Empty uses keyword matching.</p><select id="emb_m"><option value="">None (keyword matching)</option>${S.models.filter(m=>m.emb).map(m=>`<option value="${m.id}" ${S.cfg.emb===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select><h2 class="h2">Long-term memory</h2><select id="mem_on"><option ${mc.on?'':'selected'}>Off</option><option ${mc.on?'selected':''}>On</option></select><h2 class="h2">Summary model</h2><p class="ps" style="margin-top:-4px">Empty means each chat’s own reply model.</p><select id="mem_m"><option value="">Chat’s own reply model</option>${S.models.map(m=>`<option value="${m.id}" ${mc.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select>`+stp('every','Messages per memory run','New memories are written after this many older messages pile up.')+stp('per','Messages summarized per run','How many of the oldest waiting messages each run summarizes.')+stp('keep','Memories kept per chat','Older memories are dropped past this. Zero keeps everything.')+'</main>'}
+ if(T==='sec'){const L=S.lock?.hash,f=(id,l)=>`<label>${l}</label><div class="pw"><input id="${id}" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="${id}">👁</button></div>`;
+  return hd+title('Security','Lock Hearth with a password. The lock hides your chats when the app opens or returns from the background.')+(L?f('s_cur','Current password'):'')+f('s_new',L?'New password':'Password')+f('s_cf','Confirm password')+`<div class="acts"><button class="btn wide" data-a="lockset">${L?'Update password':'Set password'}</button>${L?'<button class="btn s" data-a="locknow">Lock now</button>':''}</div>`+(L?`<div class="card2 pad" style="margin-top:24px;border-color:var(--dg)"><b style="color:var(--dg)">Remove password</b><span class="ps" style="margin:0">Turns the lock off. Requires your current password.</span><button class="btn d" data-a="lockrm" style="align-self:flex-start">Remove password</button></div>`:'')+'<p class="ps" style="margin-top:22px">This is a screen lock. Data on the device is not encrypted, and there is no recovery if you forget the password except erasing the app’s data.</p></main>'}
  const pn=id=>S.provs.find(p=>p.id===id)?.name||'?',ib=(a,id,i,x='')=>`<button class="ib ${x}" data-a="${a}" data-id="${id}">${i}</button>`;
  let h=hd+title('Providers','Connect providers and register the models you chat with.')+`<div class="rowh"><h2 class="h2" style="margin:0">Custom providers</h2>${pill('addprov','Add provider')}</div>`;
  if(F?.k==='prov'){const p=F.p;h+=`<div class="card2 pad" style="margin-top:14px"><div class="rowh"><b>${p.id?'Edit':'Add custom'} provider</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>PROVIDER NAME *</label><input id="p_n" value="${esc(p.name)}" placeholder="e.g. My local LLM"><label>API KEY</label><input id="p_k" type="password" value="${esc(p.key)}" placeholder="Optional for local endpoints"><label>BASE URL *</label><input id="p_u" value="${esc(p.url)}" placeholder="e.g. http://localhost:1234/v1"><label>API FORMAT</label><select id="p_f"><option value="openai" ${p.fmt==='openai'?'selected':''}>OpenAI</option><option value="anthropic" ${p.fmt==='anthropic'?'selected':''}>Anthropic</option></select><div class="acts"><button class="btn" data-a="savep2">Save provider</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`}
  h+=`<div style="height:14px"></div>`+(S.provs.map(p=>`<div class="card2 pad"><div class="rowh"><b>🌐 ${esc(p.name)}</b><span>${ib('editprov',p.id,'⚙')}${ib('delprov',p.id,'🗑','dg')}</span></div><code>${esc(p.url)}</code><div><span class="badge">${p.fmt==='anthropic'?'Anthropic':'OpenAI'}</span> <code>${esc(mask(p.key))}</code></div></div>`).join('')||'<p class="ps">No providers yet. Add one to get started.</p>');
  h+=`<div class="rowh" style="margin-top:26px"><h2 class="h2" style="margin:0">Model registry</h2>${pill('addmodel','Add model')}</div><div style="height:14px"></div>`;
- if(F?.k==='model'){const m=F.m;h+=`<div class="card2 pad"><div class="rowh"><b>${m.id?'Edit':'Configure'} model</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>SELECT PROVIDER</label><select id="m_p">${S.provs.map(p=>`<option value="${p.id}" ${p.id===m.pid?'selected':''}>${esc(p.name)}</option>`).join('')}</select><label>MODEL ID</label><input id="m_i" value="${esc(m.mid)}" placeholder="e.g. gpt-4o"><label>DISPLAY NAME</label><input id="m_n" value="${esc(m.name)}" placeholder="e.g. My Claude"><details><summary>Advanced: sampling (empty means default)</summary><label>TEMPERATURE</label><input id="m_t" type="number" step="0.05" value="${m.temp??''}"><label>TOP P</label><input id="m_o" type="number" step="0.05" value="${m.top??''}"><label>MAX REPLY TOKENS</label><input id="m_x" type="number" value="${m.max??''}"></details><div class="acts"><button class="btn" data-a="savem2">Save model</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`}
- h+=S.models.map(m=>`<div class="card2 pad ${m.id===S.cfg.am?'act':''}" data-a="usem" data-id="${m.id}"><b>${esc(m.name||m.mid)}</b><span class="ps" style="margin:0">${esc(pn(m.pid))}</span><code>${esc(m.mid)}</code><div class="rowh"><span class="badge ok">${m.id===S.cfg.am?'Active':'Ready'}</span><span>${ib('editmodel',m.id,'⚙')}${ib('delmodel',m.id,'🗑','dg')}</span></div></div>`).join('')||'<p class="ps">No models yet. Tap Add model after adding a provider.</p>';
+ if(F?.k==='model'){const m=F.m;h+=`<div class="card2 pad"><div class="rowh"><b>${m.id?'Edit':'Configure'} model</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>SELECT PROVIDER</label><select id="m_p">${S.provs.map(p=>`<option value="${p.id}" ${p.id===m.pid?'selected':''}>${esc(p.name)}</option>`).join('')}</select><label>MODEL ID</label><input id="m_i" value="${esc(m.mid)}" placeholder="e.g. gpt-4o"><label>DISPLAY NAME</label><input id="m_n" value="${esc(m.name)}" placeholder="e.g. My Claude"><label class="chk"><input type="checkbox" id="m_e" ${m.emb?'checked':''}>Embedding model (for retrieval, not chat)</label><details><summary>Advanced: sampling (empty means default)</summary><label>TEMPERATURE</label><input id="m_t" type="number" step="0.05" value="${m.temp??''}"><label>TOP P</label><input id="m_o" type="number" step="0.05" value="${m.top??''}"><label>MAX REPLY TOKENS</label><input id="m_x" type="number" value="${m.max??''}"></details><div class="acts"><button class="btn" data-a="savem2">Save model</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`}
+ h+=S.models.map(m=>`<div class="card2 pad ${m.id===S.cfg.am?'act':''}" data-a="usem" data-id="${m.id}"><b>${esc(m.name||m.mid)}</b><span class="ps" style="margin:0">${esc(pn(m.pid))}</span><code>${esc(m.mid)}</code><div class="rowh"><span class="badge ok">${m.emb?'Embedding':m.id===S.cfg.am?'Active':'Ready'}</span><span>${ib('editmodel',m.id,'⚙')}${ib('delmodel',m.id,'🗑','dg')}</span></div></div>`).join('')||'<p class="ps">No models yet. Tap Add model after adding a provider.</p>';
  return h+'<div style="height:40px"></div></main>'}
 function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
  if(k==='c')return`<div class="hc" data-a="open" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(x.name[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
- if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}"><div class="ph">${esc((x.name||'?')[0])}</div><div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
- return`<div class="hc" data-a="book" data-id="${x.id}"><div class="ph">📖</div><div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
+ if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc((x.name||'?')[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
+ return`<div class="hc" data-a="book" data-id="${x.id}">${x.cover?`<img src="${x.cover}" alt="">`:'<div class="ph">📖</div>'}<div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
 const nc=(a,l)=>`<div class="hc nc" data-a="${a}"><i>+</i><b>${l}</b></div>`;
 function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
  const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
- if(PG2.includes(T))return pageHtml(T);
+ if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
  if(T==='settings'){const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
   return back('Settings')+`</header><main><div class="card2"><div class="srow" data-a="tab" data-id="pers"><div class="av">${esc((pn||'?')[0])}</div><div class="t"><b>${esc(pn||'No persona yet')}</b><small>Active persona</small></div><span class="chev">›</span></div></div>
-  <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',S.models.length+' models')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}</div></main>`}
+  <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',S.models.length+' models')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}</div></main>`}
  if(T!=='home'){const k={chars:'c',lore:'l',pers:'p'}[T],items=k==='c'?[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)):k==='l'?S.books:S.personas;
-  return back({chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T])+`${T!=='pers'?'<button class="ib" data-a="imp">Import</button>':''}</header><main>${k==='c'&&items.length>6?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc(k==='c'?'newc':k==='p'?'newp':'imp',k==='c'?'New character':k==='p'?'New persona':'Import lorebook')}${items.map(x=>card(k,x)).join('')}</div></main>`}
+  return back({chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T])+`${T!=='pers'?'<button class="ib" data-a="imp">Import</button>':''}</header><main>${k==='c'&&items.length>6?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc(k==='c'?'newc':k==='p'?'newp':'newl',k==='c'?'New character':k==='p'?'New persona':'New lorebook')}${items.map(x=>card(k,x)).join('')}</div></main>`}
  const sec=(t,n,k,items,add)=>`<div class="sh2" data-a="tab" data-id="${k}"><h2>${t}<span>${n}</span></h2><i>›</i></div><div class="hs">${add}${items.slice(0,12).map(x=>card({chars:'c',lore:'l',pers:'p'}[k],x)).join('')}</div>`;
  const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
  return`<header><h1 class="wm">Hearth</h1><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>
@@ -295,8 +363,9 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  ${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
  ${sec('Your Characters',S.chars.length,'chars',rc,nc('newc','New character')+(S.chars.length?'':nc('imp','Import')))}
  ${sec('Your Personas',S.personas.length,'pers',S.personas,nc('newp','New persona'))}
- ${sec('Lorebooks',S.books.length,'lore',S.books,nc('imp','Import lorebook'))}</main>`}
-function render(scroll){const a=$('#app');if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
+ ${sec('Lorebooks',S.books.length,'lore',S.books,nc('newl','New lorebook'))}</main>`}
+function render(scroll){const a=$('#app');if(V.loading||V.locked){a.innerHTML=lockHtml();return}
+ if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
   const hd=`<header><button class="ib big" data-a="back" aria-label="Back">‹</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">⋯</button></header>`,
@@ -316,8 +385,37 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  if(a==='bg'&&e.target!==t)return;if(a==='bg'||a==='close'){V.sheet=null;return render()}
  if(V.busy&&!['stop','back'].includes(a)&&!['info'].includes(V.sheet?.t))return;
  const c=V.chat&&C();
- ({imp:pick,tab:()=>{V.tab=id;V.form=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
+ ({imp:pick,tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
+  eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
+  lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={salt,hash:await hsh(n,salt)};save();toast('Password saved');render()},
+  lockrm:async()=>{if(await hsh($('#s_cur').value,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');S.lock=null;save();toast('Password removed');render()},
+  locknow:()=>{V.locked=true;render()},
+  unlock:async()=>{if(await hsh($('#lk').value,S.lock.salt)===S.lock.hash){V.locked=false;V.forgot=false;render()}else{toast('Wrong password');$('#lk').value=''}},
+  forgot:()=>{V.forgot=true;render()},unforgot:()=>{V.forgot=false;render()},
+  erase:async()=>{if($('#er').value.trim()!=='ERASE')return toast('Type ERASE to confirm');S={chars:[],books:[],personas:[],chats:{},links:{},persona:null,old:{},provs:[],models:[]};fix();if(idbOK)await idbSet(S);try{localStorage.clear()}catch(e){}V.locked=false;V.forgot=false;V.tab='home';V.chat=null;render()},
+  newc:()=>edit('c'),editc:()=>edit('c',V.chat),newp:()=>edit('p'),editp:()=>edit('p',id),newl:()=>edit('l'),editbook:()=>edit('l',V.bk),newentry:()=>edit('e',null),editentry:()=>edit('e',i),
+  book:()=>{V.bk=id;V.tab='book';render()},
+  pimg:()=>{syncEd();V.pt=t.dataset.t;$('#fi').click()},
+  rmtag:()=>{syncEd();V.ed.o[t.dataset.k].splice(i,1);render()},
+  gadd:()=>{syncEd();V.ed.o.greets.push('');render()},
+  grm:()=>{syncEd();const g=V.ed.o.greets;if(g.length>1)g.splice(i,1);else g[0]='';render()},
+  gmv:()=>{syncEd();const g=V.ed.o.greets,j=i+(+t.dataset.d);if(j>=0&&j<g.length){[g[i],g[j]]=[g[j],g[i]];render()}},
+  emv:()=>{const e=S.books.find(x=>x.id===V.bk).entries,j=i+(+t.dataset.d);if(j>=0&&j<e.length){[e[i],e[j]]=[e[j],e[i]];save();render()}},
+  edback:()=>{const b=V.ed.back;V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render()},
+  edsave:()=>{syncEd();const{k,id,o}=V.ed,b=V.ed.back,go=()=>{V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render()};
+   if(k==='c'){if(!o.name.trim())return toast('Name is required');let c=S.chars.find(x=>x.id===id);if(!c){c={id:uid()};S.chars.push(c)}
+    Object.assign(c,{name:o.name.trim(),desc:o.desc,pers:o.pers,scen:o.scen,ex:o.ex,sys:o.sys,rag:o.rag,tags:o.tags,img:o.img,banner:o.banner,bgimg:o.bgimg,first:o.greets[0]||'',alts:o.greets.slice(1).filter(Boolean)});if(o.bgimg&&!c.bg)c.bg='img';S.links[c.id]=o.links;save();return go()}
+   if(k==='p'){if(!o.name.trim())return toast('Name is required');let p=S.personas.find(x=>x.id===id);if(!p){p={id:uid()};S.personas.push(p)}Object.assign(p,{name:o.name.trim(),desc:o.desc,lore:o.lore,rag:o.rag,img:o.img,banner:o.banner});
+    if(o.active)S.persona=p.id;else if(S.persona===p.id)S.persona=null;if(!S.persona&&V.ed.isNew)S.persona=p.id;save();return go()}
+   if(k==='l'){if(!o.name.trim())return toast('Name is required');let l=S.books.find(x=>x.id===id);if(!l){l={id:uid(),entries:[]};S.books.push(l)}Object.assign(l,{name:o.name.trim(),desc:o.desc,tags:o.tags,cover:o.cover});save();V.bk=l.id;V.ed=null;V.tab='book';return render()}
+   const bk=S.books.find(x=>x.id===V.bk),e={name:o.name,keys:o.keys,content:o.content,constant:!!o.constant,delay:o.delay,cooldown:o.cooldown,sticky:o.sticky,on:o.on!==false};if(id==null)bk.entries.push(e);else bk.entries[id]=e;save();go()},
+  eddel:()=>{const{k,id}=V.ed,b=V.ed.back;
+   if(k==='c'){S.chars=S.chars.filter(x=>x.id!==id);delete S.chats[id];delete S.links[id];delete S.old[id]}
+   if(k==='p'){S.personas=S.personas.filter(x=>x.id!==id);if(S.persona===id)S.persona=null}
+   if(k==='l'){S.books=S.books.filter(x=>x.id!==id);for(const q in S.links)S.links[q]=S.links[q].filter(x=>x!==id);V.ed=null;V.tab='lore';save();return render()}
+   if(k==='e')S.books.find(x=>x.id===V.bk).entries.splice(id,1);
+   save();V.ed=null;V.tab=b.tab;render()},
   addprov:()=>{V.form={k:'prov',p:{name:'',key:'',url:'',fmt:'openai'}};render()},
   editprov:()=>{V.form={k:'prov',p:{...S.provs.find(x=>x.id===id)}};render()},
   fcancel:()=>{V.form=null;render()},
@@ -326,12 +424,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   addmodel:()=>{if(!S.provs.length)return toast('Add a provider first');V.form={k:'model',m:{pid:S.provs[0].id,mid:'',name:''}};render()},
   editmodel:()=>{V.form={k:'model',m:{...S.models.find(x=>x.id===id)}};render()},
   savem2:()=>{const m=V.form.m,mid=$('#m_i').value.trim();if(!mid)return toast('Model ID is required');const n=v=>{const x=$('#'+v).value;return x===''?undefined:+x};
-   Object.assign(m,{pid:$('#m_p').value,mid,name:$('#m_n').value.trim()||mid,temp:n('m_t'),top:n('m_o'),max:n('m_x')});
+   Object.assign(m,{pid:$('#m_p').value,mid,name:$('#m_n').value.trim()||mid,temp:n('m_t'),top:n('m_o'),max:n('m_x'),emb:$('#m_e').checked});
    if(m.id)Object.assign(S.models.find(x=>x.id===m.id),m);else{m.id=uid();S.models.push(m);if(!S.cfg.am)S.cfg.am=m.id}V.form=null;save();render()},
   delmodel:()=>{S.models=S.models.filter(x=>x.id!==id);if(S.cfg.am===id)S.cfg.am=S.models[0]?.id;save();render()},
-  usem:()=>{S.cfg.am=id;save();render()},
-  st:()=>{const k=t.dataset.k,m=S.cfg.mem;m[k]=Math.max(k==='keep'?0:1,m[k]+(+t.dataset.d)*(k==='keep'?10:1));save();render()},home:()=>{V.tab='home';render()},sh:()=>{V.sheet={t:id};render()},usep:()=>{S.persona=V.sheet.p.id;V.sheet=null;save();render()},addm:()=>{V.sheet={t:'add'};render()},imp2:()=>{V.sheet=null;render();pick()},avp:()=>$('#fa').click(),
-  newc:()=>{const n={id:uid(),name:'New character',desc:'',pers:'',scen:'',first:'',ex:'',sys:'',alts:[],img:''};S.chars.push(n);save();V.sheet=null;openChat(n.id);V.sheet={t:'char'};render()},
+  usem:()=>{if(S.models.find(x=>x.id===id)?.emb)return toast('Embedding models can’t be used for chat');S.cfg.am=id;save();render()},
+  st:()=>{const k=t.dataset.k,m=S.cfg.mem;m[k]=Math.max(k==='keep'?0:1,m[k]+(+t.dataset.d)*(k==='keep'?10:1));save();render()},home:()=>{V.tab='home';V.ed=null;render()},sh:()=>{V.sheet={t:id};render()},usep:()=>{S.persona=V.sheet.p.id;V.sheet=null;save();render()},addm:()=>{V.sheet={t:'add'};render()},imp2:()=>{V.sheet=null;render();pick()},avp:()=>$('#fa').click(),
+  
   find:()=>{V.sheet={t:'find'};render();setTimeout(()=>$('#fq')?.focus(),60)},
   goto:()=>{V.sheet=null;render();const e=document.querySelectorAll('main .msg')[i];e?.scrollIntoView({block:'center'});e?.classList.add('hl')},
   say:()=>{if(!window.speechSynthesis)return toast('Speech not available on this device');if(speechSynthesis.speaking){speechSynthesis.cancel();return}speechSynthesis.speak(new SpeechSynthesisUtterance(strip(S.chats[c.id][i].t)));V.edit=null;render()},upd:()=>{readCfg();save();checkUpdate(true)},
@@ -340,36 +438,43 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   chats:()=>{V.sheet={t:'chats'};render()},
   sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur});S.chats[c.id]=it.msgs;V.sheet=null;save();render(true)},
   delold:()=>{S.old[c.id]=(S.old[c.id]||[]).filter(x=>x.id!==id);save();V.sheet={t:'chats'};render()},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.tab='settings';render()},
-  savecfg:()=>{readCfg();save();applyTheme();V.sheet=null;render()},editc:()=>{V.sheet={t:'char'};render()},
+  savecfg:()=>{readCfg();save();applyTheme();V.sheet=null;render()},
   savec:()=>{for(const k of['name','desc','pers','scen','first','ex','sys'])c[k]=$('#c_'+k).value;save();V.sheet=null;render()},
   exp:()=>dl(c.name+' chat.txt',S.chats[c.id].map(m=>(m.r==='u'?P().name:c.name)+': '+m.t).join('\n\n')),
-  bak:()=>dl('hearth-backup.json',JSON.stringify({...S,provs:S.provs.map(p=>({...p,key:''})),cfg:{...S.cfg,gh:'',key:''}})),rest:pick,
+  bak:()=>dl('hearth-backup.json',JSON.stringify({...S,emb:undefined,lock:undefined,provs:S.provs.map(p=>({...p,key:''})),cfg:{...S.cfg,gh:'',key:''}})),rest:pick,
   regen:()=>{const h=S.chats[c.id],l=h[h.length-1];gen(l&&l.r==='c'?'swipe':'new')},
   del:()=>{S.chats[c.id].splice(i,1);V.edit=null;save();render()},
   edit:()=>{V.sheet={t:'edit',i};V.edit=null;render()},
   savem:()=>{const v=$('#em').value.trim();if(v){const m=S.chats[c.id][V.sheet.i];m.s=m.s||[m.t];if(v!==m.t){m.s.push(v);m.i=m.s.length-1;m.t=v}save()}V.sheet=null;render()},
   reset:()=>{delete S.chats[c.id];V.sheet=null;save();openChat(c.id)},
   delchar:()=>{S.chars=S.chars.filter(x=>x.id!==c.id);delete S.chats[c.id];delete S.links[c.id];delete S.old[c.id];V.chat=null;V.sheet=null;save();render()},
-  book:()=>{V.sheet={t:'book',id};render()},
+  
   delbook:()=>{S.books=S.books.filter(b=>b.id!==V.sheet.id);for(const k in S.links)S.links[k]=S.links[k].filter(x=>x!==V.sheet.id);V.sheet=null;save();render()},
-  newp:()=>{V.sheet={t:'persona',p:{name:'',desc:''}};render()},
-  editp:()=>{V.sheet={t:'persona',p:S.personas.find(p=>p.id===id)};render()},
+  
+  
   use:()=>{S.persona=id;save();render()},
   savep:()=>{const p=V.sheet.p,n=$('#pn').value.trim();if(!n)return;p.name=n;p.desc=$('#pd').value;if(!p.id){p.id=uid();S.personas.push(p);if(!S.persona)S.persona=p.id}V.sheet=null;save();render()},
   delp:()=>{const p=V.sheet.p;S.personas=S.personas.filter(x=>x!==p);if(S.persona===p.id)S.persona=null;V.sheet=null;save();render()}
  })[a]?.()});
 document.addEventListener('change',e=>{const t=e.target;
+ if(/^g_/.test(t.id)){readCfg();save();applyTheme()}
+ if(t.dataset.tag&&t.value.trim())addTag(t);
+ if(t.dataset.lk&&V.ed){const l=V.ed.o.links;if(t.checked){if(!l.includes(t.dataset.lk))l.push(t.dataset.lk)}else V.ed.o.links=l.filter(x=>x!==t.dataset.lk)}
  if(t.id==='ps'){S.persona=t.value||null;save()}
  if(t.id==='bgs'){C().bg=t.value;save();render()}
  if(t.id==='rm'){C().model=t.value;save();render()}
+ if(t.id==='emb_m'){S.cfg.emb=t.value;save()}
  if(t.id==='mem_on'){S.cfg.mem.on=t.value==='On';save()}
  if(t.id==='mem_m'){S.cfg.mem.model=t.value;save()}
  if(t.id==='prov'){readCfg();if(PRE[t.value])S.cfg.url=PRE[t.value];V.sheet={t:'prov'};render()}
  if(t.dataset.b){const c=C(),l=new Set(S.links[c.id]||[]);t.checked?l.add(t.dataset.b):l.delete(t.dataset.b);S.links[c.id]=[...l];save()}
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
-idbGet().then(d=>{if(d&&(d.ts||0)>=(S.ts||0)){S=Object.assign({chars:[],books:[],personas:[],chats:{},links:{},persona:null},d);fix();applyTheme()}idbOK=true;idbSet(S).then(()=>{try{localStorage.removeItem('hearth')}catch(e){}}).catch(()=>{});render()}).catch(()=>{});
+idbGet().then(d=>{if(d&&(d.ts||0)>=(S.ts||0)){S=Object.assign({chars:[],books:[],personas:[],chats:{},links:{},persona:null},d);fix();applyTheme()}idbOK=true;V.loading=false;V.locked=!!S.lock?.hash;idbSet(S).then(()=>{try{localStorage.removeItem('hearth')}catch(e){}}).catch(()=>{});render()}).catch(()=>{V.loading=false;V.locked=!!S.lock?.hash;render()});
+setTimeout(()=>{if(V.loading){V.loading=false;V.locked=!!S.lock?.hash;render()}},3000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.lock?.hash&&!V.loading){V.locked=true;render()}});
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.target.value.toLowerCase().trim(),c=C();
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click()});
 applyTheme();setTimeout(()=>{if(Date.now()-(S.lastUpd||0)>216e5){S.lastUpd=Date.now();save();checkUpdate(false)}},3000);document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
 addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab!=='home')V.tab='home';render()});
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
