@@ -92,9 +92,13 @@ code{font-family:ui-monospace,monospace;font-size:13px;color:var(--mut);overflow
 .brand{font:800 34px system-ui;letter-spacing:-1px;margin:0}.lock h2{font:700 26px system-ui;margin:0}.av.xl{width:120px;height:120px;font-size:44px;border:3px solid var(--ink)}
 .pw{position:relative;width:100%}.pw input{padding-right:48px}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:20px;filter:grayscale(1)}.btn.danger{background:#e5484d;color:#fff}
 .bc{display:flex;gap:12px;align-items:center;background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:10px;margin-bottom:10px}.bc img{width:64px;height:64px;border-radius:14px;object-fit:cover;flex:none;background:var(--ln)}.bc>div{flex:1;min-width:0}.bc b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bc small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--mut)}
+.hero{width:76%;margin:8px auto 18px;aspect-ratio:4/5;border-radius:26px;overflow:hidden;border:1px solid var(--ln);background:var(--sf);position:relative}.hero img,.hero .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.hero .ph{display:grid;place-items:center;font-size:64px;color:var(--mut)}
+.ctr{text-align:center}.ctr h1{font:700 30px system-ui;margin:0 0 6px}.stats{display:flex;justify-content:space-around;text-align:center;padding:18px 8px}.stats b{display:block;font-size:26px}.stats span{color:var(--mut);font-size:14px}
+.tabs{display:flex;gap:24px;border-bottom:1px solid var(--ln);margin:22px 0 4px}.tabs button{background:none;border:0;color:var(--mut);font-size:17px;padding:12px 4px;position:relative}.tabs button.on{color:var(--ink)}.tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--ac)}
+.gtext{max-height:280px;overflow-y:auto;font:16px/1.6 Literata,Georgia,serif;margin:12px 0;white-space:pre-wrap}.body{white-space:pre-wrap;line-height:1.6;margin:0 0 8px}.btn.full{width:100%;padding:15px;border-radius:16px}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=8;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<script>var VER=9;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -172,7 +176,7 @@ function normBook(j,name){const raw=j.entries||[],list=Array.isArray(raw)?raw:Ob
   constant:!!e.constant,sticky:e.sticky||0,delay:e.delay||0,cooldown:e.cooldown||0,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
 function addChar(j,img,fname){const d=j.data||j;if(!d.name)throw Error('No character data found');
  const c={id:uid(),name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',
-  first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',ex:d.mes_example||'',sys:d.system_prompt||'',img};
+  first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',tags:d.tags||[],created:Date.now(),updated:Date.now(),src:'Imported',ex:d.mes_example||'',sys:d.system_prompt||'',img};
  S.chars.push(c);
  if(d.character_book&&(d.character_book.entries||[]).length){const b=normBook(d.character_book,d.name+' lore');S.books.push(b);S.links[c.id]=[b.id]}
  return c.name}
@@ -215,6 +219,26 @@ async function chubSearch(more){const B=V.br,qi=$('#bq');if(qi)B.q=qi.value;if(!
 async function chubImport(fp){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);await importFiles([new File([b],'card.png',{type:'image/png'})]);if(V.br&&S.chars.length>n)V.br.done[fp]=1;render()}catch(e){toast('Import failed: '+e.message)}}
 async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');const m=u.match(/(?:chub\.ai|characterhub\.org)\/characters\/([^?#\s]+)/i);if(m)return chubImport(m[1].replace(/\/$/,''));
  try{toast('Downloading…');const b=await nfetch(u,{},true),png=b[0]===137&&b[1]===80;await importFiles([new File([b],png?'card.png':'card.json',{type:png?'image/png':'application/json'})])}catch(e){toast('Import failed: '+e.message)}}
+function startWith(id,i){const c=S.chars.find(x=>x.id===id),cur=S.chats[id];if(cur?.some(m=>m.r==='u'))(S.old[id]=S.old[id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});
+ const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[i]||g[0],s:g,i:Math.min(i,g.length-1)}]:[];(S.act=S.act||{})[id]=Date.now();save();openChat(id)}
+function charHtml(){const c=S.chars.find(x=>x.id===V.cd);if(!c){V.tab='home';return listHtml()}
+ const cur=S.chats[c.id]||[],olds=S.old[c.id]||[],has=cur.some(m=>m.r==='u'),chats=olds.length+(has?1:0),msgs=olds.reduce((a,o)=>a+o.msgs.length,0)+cur.length,
+  tk=Math.round(['name','desc','pers','scen','ex','sys','first'].map(k=>c[k]||'').join('').length/4),fmt=n=>n>=1e3?(n/1e3).toFixed(1)+'K':n,
+  dt=t=>t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—',
+  gs=[c.first,...(c.alts||[])].filter(Boolean),gi=Math.min(V.gi||0,Math.max(gs.length-1,0)),img=c.banner||c.img,
+  sec=(t,x)=>x?`<h2 class="h2">${t}</h2><p class="body">${esc(x)}</p>`:'';
+ const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">‹</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">›</button></div><button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
+  +sec('About',c.desc);
+ const card=sec('About',c.desc)+sec('Personality',c.pers)+sec('Scenario',c.scen)+sec('Definition',c.ex)+((c.tags||[]).length?`<div class="tags" style="margin-top:14px">${c.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')
+  +((S.links[c.id]||[]).length?`<h2 class="h2">Lorebooks</h2><div class="tags">${S.links[c.id].map(i=>S.books.find(b=>b.id===i)).filter(Boolean).map(b=>`<span class="chip">📖 ${esc(b.name)}</span>`).join('')}</div>`:'')
+  +`<p class="ps" style="margin-top:22px">Created ${dt(c.created)} · Updated ${dt(c.updated)}<br>Origin ${c.src||'Unknown'}</p>`;
+ return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><div class="hero">${img?`<img src="${img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}</div>
+ <div class="ctr"><h1>${esc(c.name)}</h1><p class="ps" style="margin:0 0 4px">${esc(strip(c.desc||'').slice(0,110))}${(c.desc||'').length>110?'…':''}</p>${c.creator?`<p class="note" style="margin:0 0 14px">By ${esc(c.creator)}</p>`:'<div style="height:14px"></div>'}</div>
+ <button class="btn full" data-a="open" data-id="${c.id}">💬 ${has?'Continue chat':'Chat now'}</button>
+ <div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="editc">✎ Edit</button><button class="btn s" style="flex:1" data-a="cnew" data-id="${c.id}">＋ New chat</button></div>
+ <div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div><div><b>${chats?(msgs/chats).toFixed(1):'0'}</b><span>msg/chat</span></div></div>
+ <p class="note" style="text-align:center">${fmt(tk)} tokens · Updated ${dt(c.updated)}</p>
+ <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card:story}<div style="height:40px"></div></main>`}
 function browseHtml(){const B=V.br;
  return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from a third-party hub.</p>
  <div class="rowh" style="gap:8px"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="pill" data-a="bsearch">Search</button></div>
@@ -351,7 +375,7 @@ function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="h
  if(T==='memory'){const mc=S.cfg.mem,stp=(k,t,d)=>`<h2 class="h2">${t}</h2><div class="card2 pad"><div class="rowh"><p class="ps" style="margin:0;font-size:15px;flex:1">${d}</p><div class="step"><button data-a="st" data-k="${k}" data-d="-1">−</button><b>${mc[k]}</b><button data-a="st" data-k="${k}" data-d="1">+</button></div></div></div>`;
   return hd+title('Memory','Older messages are summarized into memories so long chats stay coherent.')+`<h2 class="h2">Embedding model</h2><p class="ps" style="margin-top:-4px">Retrieves RAG paragraphs and keyword-less lorebook entries by meaning. Mark a model as an embedding model in Providers. Empty uses keyword matching.</p><select id="emb_m"><option value="">None (keyword matching)</option>${S.models.filter(m=>m.emb).map(m=>`<option value="${m.id}" ${S.cfg.emb===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select><h2 class="h2">Long-term memory</h2><select id="mem_on"><option ${mc.on?'':'selected'}>Off</option><option ${mc.on?'selected':''}>On</option></select><h2 class="h2">Summary model</h2><p class="ps" style="margin-top:-4px">Empty means each chat’s own reply model.</p><select id="mem_m"><option value="">Chat’s own reply model</option>${S.models.map(m=>`<option value="${m.id}" ${mc.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select>`+stp('every','Messages per memory run','New memories are written after this many older messages pile up.')+stp('per','Messages summarized per run','How many of the oldest waiting messages each run summarizes.')+stp('keep','Memories kept per chat','Older memories are dropped past this. Zero keeps everything.')+'</main>'}
  if(T==='sec'){const L=S.lock?.hash,f=(id,l)=>`<label>${l}</label><div class="pw"><input id="${id}" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="${id}">👁</button></div>`;
-  return hd+title('Security','Lock Hearth with a password. The lock hides your chats when the app opens or returns from the background.')+(L?f('s_cur','Current password'):'')+f('s_new',L?'New password':'Password')+f('s_cf','Confirm password')+`<div class="acts"><button class="btn wide" data-a="lockset">${L?'Update password':'Set password'}</button>${L?'<button class="btn s" data-a="locknow">Lock now</button>':''}</div>`+(L?`<div class="card2 pad" style="margin-top:24px;border-color:var(--dg)"><b style="color:var(--dg)">Remove password</b><span class="ps" style="margin:0">Turns the lock off. Requires your current password.</span><button class="btn d" data-a="lockrm" style="align-self:flex-start">Remove password</button></div>`:'')+'<p class="ps" style="margin-top:22px">This is a screen lock. Data on the device is not encrypted, and there is no recovery if you forget the password except erasing the app’s data.</p></main>'}
+  return hd+title('Security','Lock Hearth with a password. The lock hides your chats when the app opens or returns from the background.')+(L?f('s_cur','Current password'):'')+f('s_new',L?'New password':'Password')+f('s_cf','Confirm password')+(L?`<label>Lock after leaving the app</label><select id="la">${[[0,'Immediately'],[1,'1 minute'],[5,'5 minutes'],[15,'15 minutes'],[-1,'Never (only at launch)']].map(([v,n])=>`<option value="${v}" ${(S.lock.after??5)===v?'selected':''}>${n}</option>`).join('')}</select>`:'')+`<div class="acts"><button class="btn wide" data-a="lockset">${L?'Update password':'Set password'}</button>${L?'<button class="btn s" data-a="locknow">Lock now</button>':''}</div>`+(L?`<div class="card2 pad" style="margin-top:24px;border-color:var(--dg)"><b style="color:var(--dg)">Remove password</b><span class="ps" style="margin:0">Turns the lock off. Requires your current password.</span><button class="btn d" data-a="lockrm" style="align-self:flex-start">Remove password</button></div>`:'')+'<p class="ps" style="margin-top:22px">This is a screen lock. Data on the device is not encrypted, and there is no recovery if you forget the password except erasing the app’s data.</p></main>'}
  const pn=id=>S.provs.find(p=>p.id===id)?.name||'?',ib=(a,id,i,x='')=>`<button class="ib ${x}" data-a="${a}" data-id="${id}">${i}</button>`;
  let h=hd+title('Providers','Connect providers and register the models you chat with.')+`<div class="rowh"><h2 class="h2" style="margin:0">Custom providers</h2>${pill('addprov','Add provider')}</div>`;
  if(F?.k==='prov'){const p=F.p;h+=`<div class="card2 pad" style="margin-top:14px"><div class="rowh"><b>${p.id?'Edit':'Add custom'} provider</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>PROVIDER NAME *</label><input id="p_n" value="${esc(p.name)}" placeholder="e.g. My local LLM"><label>API KEY</label><input id="p_k" type="password" value="${esc(p.key)}" placeholder="Optional for local endpoints"><label>BASE URL *</label><input id="p_u" value="${esc(p.url)}" placeholder="e.g. http://localhost:1234/v1"><label>API FORMAT</label><select id="p_f"><option value="openai" ${p.fmt==='openai'?'selected':''}>OpenAI</option><option value="anthropic" ${p.fmt==='anthropic'?'selected':''}>Anthropic</option></select><div class="acts"><button class="btn" data-a="savep2">Save provider</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`}
@@ -361,13 +385,13 @@ function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="h
  h+=S.models.map(m=>`<div class="card2 pad ${m.id===S.cfg.am?'act':''}" data-a="usem" data-id="${m.id}"><b>${esc(m.name||m.mid)}</b><span class="ps" style="margin:0">${esc(pn(m.pid))}</span><code>${esc(m.mid)}</code><div class="rowh"><span class="badge ok">${m.emb?'Embedding':m.id===S.cfg.am?'Active':'Ready'}</span><span>${ib('editmodel',m.id,'⚙')}${ib('delmodel',m.id,'🗑','dg')}</span></div></div>`).join('')||'<p class="ps">No models yet. Tap Add model after adding a provider.</p>';
  return h+'<div style="height:40px"></div></main>'}
 function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
- if(k==='c')return`<div class="hc" data-a="open" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(x.name[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
+ if(k==='c')return`<div class="hc" data-a="cview" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(x.name[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
  if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc((x.name||'?')[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
  return`<div class="hc" data-a="book" data-id="${x.id}">${x.cover?`<img src="${x.cover}" alt="">`:'<div class="ph">📖</div>'}<div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
 const nc=(a,l,ic='+')=>`<div class="hc nc" data-a="${a}"><i>${ic}</i><b>${l}</b></div>`;
 function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
  const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
- if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
+ if(T==='char')return charHtml();if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
  if(T==='settings'){const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
   return back('Settings')+`</header><main><div class="card2"><div class="srow" data-a="tab" data-id="pers"><div class="av">${esc((pn||'?')[0])}</div><div class="t"><b>${esc(pn||'No persona yet')}</b><small>Active persona</small></div><span class="chev">›</span></div></div>
   <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',S.models.length+' models')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}</div></main>`}
@@ -404,16 +428,19 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
+  cview:()=>{V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
+  gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
+  start:()=>startWith(id,i),cnew:()=>startWith(id,0),
   browse:()=>{V.br=V.br||{q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
   bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
   eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
-  lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={salt,hash:await hsh(n,salt)};save();toast('Password saved');render()},
+  lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={...S.lock,salt,hash:await hsh(n,salt)};save();toast('Password saved');render()},
   lockrm:async()=>{if(await hsh($('#s_cur').value,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');S.lock=null;save();toast('Password removed');render()},
   locknow:()=>{V.locked=true;render()},
   unlock:async()=>{if(await hsh($('#lk').value,S.lock.salt)===S.lock.hash){V.locked=false;V.forgot=false;render()}else{toast('Wrong password');$('#lk').value=''}},
   forgot:()=>{V.forgot=true;render()},unforgot:()=>{V.forgot=false;render()},
   erase:async()=>{if($('#er').value.trim()!=='ERASE')return toast('Type ERASE to confirm');S={chars:[],books:[],personas:[],chats:{},links:{},persona:null,old:{},provs:[],models:[]};fix();if(idbOK)await idbSet(S);try{localStorage.clear()}catch(e){}V.locked=false;V.forgot=false;V.tab='home';V.chat=null;render()},
-  newc:()=>edit('c'),editc:()=>edit('c',V.chat),newp:()=>edit('p'),editp:()=>edit('p',id),newl:()=>edit('l'),editbook:()=>edit('l',V.bk),newentry:()=>edit('e',null),editentry:()=>edit('e',i),
+  newc:()=>edit('c'),editc:()=>edit('c',V.chat||V.cd),newp:()=>edit('p'),editp:()=>edit('p',id),newl:()=>edit('l'),editbook:()=>edit('l',V.bk),newentry:()=>edit('e',null),editentry:()=>edit('e',i),
   book:()=>{V.bk=id;V.tab='book';render()},
   pimg:()=>{syncEd();V.pt=t.dataset.t;$('#fi').click()},
   rmtag:()=>{syncEd();V.ed.o[t.dataset.k].splice(i,1);render()},
@@ -424,7 +451,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   edback:()=>{const b=V.ed.back;V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render()},
   edsave:()=>{syncEd();const{k,id,o}=V.ed,b=V.ed.back,go=()=>{V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render()};
    if(k==='c'){if(!o.name.trim())return toast('Name is required');let c=S.chars.find(x=>x.id===id);if(!c){c={id:uid()};S.chars.push(c)}
-    Object.assign(c,{name:o.name.trim(),desc:o.desc,pers:o.pers,scen:o.scen,ex:o.ex,sys:o.sys,rag:o.rag,tags:o.tags,img:o.img,banner:o.banner,bgimg:o.bgimg,first:o.greets[0]||'',alts:o.greets.slice(1).filter(Boolean)});if(o.bgimg&&!c.bg)c.bg='img';S.links[c.id]=o.links;save();return go()}
+    Object.assign(c,{name:o.name.trim(),desc:o.desc,pers:o.pers,scen:o.scen,ex:o.ex,sys:o.sys,rag:o.rag,tags:o.tags,img:o.img,banner:o.banner,bgimg:o.bgimg,first:o.greets[0]||'',alts:o.greets.slice(1).filter(Boolean),updated:Date.now()});if(!c.created){c.created=Date.now();c.src='Created'}if(o.bgimg&&!c.bg)c.bg='img';S.links[c.id]=o.links;save();return go()}
    if(k==='p'){if(!o.name.trim())return toast('Name is required');let p=S.personas.find(x=>x.id===id);if(!p){p={id:uid()};S.personas.push(p)}Object.assign(p,{name:o.name.trim(),desc:o.desc,lore:o.lore,rag:o.rag,img:o.img,banner:o.banner});
     if(o.active)S.persona=p.id;else if(S.persona===p.id)S.persona=null;if(!S.persona&&V.ed.isNew)S.persona=p.id;save();return go()}
    if(k==='l'){if(!o.name.trim())return toast('Name is required');let l=S.books.find(x=>x.id===id);if(!l){l={id:uid(),entries:[]};S.books.push(l)}Object.assign(l,{name:o.name.trim(),desc:o.desc,tags:o.tags,cover:o.cover});save();V.bk=l.id;V.ed=null;V.tab='book';return render()}
@@ -476,6 +503,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   delp:()=>{const p=V.sheet.p;S.personas=S.personas.filter(x=>x!==p);if(S.persona===p.id)S.persona=null;V.sheet=null;save();render()}
  })[a]?.()});
 document.addEventListener('change',e=>{const t=e.target;
+ if(t.id==='la'){S.lock.after=+t.value;save()}
  if(t.id==='bs'){V.br.sort=t.value;chubSearch()}
  if(t.id==='bn'){V.br.nsfw=t.checked;chubSearch()}
  if(/^g_/.test(t.id)){readCfg();save();applyTheme()}
@@ -492,7 +520,9 @@ document.addEventListener('change',e=>{const t=e.target;
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
 idbGet().then(d=>{if(d&&(d.ts||0)>=(S.ts||0)){S=Object.assign({chars:[],books:[],personas:[],chats:{},links:{},persona:null},d);fix();applyTheme()}idbOK=true;V.loading=false;V.locked=!!S.lock?.hash;idbSet(S).then(()=>{try{localStorage.removeItem('hearth')}catch(e){}}).catch(()=>{});render()}).catch(()=>{V.loading=false;V.locked=!!S.lock?.hash;render()});
 setTimeout(()=>{if(V.loading){V.loading=false;V.locked=!!S.lock?.hash;render()}},3000);
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.lock?.hash&&!V.loading){V.locked=true;render()}});
+document.addEventListener('visibilitychange',()=>{if(!S.lock?.hash||V.loading)return;if(document.hidden){V.hid=Date.now();return}
+ if(Date.now()<(V.skipUntil||0))return;const m=S.lock.after??5;if(m>=0&&Date.now()-(V.hid||0)>=m*60000){V.locked=true;render()}});
+document.addEventListener('click',e=>{if(e.target?.type==='file')V.skipUntil=Date.now()+180000},true);
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.target.value.toLowerCase().trim(),c=C();
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
