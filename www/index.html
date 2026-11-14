@@ -48,8 +48,16 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 5px}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;z-index:40;max-width:90%;text-align:center;animation:fade .2s}
 .dots::after{content:"…";animation:b 1s infinite}
 @keyframes b{50%{opacity:.2}}@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(40px);opacity:0}}
+.mw{display:flex;flex-direction:column;max-width:84%;min-width:0}.u .mw{align-items:flex-end}.mw .bub{max-width:100%}
+#v{flex:1;display:flex;flex-direction:column;min-height:0;position:relative}#cb{display:flex;gap:8px;align-items:flex-end}.comp textarea{flex:1}
+.srch{margin-bottom:14px;border-radius:14px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px 14px}
+.card{display:flex;flex-direction:column;gap:2px;min-width:0;transition:transform .12s}.card:active{transform:scale(.97)}
+.card img,.card .ph{width:100%;aspect-ratio:1;object-fit:cover;border-radius:20px;background:var(--ln);box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.card .ph{display:grid;place-items:center;font-size:44px;font-weight:600;color:var(--mut)}.card b{margin-top:6px}.card small{color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fab{position:absolute;right:18px;bottom:74px;width:58px;height:58px;border-radius:20px;border:0;background:var(--ac);color:var(--acT);font-size:32px;line-height:1;box-shadow:var(--sh)}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden>
+<script>var VER=2;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -57,8 +65,9 @@ let S={chars:[],books:[],personas:[],chats:{},links:{},persona:null};
 try{S=Object.assign(S,JSON.parse(localStorage.getItem('hearth')||'{}'))}catch(e){}
 let saveErr=false;
 const save=()=>{try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false}catch(e){saveErr=true}};
-let V={tab:'chars',chat:null,sheet:null,busy:false,edit:null,ctl:null};
-S.cfg=Object.assign({html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:''},S.cfg);
+let V={stick:true,tab:'chars',chat:null,sheet:null,busy:false,edit:null,ctl:null};
+S.cfg=Object.assign({repo:'WiktorWojno/Hearth',gh:'',html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:''},S.cfg);
+S.old=S.old||{};
 const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
 let M=[],hd=0,pop=false;
 const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
@@ -67,6 +76,13 @@ const applyTheme=()=>{const t=S.cfg.theme;if(t==='light'||t==='dark')document.do
 function syncHist(){const w=(V.chat?1:0)+(V.sheet?1:0);if(w>hd){while(hd<w){history.pushState({},'');hd++}}else if(w<hd){pop=true;history.go(w-hd);hd=w}}
 async function dl(n,t){try{const f=new File([t],n,{type:'text/plain'});if(navigator.canShare?.({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}
  try{await navigator.clipboard.writeText(t);toast('Copied to clipboard. Paste it into a note to keep it.')}catch(e){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t]));a.download=n;a.click()}}
+async function checkUpdate(manual){const g=S.cfg;if(!g.repo)return manual&&toast('Set an update source first');
+ try{const r=await fetch(`https://api.github.com/repos/${g.repo}/contents/www/index.html`,{cache:'no-store',headers:{accept:'application/vnd.github.raw+json',...(g.gh?{authorization:'Bearer '+g.gh}:{})}});
+  if(!r.ok)throw Error(r.status===404?'repo not found (private repos need a token)':r.status);
+  const t=await r.text(),m=t.match(/var VER=(\d+)/);
+  if(m&&+m[1]>VER){localStorage.setItem('hearth_ota',t);toast('Update v'+m[1]+' downloaded. Restarting…');setTimeout(()=>location.reload(),1500)}
+  else if(manual)toast('You’re up to date (v'+VER+')')}
+ catch(e){if(manual)toast('Update check failed: '+e.message)}}
 async function fetchModels(){readCfg();const g=S.cfg,an=g.prov==='anthropic';
  try{const r=await fetch(g.url.replace(/\/$/,'')+'/models',{headers:an?{'x-api-key':g.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}:(g.key?{authorization:'Bearer '+g.key}:{})});
   if(!r.ok)throw Error(r.status);const j=await r.json();M=(j.data||j.models||[]).map(m=>m.id||m.name||m).filter(x=>typeof x==='string').sort();
@@ -91,7 +107,7 @@ function md(n){for(const c of [...n.childNodes]){if(c.nodeType===3){if(/[*`]/.te
   else if(c.nodeType===1&&!/^(code|pre)$/i.test(c.tagName))md(c)}}
 function rich(t){if(S.cfg.html===false)return esc(t);
  const b=new DOMParser().parseFromString('<body>'+t,'text/html').body;clean(b);md(b);return b.innerHTML}
-const readCfg=()=>{if(!$('#g_url'))return;const g=S.cfg;g.prov=$('#prov').value;g.url=$('#g_url').value.trim();g.key=$('#g_key').value.trim();g.model=$('#g_model').value.trim();g.temp=+$('#g_temp').value;g.max=+$('#g_max').value||600;g.top=+$('#g_top').value||1;g.sys=$('#g_sys').value;g.html=$('#g_html').checked;g.theme=$('#g_theme').value};
+const readCfg=()=>{if(!$('#g_url'))return;const g=S.cfg;g.prov=$('#prov').value;g.url=$('#g_url').value.trim();g.key=$('#g_key').value.trim();g.model=$('#g_model').value.trim();g.temp=+$('#g_temp').value;g.max=+$('#g_max').value||600;g.top=+$('#g_top').value||1;g.sys=$('#g_sys').value;g.html=$('#g_html').checked;g.theme=$('#g_theme').value;g.repo=$('#g_repo').value.trim();g.gh=$('#g_gh').value.trim()};
 
 /* ---------- import ---------- */
 const lat=b=>{let s='';for(const x of b)s+=String.fromCharCode(x);return s};
@@ -162,17 +178,17 @@ async function gen(mode='new'){const c=C(),h=S.chats[c.id],g=S.cfg;
  if(mode==='new'){m={r:'c',t:'',s:[''],i:0};h.push(m);hist=h.slice(0,-1)}
  else if(mode==='swipe'){m=h[h.length-1];m.s=m.s||[m.t];m.s.push('');m.i=m.s.length-1;m.t='';hist=h.slice(0,-1)}
  else{m=h[h.length-1];base=m.t;hist=h}
- V.busy=true;V.ctl=new AbortController();render(true);
+ V.busy=true;V.stick=true;V.ctl=new AbortController();render(true);
  const set=t=>{m.t=base+(t.startsWith(c.name+':')?t.slice(c.name.length+1).trimStart():t);m.s&&(m.s[m.i||0]=m.t)};
  try{const{sys,msgs}=build(c,hist,mode==='cont');await llm(sys,msgs,t=>{set(t);upd()},V.ctl.signal)}
  catch(e){if(e.name!=='AbortError')V.sheet={t:'info',m:'Request failed: '+e.message+(/Failed to fetch|Load failed/.test(e.message)?'\nCheck the URL and key, and that the server allows browser (CORS) requests.':'')}}
  if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
- V.busy=false;V.ctl=null;save();render(true)}
+ V.busy=false;V.ctl=null;save();render(V.stick)}
 function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
  if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
 const swb=x=>`<div class="tools"><button data-a="sl">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">▶</button><button data-a="cont">Continue</button></div>`;
-function upd(){const b=document.querySelector('.msg:last-child .bub');if(b){b.innerHTML=rich(S.chats[V.chat].slice(-1)[0].t);const m=$('main');if(m.scrollHeight-m.scrollTop-m.clientHeight<200)m.scrollTop=m.scrollHeight}}
-function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t});(S.act=S.act||{})[V.chat]=Date.now();i.value='';save();gen()}
+function upd(){const b=document.querySelector('.msg:last-child .bub');if(b){b.innerHTML=rich(S.chats[V.chat].slice(-1)[0].t);const m=$('main');if(V.stick)m.scrollTop=m.scrollHeight}}
+function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t});(S.act=S.act||{})[V.chat]=Date.now();i.value='';i.style.height='auto';save();gen()}
 
 /* ---------- views ---------- */
 const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc((c.name||'?')[0])}</div>`;
@@ -182,40 +198,55 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
  if(s.t==='api'){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`;
   h=`<h2>API</h2><label>Provider</label><select id="prov">${[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']].map(([v,n])=>`<option value="${v}" ${g.prov===v?'selected':''}>${n}</option>`).join('')}</select>`+
   f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('max','Max reply tokens',g.max,'type="number"')+f('top','Top P',g.top,'type="number" step="0.05"')+
-  `<label>Theme</label><select id="g_theme">${['auto','light','dark'].map(v=>`<option ${g.theme===v?'selected':''}>${v}</option>`).join('')}</select><label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label><label>System prompt (optional)</label><textarea id="g_sys" rows="4" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea><p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>
+  `<label>Theme</label><select id="g_theme">${['auto','light','dark'].map(v=>`<option ${g.theme===v?'selected':''}>${v}</option>`).join('')}</select><label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label><label>Update source (GitHub owner/repo)</label><input id="g_repo" value="${esc(g.repo)}"><label>GitHub token (private repos only)</label><input id="g_gh" type="password" value="${esc(g.gh)}"><button class="btn s" data-a="upd" style="margin-top:8px">Check for updates (v${VER})</button><label>System prompt (optional)</label><textarea id="g_sys" rows="4" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea><p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>
   <div class="acts"><button class="btn" data-a="savecfg">Save</button><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='char'){const c=C(),f=(k,l,r)=>`<label>${l}</label><textarea id="c_${k}" rows="${r}">${esc(c[k])}</textarea>`;
   h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="close">Cancel</button></div>`}
+ if(s.t==='chats'){const c=C(),o=S.old[c.id]||[];h=`<h2>Chats with ${esc(c.name)}</h2>`+(o.length?o.map(x=>`<div class="row" data-a="sw" data-id="${x.id}"><div class="t"><b>${esc(strip(x.msgs.find(m=>m.r==='u')?.t||'Chat').slice(0,50))}</b><small>${new Date(x.t).toLocaleDateString()} · ${x.msgs.length} messages</small></div><button class="ib" data-a="delold" data-id="${x.id}">Delete</button></div>`).join(''):'<p class="note">No other chats yet. Use New chat to start another one; this chat is kept here.</p>')+`<div class="acts"><button class="btn" data-a="close">Done</button></div>`}
  if(s.t==='set'){const c=C();h=`<h2>${esc(c.name)}</h2><label>Persona</label><select id="ps"><option value="">You (default)</option>${S.personas.map(p=>`<option value="${p.id}" ${p.id===S.persona?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
   <label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
-  <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="reset">Restart</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
+  <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="newchat">New chat</button><button class="btn s" data-a="chats">Chats (${(S.old[c.id]||[]).length})</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
  if(s.t==='persona'){const p=s.p;h=`<h2>${p.id?'Edit':'New'} persona</h2><label>Name</label><input id="pn" value="${esc(p.name)}"><label>Description</label><textarea id="pd" rows="5" placeholder="Who are you in the story?">${esc(p.desc)}</textarea>
   <div class="acts"><button class="btn" data-a="savep">Save</button><button class="btn s" data-a="close">Cancel</button>${p.id?'<button class="btn d" data-a="delp">Delete</button>':''}</div>`}
  if(s.t==='book'){const b=S.books.find(b=>b.id===s.id);h=`<h2>${esc(b.name)}</h2>`+b.entries.map((e,i)=>`<label class="chk"><input type="checkbox" data-e="${i}" ${e.on?'checked':''}><span><b>${esc(e.name||e.keys[0]||'Entry')}</b><small class="note" style="display:block">${e.constant?'Always on':esc(e.keys.join(', '))}</small></span></label>`).join('')+
   `<div class="acts"><button class="btn" data-a="close">Done</button><button class="btn d" data-a="delbook">Delete lorebook</button></div>`}
  return`<div class="sheet" data-a="bg"><div><i class="grab"></i>${h}</div></div>`}
-function render(scroll){const a=$('#app');let h='';
+const msgHtml=(x,i,m,c)=>{const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
+ return `<div class="msg ${x.r}">${x.r==='c'?av(c):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${last&&x.r==='c'&&!V.busy?swb(x):''}${V.edit===i?`<div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">▶</button>`:''}</div>`:''}</div></div>`};
+function listHtml(){const T=V.tab;
+ let h=`<header><h1 style="font-size:28px">${{chars:'Hearth',lore:'Lorebooks',pers:'Personas'}[T]}</h1><button class="ib" data-a="api">Settings</button></header><main>`;
+ if(T==='chars')h+=S.chars.length?(S.chars.length>3?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':'')+'<div class="grid">'+[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)).map(c=>`<div class="card" data-a="open" data-id="${c.id}" data-n="${esc(c.name.toLowerCase())}">${c.img?`<img src="${c.img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}<b>${esc(c.name)}</b><small>${esc(strip((S.chats[c.id]||[]).slice(-1)[0]?.t||c.desc||''))}</small></div>`).join('')+'</div>':`<div class="empty">Import a SillyTavern character card (.png or .json) to start chatting.<div class="acts" style="justify-content:center"><button class="btn" data-a="imp">Import cards</button></div></div>`;
+ if(T==='lore')h+=S.books.length?S.books.map(b=>`<div class="row" data-a="book" data-id="${b.id}"><div class="av">${b.entries.length}</div><div class="t"><b>${esc(b.name)}</b><small>${b.entries.filter(e=>e.on).length} active entries</small></div></div>`).join('')+'<p class="note">Attach lorebooks to a character from its chat Options.</p>':`<div class="empty">Import a lorebook (.json) or a character card with an embedded one.</div>`;
+ if(T==='pers')h+=S.personas.length?S.personas.map(p=>`<div class="row" data-a="editp" data-id="${p.id}"><div class="av">${esc(p.name[0]||'?')}</div><div class="t"><b>${esc(p.name)}${p.id===S.persona?' (active)':''}</b><small>${esc(p.desc)}</small></div>${p.id===S.persona?'':`<button class="ib" data-a="use" data-id="${p.id}">Use</button>`}</div>`).join(''):`<div class="empty">Personas tell characters who you are. Create one and pick it in any chat.</div>`;
+ if(!S.cfg.model)h+='<p class="note">Tap Settings to connect a model before chatting.</p>';
+ return h+`<div style="height:80px"></div></main><button class="fab" data-a="${T==='pers'?'newp':'imp'}" aria-label="Add">+</button><nav>${[['chars','Characters'],['lore','Lorebooks'],['pers','Personas']].map(([k,n])=>`<button class="${T===k?'on':''}" data-a="tab" data-id="${k}">${n}</button>`).join('')}</nav>`}
+function render(scroll){const a=$('#app');if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
+ const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
-  h=`<header><button class="ib big" data-a="back" aria-label="Back">‹</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${S.cfg.model?' · '+esc(S.cfg.model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">⋯</button></header><main>`+
-  m.map((x,i)=>`<div class="msg ${x.r}">${x.r==='c'?av(c):''}<div style="max-width:82%"><div class="bub ${V.busy&&i===m.length-1&&!x.t?'dots':''}" style="max-width:100%">${rich(x.t)}</div>${i===m.length-1&&x.r==='c'&&!V.busy?swb(x):''}${V.edit===i?`<div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button></div>`:''}</div></div>`.replace('data-a="bub"','')).join('')+
-  `</main><div class="comp"><textarea id="in" rows="1" placeholder="Message ${esc(c.name)}"></textarea>${V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">■</button>':'<button class="ib big" data-a="regen" aria-label="Retry">↻</button><button class="btn send" data-a="send" aria-label="Send">↑</button>'}</div>`}
- else{const T=V.tab;
-  h=`<header><h1>${{chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T]}</h1><button class="ib" data-a="api">Settings</button><button class="ib" data-a="${T==='pers'?'newp':'imp'}">${T==='pers'?'New':'Import'}</button></header><main>`;
-  if(T==='chars')h+=S.chars.length?[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)).map(c=>`<div class="row" data-a="open" data-id="${c.id}">${av(c)}<div class="t"><b>${esc(c.name)}</b><small>${esc(strip((S.chats[c.id]||[]).slice(-1)[0]?.t||c.desc||''))}</small></div></div>`).join(''):`<div class="empty">Import a SillyTavern character card (.png or .json) to start chatting.<div class="acts" style="justify-content:center"><button class="btn" data-a="imp">Import cards</button></div></div>`;
-  if(T==='lore')h+=S.books.length?S.books.map(b=>`<div class="row" data-a="book" data-id="${b.id}"><div class="av">${b.entries.length}</div><div class="t"><b>${esc(b.name)}</b><small>${b.entries.filter(e=>e.on).length} active entries</small></div></div>`).join('')+'<p class="note">Attach lorebooks to a character from its chat Options.</p>':`<div class="empty">Import a lorebook (.json) or a character card with an embedded one.</div>`;
-  if(T==='pers')h+=S.personas.length?S.personas.map(p=>`<div class="row" data-a="editp" data-id="${p.id}"><div class="av">${esc(p.name[0]||'?')}</div><div class="t"><b>${esc(p.name)}${p.id===S.persona?' (active)':''}</b><small>${esc(p.desc)}</small></div>${p.id===S.persona?'':`<button class="ib" data-a="use" data-id="${p.id}">Use</button>`}</div>`).join(''):`<div class="empty">Personas tell characters who you are. Create one and pick it in any chat.</div>`;
-  if(!S.cfg.model)h+='<p class="note">Tap Settings to connect a model before chatting.</p>';
-  h+=`</main><nav>${[['chars','Characters'],['lore','Lorebooks'],['pers','Personas']].map(([k,n])=>`<button class="${T===k?'on':''}" data-a="tab" data-id="${k}">${n}</button>`).join('')}</nav>`}
- const keep=$('#in')?.value||'',foc=document.activeElement?.id==='in',st=$('main')?.scrollTop;a.innerHTML=h+sheetHtml();
- const i=$('#in');if(i){i.value=keep;if(foc)i.focus({preventScroll:true});i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'};i.oninput()}
- {const m=$('main');if(m)m.scrollTop=scroll?m.scrollHeight:(st||0)}
- document.querySelectorAll('.msg .bub').forEach((b,i)=>b.onclick=e=>{if(e.target.closest('a'))return;V.edit=V.edit===i?null:i;render()});syncHist()}
+  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">‹</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${S.cfg.model?' · '+esc(S.cfg.model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">⋯</button></header>`,
+   body=m.map((x,i)=>msgHtml(x,i,m,c)).join(''),
+   cb=V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">■</button>':'<button class="ib big" data-a="regen" aria-label="Retry">↻</button><button class="btn send" data-a="send" aria-label="Send">↑</button>';
+  if(!same){v.innerHTML=`<div id="hd">${hd}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Message ${esc(c.name)}"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
+   const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
+  else{$('#hd').innerHTML=hd;$('main').innerHTML=body;$('#cb').innerHTML=cb}
+  const mn=$('main');mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
+  mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
+  mn.querySelectorAll('.bub').forEach((b,i)=>b.onclick=e=>{if(e.target.closest('a'))return;V.edit=V.edit===i?null:i;render()})}
+ else{v.innerHTML=listHtml();v.dataset.k=key;const mn=$('main');if(same&&st)mn.scrollTop=st;
+  const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.card').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
+ const sh=$('#sh'),hh=sheetHtml();if(sh.dataset.h!==hh){sh.innerHTML=hh;sh.dataset.h=hh}
+ syncHist()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,id=t.dataset.id,i=+t.dataset.i;
  if(a==='bg'&&e.target!==t)return;if(a==='bg'||a==='close'){V.sheet=null;return render()}
  if(V.busy&&!['stop','back'].includes(a)&&!['info'].includes(V.sheet?.t))return;
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
-  set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.sheet={t:'api'};render()},
+  set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),upd:()=>{readCfg();save();checkUpdate(true)},
+  vsw:()=>{const m=S.chats[c.id][i],n=(m.i||0)+(+t.dataset.d);if(m.s&&n>=0&&n<m.s.length){m.i=n;m.t=m.s[n];save();render()}},
+  newchat:()=>{const cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))(S.old[c.id]=S.old[c.id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});delete S.chats[c.id];V.sheet=null;save();openChat(c.id);toast('New chat started')},
+  chats:()=>{V.sheet={t:'chats'};render()},
+  sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur});S.chats[c.id]=it.msgs;V.sheet=null;save();render(true)},
+  delold:()=>{S.old[c.id]=(S.old[c.id]||[]).filter(x=>x.id!==id);save();V.sheet={t:'chats'};render()},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.sheet={t:'api'};render()},
   savecfg:()=>{readCfg();save();applyTheme();V.sheet=null;render()},editc:()=>{V.sheet={t:'char'};render()},
   savec:()=>{for(const k of['name','desc','pers','scen','first','ex','sys'])c[k]=$('#c_'+k).value;save();V.sheet=null;render()},
   exp:()=>dl(c.name+' chat.txt',S.chats[c.id].map(m=>(m.r==='u'?P().name:c.name)+': '+m.t).join('\n\n')),
@@ -223,9 +254,9 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   regen:()=>{const h=S.chats[c.id],l=h[h.length-1];gen(l&&l.r==='c'?'swipe':'new')},
   del:()=>{S.chats[c.id].splice(i,1);V.edit=null;save();render()},
   edit:()=>{V.sheet={t:'edit',i};V.edit=null;render()},
-  savem:()=>{const v=$('#em').value.trim();if(v){const m=S.chats[c.id][V.sheet.i];m.t=v;if(m.s)m.s[m.i||0]=v;save()}V.sheet=null;render()},
+  savem:()=>{const v=$('#em').value.trim();if(v){const m=S.chats[c.id][V.sheet.i];m.s=m.s||[m.t];if(v!==m.t){m.s.push(v);m.i=m.s.length-1;m.t=v}save()}V.sheet=null;render()},
   reset:()=>{delete S.chats[c.id];V.sheet=null;save();openChat(c.id)},
-  delchar:()=>{S.chars=S.chars.filter(x=>x.id!==c.id);delete S.chats[c.id];delete S.links[c.id];V.chat=null;V.sheet=null;save();render()},
+  delchar:()=>{S.chars=S.chars.filter(x=>x.id!==c.id);delete S.chats[c.id];delete S.links[c.id];delete S.old[c.id];V.chat=null;V.sheet=null;save();render()},
   book:()=>{V.sheet={t:'book',id};render()},
   delbook:()=>{S.books=S.books.filter(b=>b.id!==V.sheet.id);for(const k in S.links)S.links[k]=S.links[k].filter(x=>x!==V.sheet.id);V.sheet=null;save();render()},
   newp:()=>{V.sheet={t:'persona',p:{name:'',desc:''}};render()},
@@ -239,7 +270,7 @@ document.addEventListener('change',e=>{const t=e.target;
  if(t.id==='prov'){readCfg();if(PRE[t.value])S.cfg.url=PRE[t.value];V.sheet={t:'api'};render()}
  if(t.dataset.b){const c=C(),l=new Set(S.links[c.id]||[]);t.checked?l.add(t.dataset.b):l.delete(t.dataset.b);S.links[c.id]=[...l];save()}
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
-applyTheme();document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
+applyTheme();setTimeout(()=>{if(Date.now()-(S.lastUpd||0)>216e5){S.lastUpd=Date.now();save();checkUpdate(false)}},3000);document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
 addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}render()});
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 render();
