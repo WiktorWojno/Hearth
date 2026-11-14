@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
 <style>
 :root{--bg:#f3f4f9;--sf:#fff;--ink:#171a2b;--mut:#6a6f89;--ac:#4b53e0;--acT:#fff;--ln:#e1e4ef;--me:#4b53e0;--meT:#fff;--bot:#fff;--dg:#c62828;--sh:0 8px 30px rgba(20,24,60,.18);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1018;--sf:#171a28;--ink:#e9ebf7;--mut:#8a90ae;--ac:#8c96ff;--acT:#10122a;--ln:#262a3e;--me:#4650d6;--meT:#fff;--bot:#1b1e2e;--dg:#ff8a80;--sh:0 8px 30px rgba(0,0,0,.5);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0e1018;--sf:#171a28;--ink:#e9ebf7;--mut:#8a90ae;--ac:#8c96ff;--acT:#10122a;--ln:#262a3e;--me:#4650d6;--meT:#fff;--bot:#1b1e2e;--dg:#ff8a80;--sh:0 8px 30px rgba(0,0,0,.5);color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0f10;--sf:#161617;--ink:#f4f4f5;--mut:#8e8e96;--ac:#8c96ff;--acT:#10122a;--ln:#2a2a2e;--me:#4650d6;--meT:#fff;--bot:#18181a;--dg:#ff8a80;--sh:0 8px 30px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f0f10;--sf:#161617;--ink:#f4f4f5;--mut:#8e8e96;--ac:#8c96ff;--acT:#10122a;--ln:#2a2a2e;--me:#4650d6;--meT:#fff;--bot:#18181a;--dg:#ff8a80;--sh:0 8px 30px rgba(0,0,0,.5);color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,sans-serif}
 #app{height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto;background:var(--bg)}
@@ -56,9 +56,23 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 5px}
 .card .ph{display:grid;place-items:center;font-size:44px;font-weight:600;color:var(--mut)}.card b{margin-top:6px}.card small{color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fab{position:absolute;right:18px;bottom:74px;width:58px;height:58px;border-radius:20px;border:0;background:var(--ac);color:var(--acT);font-size:32px;line-height:1;box-shadow:var(--sh)}
 .bub{font-size:var(--fs,16px);font-family:var(--ff,Literata,Georgia,serif)}.hl .bub{outline:2px solid var(--ac);outline-offset:2px}
+.wm{font:800 24px system-ui!important;letter-spacing:-.5px}
+.hello{display:flex;gap:16px;align-items:center;margin:8px 0 22px}.hello h1{font:700 25px/1.15 system-ui;margin:0}.hello small{color:var(--mut)}.av.big{width:68px;height:68px;font-size:26px}
+.sh2{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px}.sh2 h2{font:600 19px system-ui;margin:0}.sh2 span{color:var(--mut);font-weight:400;margin-left:8px;font-size:16px}.sh2 i{font-style:normal;color:var(--mut);font-size:26px}
+.hs{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 14px 6px 0;margin-right:-14px}.hs::-webkit-scrollbar{display:none}
+.hc{position:relative;flex:none;width:150px;aspect-ratio:3/4;border-radius:22px;overflow:hidden;background:var(--sf);border:1px solid var(--ln);transition:transform .12s}.hc:active{transform:scale(.97)}
+.hc img,.hc .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.hc .ph{display:grid;place-items:center;font-size:46px;font-weight:600;color:var(--mut)}
+.hc::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.78))}
+.cap{position:absolute;left:12px;right:12px;bottom:10px;z-index:1;color:#fff}.cap b{display:block;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.6)}.cap small{display:block;color:rgba(255,255,255,.75);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nc{background:none;border:2px dashed var(--ln);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--mut)}.nc::after{display:none}.nc i{font-style:normal;font-size:34px;line-height:1}.nc b{font-weight:500;font-size:15px;text-align:center}
+.grid .hc{width:auto}
+.card2{background:var(--sf);border:1px solid var(--ln);border-radius:22px;overflow:hidden;margin-bottom:16px}
+.srow{display:flex;align-items:center;gap:14px;padding:14px;border-top:1px solid var(--ln)}.srow:first-child{border-top:0}.srow:active{background:var(--bg)}.srow .t{flex:1;min-width:0}.srow b{display:block}.srow small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ic{width:46px;height:46px;border-radius:14px;background:var(--bg);display:grid;place-items:center;font-size:20px;filter:grayscale(1)}.chev{color:var(--mut);font-size:24px}
+.banner{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:12px 14px;margin-bottom:6px;color:var(--ac)}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden>
-<script>var VER=3;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<script>var VER=4;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -70,8 +84,8 @@ const idbGet=async()=>{const d=await idb();return new Promise((res,rej)=>{const 
 const idbSet=async v=>{const d=await idb();return new Promise((res,rej)=>{const t=d.transaction('k','readwrite');t.objectStore('k').put(v,'S');t.oncomplete=res;t.onerror=()=>rej(t.error)})};
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false}catch(e){saveErr=true}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false}).catch(()=>{saveErr=true}),250)};
-let V={stick:true,tab:'chars',chat:null,sheet:null,busy:false,edit:null,ctl:null};
-const CFG0={repo:'WiktorWojno/Hearth',gh:'',html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif'};S.cfg=Object.assign({},CFG0,S.cfg);
+let V={stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null};
+const CFG0={repo:'WiktorWojno/Hearth',gh:'',html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40};S.cfg=Object.assign({},CFG0,S.cfg);
 S.old=S.old||{};
 const fix=()=>{S.cfg=Object.assign({},CFG0,S.cfg);S.old=S.old||{}};
 const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
@@ -81,7 +95,7 @@ const bgOf=c=>c.bg==='avatar'&&c.img?`linear-gradient(color-mix(in srgb,var(--bg
 const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
 const strip=t=>t.replace(/<[^>]*>/g,'').replace(/[*`]/g,'');
 const applyTheme=()=>{const t=S.cfg.theme;if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;const st=document.documentElement.style;st.setProperty('--fs',(S.cfg.fs||16)+'px');st.setProperty('--ff',S.cfg.ff==='sans'?'system-ui,sans-serif':'Literata,Georgia,serif')};
-function syncHist(){const w=(V.chat?1:0)+(V.sheet?1:0);if(w>hd){while(hd<w){history.pushState({},'');hd++}}else if(w<hd){pop=true;history.go(w-hd);hd=w}}
+function syncHist(){const w=(V.chat?1:0)+(V.sheet?1:0)+(V.tab!=='home'?1:0);if(w>hd){while(hd<w){history.pushState({},'');hd++}}else if(w<hd){pop=true;history.go(w-hd);hd=w}}
 async function dl(n,t){try{const f=new File([t],n,{type:'text/plain'});if(navigator.canShare?.({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}
  try{await navigator.clipboard.writeText(t);toast('Copied to clipboard. Paste it into a note to keep it.')}catch(e){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t]));a.download=n;a.click()}}
 async function checkUpdate(manual){const g=S.cfg;if(!g.repo)return manual&&toast('Set an update source first');
@@ -94,8 +108,8 @@ async function checkUpdate(manual){const g=S.cfg;if(!g.repo)return manual&&toast
 async function fetchModels(){readCfg();const g=S.cfg,an=g.prov==='anthropic';
  try{const r=await fetch(g.url.replace(/\/$/,'')+'/models',{headers:an?{'x-api-key':g.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}:(g.key?{authorization:'Bearer '+g.key}:{})});
   if(!r.ok)throw Error(r.status);const j=await r.json();M=(j.data||j.models||[]).map(m=>m.id||m.name||m).filter(x=>typeof x==='string').sort();
-  V.sheet={t:'api'};render();toast(M.length+' models found. Tap the Model field to pick one.')}
- catch(e){V.sheet={t:'api'};render();toast('Could not reach the server: '+e.message)}};
+  V.sheet={t:'prov'};render();toast(M.length+' models found. Tap the Model field to pick one.')}
+ catch(e){V.sheet={t:'prov'};render();toast('Could not reach the server: '+e.message)}};
 const OK=new Set('img span b i em strong u s del br p div a font center small big sub sup code pre hr blockquote ul ol li h1 h2 h3 h4 h5 h6 table thead tbody tr td th details summary mark q cite abbr'.split(' '));
 const AT=new Set('style alt width height color size title align colspan rowspan open'.split(' '));
 const DROP=/^(script|style|iframe|object|embed|link|meta|svg|math|form|textarea|select|button|input|video|audio|base|template|noscript)$/;
@@ -115,7 +129,8 @@ function md(n){for(const c of [...n.childNodes]){if(c.nodeType===3){if(/[*`]/.te
   else if(c.nodeType===1&&!/^(code|pre)$/i.test(c.tagName))md(c)}}
 function rich(t){if(S.cfg.html===false)return esc(t);
  const b=new DOMParser().parseFromString('<body>'+t,'text/html').body;clean(b);md(b);return b.innerHTML}
-const readCfg=()=>{if(!$('#g_url'))return;const g=S.cfg;g.prov=$('#prov').value;g.url=$('#g_url').value.trim();g.key=$('#g_key').value.trim();g.model=$('#g_model').value.trim();g.temp=+$('#g_temp').value;g.max=+$('#g_max').value||600;g.top=+$('#g_top').value||1;g.sys=$('#g_sys').value;g.html=$('#g_html').checked;g.theme=$('#g_theme').value;g.fs=+$('#g_fs').value;g.ff=$('#g_ff').value;g.repo=$('#g_repo').value.trim();g.gh=$('#g_gh').value.trim()};
+const readCfg=()=>{const g=S.cfg;for(const[k,id]of Object.entries({prov:'prov',url:'g_url',key:'g_key',model:'g_model',temp:'g_temp',max:'g_max',top:'g_top',sys:'g_sys',html:'g_html',theme:'g_theme',fs:'g_fs',ff:'g_ff',repo:'g_repo',gh:'g_gh',hist:'g_hist'})){const e=document.getElementById(id);if(!e)continue;
+ g[k]=e.type==='checkbox'?e.checked:['temp','max','top','fs','hist'].includes(k)?(e.value===''?g[k]:+e.value):k==='sys'?e.value:e.value.trim()}};
 
 /* ---------- import ---------- */
 const lat=b=>{let s='';for(const x of b)s+=String.fromCharCode(x);return s};
@@ -134,7 +149,7 @@ function normBook(j,name){const raw=j.entries||[],list=Array.isArray(raw)?raw:Ob
   constant:!!e.constant,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
 function addChar(j,img,fname){const d=j.data||j;if(!d.name)throw Error('No character data found');
  const c={id:uid(),name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',
-  first:d.first_mes||'',alts:d.alternate_greetings||[],ex:d.mes_example||'',sys:d.system_prompt||'',img};
+  first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',ex:d.mes_example||'',sys:d.system_prompt||'',img};
  S.chars.push(c);
  if(d.character_book&&(d.character_book.entries||[]).length){const b=normBook(d.character_book,d.name+' lore');S.books.push(b);S.links[c.id]=[b.id]}
  return c.name}
@@ -166,7 +181,7 @@ function build(c,h,cont){const u=P().name,L=lore(c,h);
  const head=rep(S.cfg.sys,c)||`You are roleplaying as ${c.name} in an ongoing chat with ${u}. Stay in character and write only ${c.name}’s next reply. Never write ${u}’s words or actions.`;
  const sys=head+'\n\n'+(c.sys?rep(c.sys,c)+'\n\n':'')+`[${c.name}]\n${rep(c.desc,c)}\n`+(c.pers?`Personality: ${rep(c.pers,c)}\n`:'')+(c.scen?`Scenario: ${rep(c.scen,c)}\n`:'')+
  `\n[${u}]\n${rep(P().desc,c)||'(no description)'}\n`+(L?`\n[World info]\n${L}\n`:'')+(c.ex?`\n[Example dialogue]\n${rep(c.ex,c)}\n`:'');
- const m=[];for(const x of h.slice(-40)){const r=x.r==='u'?'user':'assistant';if(m.length&&m[m.length-1].role===r)m[m.length-1].content+='\n\n'+x.t;else m.push({role:r,content:x.t})}
+ const m=[];for(const x of h.slice(-(S.cfg.hist||40))){const r=x.r==='u'?'user':'assistant';if(m.length&&m[m.length-1].role===r)m[m.length-1].content+='\n\n'+x.t;else m.push({role:r,content:x.t})}
  if(cont)m.push({role:'user',content:`[Continue ${c.name}’s last message from exactly where it stopped. Do not repeat it.]`});
  if(!m.length||m[0].role!=='user')m.unshift({role:'user',content:'[Start of roleplay]'});
  return{sys,msgs:m}}
@@ -182,7 +197,7 @@ async function llm(sys,msgs,on,signal){const g=S.cfg,an=g.prov==='anthropic',bas
  return out}
 function openChat(id){V.chat=id;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0}]:[];save()}render(true)}
 async function gen(mode='new'){const c=C(),h=S.chats[c.id],g=S.cfg;
- if(!g.model||!g.url){V.sheet={t:'api'};return render()}
+ if(!g.model||!g.url){V.sheet={t:'prov'};return render()}
  let m,base='',hist;
  if(mode==='new'){m={r:'c',t:'',s:[''],i:0};h.push(m);hist=h.slice(0,-1)}
  else if(mode==='swipe'){m=h[h.length-1];m.s=m.s||[m.t];m.s.push('');m.i=m.s.length-1;m.t='';hist=h.slice(0,-1)}
@@ -204,11 +219,14 @@ const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div
 function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
  if(s.t==='info')h=`<p style="white-space:pre-wrap;margin:0 0 4px">${esc(s.m)}</p><div class="acts"><button class="btn" data-a="close">OK</button></div>`;
  if(s.t==='edit')h=`<h2>Edit message</h2><textarea id="em" rows="8">${esc(S.chats[V.chat][s.i].t)}</textarea><div class="acts"><button class="btn" data-a="savem">Save</button><button class="btn s" data-a="close">Cancel</button></div>`;
- if(s.t==='api'){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`;
-  h=`<h2>API</h2><label>Provider</label><select id="prov">${[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']].map(([v,n])=>`<option value="${v}" ${g.prov===v?'selected':''}>${n}</option>`).join('')}</select>`+
-  f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('max','Max reply tokens',g.max,'type="number"')+f('top','Top P',g.top,'type="number" step="0.05"')+
-  `<label>Theme</label><select id="g_theme">${['auto','light','dark'].map(v=>`<option ${g.theme===v?'selected':''}>${v}</option>`).join('')}</select><label>Text size</label><select id="g_fs">${[14,16,18,20].map(v=>`<option value="${v}" ${+g.fs===v?'selected':''}>${v}px</option>`).join('')}</select><label>Font</label><select id="g_ff">${['serif','sans'].map(v=>`<option ${g.ff===v?'selected':''}>${v}</option>`).join('')}</select><label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label><label>Update source (GitHub owner/repo)</label><input id="g_repo" value="${esc(g.repo)}"><label>GitHub token (private repos only)</label><input id="g_gh" type="password" value="${esc(g.gh)}"><button class="btn s" data-a="upd" style="margin-top:8px">Check for updates (v${VER})</button><label>System prompt (optional)</label><textarea id="g_sys" rows="4" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea><p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>
-  <div class="acts"><button class="btn" data-a="savecfg">Save</button><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button><button class="btn s" data-a="close">Cancel</button></div>`}
+ if(['appr','prov','instr','lim','upd','data'].includes(s.t)){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`,sel=(i,l,o,v)=>`<label>${l}</label><select id="g_${i}">${o.map(x=>`<option ${String(v)===String(x)?'selected':''}>${x}</option>`).join('')}</select>`;
+  const T={appr:['Appearance',sel('theme','Theme',['auto','light','dark'],g.theme)+sel('fs','Text size (px)',[14,16,18,20],g.fs)+sel('ff','Font',['serif','sans'],g.ff)+`<label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label>`],
+   prov:['Providers',`<label>Provider</label><select id="prov">${[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']].map(([v,n])=>`<option value="${v}" ${g.prov===v?'selected':''}>${n}</option>`).join('')}</select>`+f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('top','Top P',g.top,'type="number" step="0.05"')+`<p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>`],
+   instr:['Instructions',`<label>System prompt</label><textarea id="g_sys" rows="9" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea>`],
+   lim:['Limits',f('hist','Messages sent as history',g.hist,'type="number"')+f('max','Max reply tokens',g.max,'type="number"')],
+   upd:['Updates',f('repo','GitHub owner/repo',g.repo)+f('gh','GitHub token (private repos only)',g.gh,'type="password"')+`<button class="btn s" data-a="upd" style="margin-top:8px">Check for updates (v${VER})</button>`],
+   data:['Backup',`<p class="note">Backups include avatars, chats, and your API key.</p><div class="acts"><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button></div>`]}[s.t];
+  h=`<h2>${T[0]}</h2>${T[1]}<div class="acts"><button class="btn" data-a="savecfg">${s.t==='data'?'Done':'Save'}</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='char'){const c=C(),f=(k,l,r)=>`<label>${l}</label><textarea id="c_${k}" rows="${r}">${esc(c[k])}</textarea>`;
   h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="avp">Avatar</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='add')h=`<h2>Add</h2><div class="acts" style="flex-direction:column;margin-top:0"><button class="btn" data-a="imp2">Import cards or lorebooks</button><button class="btn s" data-a="newc">Create a character</button></div>`;
@@ -218,19 +236,32 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
   <label>Chat background</label><select id="bgs">${[['','None'],['dusk','Dusk'],['forest','Forest'],['ember','Ember'],['avatar','Avatar blur']].map(([v,n])=>`<option value="${v}" ${(c.bg||'')===v?'selected':''}>${n}</option>`).join('')}</select><label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
   <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="find">Search</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="newchat">New chat</button><button class="btn s" data-a="chats">Chats (${(S.old[c.id]||[]).length})</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
  if(s.t==='persona'){const p=s.p;h=`<h2>${p.id?'Edit':'New'} persona</h2><label>Name</label><input id="pn" value="${esc(p.name)}"><label>Description</label><textarea id="pd" rows="5" placeholder="Who are you in the story?">${esc(p.desc)}</textarea>
-  <div class="acts"><button class="btn" data-a="savep">Save</button><button class="btn s" data-a="close">Cancel</button>${p.id?'<button class="btn d" data-a="delp">Delete</button>':''}</div>`}
+  <div class="acts"><button class="btn" data-a="savep">Save</button><button class="btn s" data-a="close">Cancel</button>${p.id?'<button class="btn s" data-a="usep">Use</button><button class="btn d" data-a="delp">Delete</button>':''}</div>`}
  if(s.t==='book'){const b=S.books.find(b=>b.id===s.id);h=`<h2>${esc(b.name)}</h2>`+b.entries.map((e,i)=>`<label class="chk"><input type="checkbox" data-e="${i}" ${e.on?'checked':''}><span><b>${esc(e.name||e.keys[0]||'Entry')}</b><small class="note" style="display:block">${e.constant?'Always on':esc(e.keys.join(', '))}</small></span></label>`).join('')+
   `<div class="acts"><button class="btn" data-a="close">Done</button><button class="btn d" data-a="delbook">Delete lorebook</button></div>`}
  return`<div class="sheet" data-a="bg"><div><i class="grab"></i>${h}</div></div>`}
 const msgHtml=(x,i,m,c)=>{const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
  return `<div class="msg ${x.r}">${x.r==='c'?av(c):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${last&&x.r==='c'&&!V.busy?swb(x):''}${V.edit===i?`<div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">▶</button>`:''}</div>`:''}</div></div>`};
-function listHtml(){const T=V.tab;
- let h=`<header><h1 style="font-size:28px">${{chars:'Hearth',lore:'Lorebooks',pers:'Personas'}[T]}</h1><button class="ib" data-a="api">Settings</button></header><main>`;
- if(T==='chars')h+=S.chars.length?(S.chars.length>3?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':'')+'<div class="grid">'+[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)).map(c=>`<div class="card" data-a="open" data-id="${c.id}" data-n="${esc(c.name.toLowerCase())}">${c.img?`<img src="${c.img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}<b>${esc(c.name)}</b><small>${esc(strip((S.chats[c.id]||[]).slice(-1)[0]?.t||c.desc||''))}</small></div>`).join('')+'</div>':`<div class="empty">Import a SillyTavern character card (.png or .json) to start chatting.<div class="acts" style="justify-content:center"><button class="btn" data-a="imp">Import cards</button></div></div>`;
- if(T==='lore')h+=S.books.length?S.books.map(b=>`<div class="row" data-a="book" data-id="${b.id}"><div class="av">${b.entries.length}</div><div class="t"><b>${esc(b.name)}</b><small>${b.entries.filter(e=>e.on).length} active entries</small></div></div>`).join('')+'<p class="note">Attach lorebooks to a character from its chat Options.</p>':`<div class="empty">Import a lorebook (.json) or a character card with an embedded one.</div>`;
- if(T==='pers')h+=S.personas.length?S.personas.map(p=>`<div class="row" data-a="editp" data-id="${p.id}"><div class="av">${esc(p.name[0]||'?')}</div><div class="t"><b>${esc(p.name)}${p.id===S.persona?' (active)':''}</b><small>${esc(p.desc)}</small></div>${p.id===S.persona?'':`<button class="ib" data-a="use" data-id="${p.id}">Use</button>`}</div>`).join(''):`<div class="empty">Personas tell characters who you are. Create one and pick it in any chat.</div>`;
- if(!S.cfg.model)h+='<p class="note">Tap Settings to connect a model before chatting.</p>';
- return h+`<div style="height:80px"></div></main><button class="fab" data-a="${T==='pers'?'newp':T==='chars'?'addm':'imp'}" aria-label="Add">+</button><nav>${[['chars','Characters'],['lore','Lorebooks'],['pers','Personas']].map(([k,n])=>`<button class="${T===k?'on':''}" data-a="tab" data-id="${k}">${n}</button>`).join('')}</nav>`}
+function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
+ if(k==='c')return`<div class="hc" data-a="open" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(x.name[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
+ if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}"><div class="ph">${esc((x.name||'?')[0])}</div><div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
+ return`<div class="hc" data-a="book" data-id="${x.id}"><div class="ph">📖</div><div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
+const nc=(a,l)=>`<div class="hc nc" data-a="${a}"><i>+</i><b>${l}</b></div>`;
+function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
+ const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
+ if(T==='settings'){const row=(id,ic,t,sub)=>`<div class="srow" data-a="${id==='imp'?'imp':'sh'}" data-id="${id}"><span class="ic">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
+  return back('Settings')+`</header><main><div class="card2"><div class="srow" data-a="tab" data-id="pers"><div class="av">${esc((pn||'?')[0])}</div><div class="t"><b>${esc(pn||'No persona yet')}</b><small>Active persona</small></div><span class="chev">›</span></div></div>
+  <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',g.prov+' · '+(g.model||'not set'))}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}${row('data','💾','Backup','Export or restore')}</div></main>`}
+ if(T!=='home'){const k={chars:'c',lore:'l',pers:'p'}[T],items=k==='c'?[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)):k==='l'?S.books:S.personas;
+  return back({chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T])+`${T!=='pers'?'<button class="ib" data-a="imp">Import</button>':''}</header><main>${k==='c'&&items.length>6?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc(k==='c'?'newc':k==='p'?'newp':'imp',k==='c'?'New character':k==='p'?'New persona':'Import lorebook')}${items.map(x=>card(k,x)).join('')}</div></main>`}
+ const sec=(t,n,k,items,add)=>`<div class="sh2" data-a="tab" data-id="${k}"><h2>${t}<span>${n}</span></h2><i>›</i></div><div class="hs">${add}${items.slice(0,12).map(x=>card({chars:'c',lore:'l',pers:'p'}[k],x)).join('')}</div>`;
+ const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
+ return`<header><h1 class="wm">Hearth</h1><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>
+ <div class="hello"><div class="av big">${esc((pn||'H')[0])}</div><div><h1>${gr}${pn?', '+esc(pn):''}</h1><small>${S.chars.length} characters</small></div></div>
+ ${g.model?'':'<div class="banner" data-a="sh" data-id="prov">Connect a model to start chatting ›</div>'}
+ ${sec('Your Characters',S.chars.length,'chars',rc,nc('newc','New character')+(S.chars.length?'':nc('imp','Import')))}
+ ${sec('Your Personas',S.personas.length,'pers',S.personas,nc('newp','New persona'))}
+ ${sec('Lorebooks',S.books.length,'lore',S.books,nc('imp','Import lorebook'))}</main>`}
 function render(scroll){const a=$('#app');if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
@@ -252,7 +283,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  if(V.busy&&!['stop','back'].includes(a)&&!['info'].includes(V.sheet?.t))return;
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
-  set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),addm:()=>{V.sheet={t:'add'};render()},imp2:()=>{V.sheet=null;render();pick()},avp:()=>$('#fa').click(),
+  set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),home:()=>{V.tab='home';render()},sh:()=>{V.sheet={t:id};render()},usep:()=>{S.persona=V.sheet.p.id;V.sheet=null;save();render()},addm:()=>{V.sheet={t:'add'};render()},imp2:()=>{V.sheet=null;render();pick()},avp:()=>$('#fa').click(),
   newc:()=>{const n={id:uid(),name:'New character',desc:'',pers:'',scen:'',first:'',ex:'',sys:'',alts:[],img:''};S.chars.push(n);save();V.sheet=null;openChat(n.id);V.sheet={t:'char'};render()},
   find:()=>{V.sheet={t:'find'};render();setTimeout(()=>$('#fq')?.focus(),60)},
   goto:()=>{V.sheet=null;render();const e=document.querySelectorAll('main .msg')[i];e?.scrollIntoView({block:'center'});e?.classList.add('hl')},
@@ -261,7 +292,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   newchat:()=>{const cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))(S.old[c.id]=S.old[c.id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});delete S.chats[c.id];V.sheet=null;save();openChat(c.id);toast('New chat started')},
   chats:()=>{V.sheet={t:'chats'};render()},
   sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur});S.chats[c.id]=it.msgs;V.sheet=null;save();render(true)},
-  delold:()=>{S.old[c.id]=(S.old[c.id]||[]).filter(x=>x.id!==id);save();V.sheet={t:'chats'};render()},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.sheet={t:'api'};render()},
+  delold:()=>{S.old[c.id]=(S.old[c.id]||[]).filter(x=>x.id!==id);save();V.sheet={t:'chats'};render()},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.tab='settings';render()},
   savecfg:()=>{readCfg();save();applyTheme();V.sheet=null;render()},editc:()=>{V.sheet={t:'char'};render()},
   savec:()=>{for(const k of['name','desc','pers','scen','first','ex','sys'])c[k]=$('#c_'+k).value;save();V.sheet=null;render()},
   exp:()=>dl(c.name+' chat.txt',S.chats[c.id].map(m=>(m.r==='u'?P().name:c.name)+': '+m.t).join('\n\n')),
@@ -283,14 +314,14 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
 document.addEventListener('change',e=>{const t=e.target;
  if(t.id==='ps'){S.persona=t.value||null;save()}
  if(t.id==='bgs'){C().bg=t.value;save();render()}
- if(t.id==='prov'){readCfg();if(PRE[t.value])S.cfg.url=PRE[t.value];V.sheet={t:'api'};render()}
+ if(t.id==='prov'){readCfg();if(PRE[t.value])S.cfg.url=PRE[t.value];V.sheet={t:'prov'};render()}
  if(t.dataset.b){const c=C(),l=new Set(S.links[c.id]||[]);t.checked?l.add(t.dataset.b):l.delete(t.dataset.b);S.links[c.id]=[...l];save()}
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
 idbGet().then(d=>{if(d&&(d.ts||0)>=(S.ts||0)){S=Object.assign({chars:[],books:[],personas:[],chats:{},links:{},persona:null},d);fix();applyTheme()}idbOK=true;idbSet(S).then(()=>{try{localStorage.removeItem('hearth')}catch(e){}}).catch(()=>{});render()}).catch(()=>{});
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.target.value.toLowerCase().trim(),c=C();
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
 applyTheme();setTimeout(()=>{if(Date.now()-(S.lastUpd||0)>216e5){S.lastUpd=Date.now();save();checkUpdate(false)}},3000);document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
-addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}render()});
+addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab!=='home')V.tab='home';render()});
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 render();
 </script></body></html>
