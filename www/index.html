@@ -99,7 +99,7 @@ code{font-family:ui-monospace,monospace;font-size:13px;color:var(--mut);overflow
 .phero{width:62%;margin:0 auto;aspect-ratio:4/5;border-radius:22px;overflow:hidden;background:var(--bg)}.phero img,.phero .ph{width:100%;height:100%;object-fit:cover}.phero .ph{display:grid;place-items:center;font-size:56px;color:var(--mut)}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=10;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<script>var VER=11;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -177,7 +177,7 @@ function normBook(j,name){const raw=j.entries||[],list=Array.isArray(raw)?raw:Ob
   constant:!!e.constant,sticky:e.sticky||0,delay:e.delay||0,cooldown:e.cooldown||0,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
 function addChar(j,img,fname,about){const d=j.data||j;if(!d.name)throw Error('No character data found');
  const c={id:uid(),name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',
-  first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',about:(about||d.creator_notes||'').replace(/<[^>]*>/g,'').slice(0,600),tags:d.tags||[],created:Date.now(),updated:Date.now(),src:'Imported',ex:d.mes_example||'',sys:d.system_prompt||'',img};
+  first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',about:cleanNote(about||d.creator_notes),tags:d.tags||[],created:Date.now(),updated:Date.now(),src:'Imported',ex:d.mes_example||'',sys:d.system_prompt||'',img};
  S.chars.push(c);
  if(d.character_book&&(d.character_book.entries||[]).length){const b=normBook(d.character_book,d.name+' lore');S.books.push(b);S.links[c.id]=[b.id]}
  return c.name}
@@ -216,11 +216,14 @@ let IMPOPT=null,LASTC=null;
 function stage(j,img,msg){const d=j.data||j;if(!d.name)throw Error('No character data found');
  if(IMPOPT?.direct){addChar(j,img,'',IMPOPT.about);LASTC=S.chars[S.chars.length-1].id;msg.push('Added '+d.name)}else(V.pq=V.pq||[]).push({j,img})}
 function goDetail(id){V.sheet=null;V.prev=null;V.pq=null;V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()}
-function prevFrom(p){const d=p.j.data||p.j,tk=Math.round(['name','description','personality','scenario','mes_example','first_mes','system_prompt'].map(k=>d[k]||'').join('').length/4),g=1+(d.alternate_greetings||[]).length,l=(d.character_book?.entries||[]).length;
- return{src:'file',name:d.name,creator:d.creator||'',about:(d.creator_notes||'').replace(/<[^>]*>/g,'').slice(0,500)||strip(d.description||'').slice(0,300),tags:d.tags||[],img:p.img,stats:`${tk>=1e3?(tk/1e3).toFixed(1)+'K':tk} tokens · ${g} greeting${g>1?'s':''}${l?' · '+l+' lore entries':''}`,q:p}}
-function nextPrev(){const q=V.pq;if(!q?.length){V.prev=null;V.sheet=null;return render()}V.prev=prevFrom(q[0]);V.sheet={t:'cprev'};render()}
-function hubPrev(n){const fp=n.fullPath,dt=n.lastActivityAt||n.createdAt,st=[n.starCount?'⭐ '+n.starCount:'',n.downloadCount?'⬇ '+n.downloadCount:'',n.nTokens?n.nTokens+' tokens':'',dt?'Updated '+new Date(dt).toLocaleDateString():''].filter(Boolean).join(' · ');
- return{src:'hub',fp,name:n.name,creator:fp.split('/')[0],about:n.tagline||n.description||'',tags:n.topics||n.tags||[],img:n.max_res_url||n.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`,stats:st}}
+function cleanNote(t){return(t||'').replace(/<[^>]*>/g,'').replace(/\n{3,}/g,'\n\n').trim().slice(0,1500)}
+async function hubCard(fp){const b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true),t=pngText(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)),k=t.ccv3||t.chara;if(!k)throw Error('no card data');return{bytes:b,j:b64json(k)}}
+function prevFrom(p){const d=p.j.data||p.j,n=p.node||{},nt=cleanNote(d.creator_notes),fp=p.fp,
+ c={name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',ex:d.mes_example||'',first:d.first_mes||'',alts:d.alternate_greetings||[],tags:d.tags||n.topics||[],creator:d.creator||(fp?fp.split('/')[0]:''),about:nt.length>15?nt:cleanNote(n.tagline||n.description)||nt,img:p.img,created:n.createdAt?Date.parse(n.createdAt):0,updated:n.lastActivityAt?Date.parse(n.lastActivityAt):0,src:'Imported'};
+ return{...p,c,lore:(d.character_book?.entries||[]).length,stars:n.starCount||0,dl:n.downloadCount||0}}
+function openPrev(p){V.prevBack=V.tab==='prev'?V.prevBack:V.tab;V.prev=p;V.gi=0;V.cdt='story';V.sheet=null;V.tab='prev';render()}
+function closePrev(){V.prev=null;V.pq=null;V.tab=V.prevBack||'home';render()}
+function nextPrev(){const q=V.pq;if(!q?.length)return closePrev();openPrev(prevFrom({src:'file',j:q[0].j,img:q[0].img}))}
 async function nfetch(url,o={},bin){const CH=window.Capacitor?.Plugins?.CapacitorHttp;
  try{const r=await fetch(url,o);if(!r.ok)throw Error(r.status);return bin?new Uint8Array(await r.arrayBuffer()):await r.json()}
  catch(e){if(!CH)throw e;const r=await CH.request({url,method:o.method||'GET',headers:o.headers||{},data:o.body?JSON.parse(o.body):undefined,responseType:bin?'arraybuffer':'json'});if(r.status>=400)throw Error(r.status);return bin?Uint8Array.from(atob(r.data),c=>c.charCodeAt(0)):r.data}}
@@ -232,24 +235,25 @@ async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link fi
  try{toast('Downloading…');const b=await nfetch(u,{},true),png=b[0]===137&&b[1]===80;await importFiles([new File([b],png?'card.png':'card.json',{type:png?'image/png':'application/json'})])}catch(e){toast('Import failed: '+e.message)}}
 function startWith(id,i){const c=S.chars.find(x=>x.id===id),cur=S.chats[id];if(cur?.some(m=>m.r==='u'))(S.old[id]=S.old[id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});
  const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[i]||g[0],s:g,i:Math.min(i,g.length-1)}]:[];(S.act=S.act||{})[id]=Date.now();save();openChat(id)}
-function charHtml(){const c=S.chars.find(x=>x.id===V.cd);if(!c){V.tab='home';return listHtml()}
+function charHtml(){const c=S.chars.find(x=>x.id===V.cd);if(!c){V.tab='home';return listHtml()}return charView(c,null)}
+function charView(c,pv){
  const cur=S.chats[c.id]||[],olds=S.old[c.id]||[],has=cur.some(m=>m.r==='u'),chats=olds.length+(has?1:0),msgs=olds.reduce((a,o)=>a+o.msgs.length,0)+cur.length,
   tk=Math.round(['name','desc','pers','scen','ex','sys','first'].map(k=>c[k]||'').join('').length/4),fmt=n=>n>=1e3?(n/1e3).toFixed(1)+'K':n,
   dt=t=>t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—',
   gs=[c.first,...(c.alts||[])].filter(Boolean),gi=Math.min(V.gi||0,Math.max(gs.length-1,0)),img=c.banner||c.img,
   sec=(t,x)=>x?`<h2 class="h2">${t}</h2><p class="body">${esc(x)}</p>`:'';
  const meta=((c.tags||[]).length?`<div class="tags" style="margin-top:14px">${c.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+`<p class="ps" style="margin-top:18px">Created ${dt(c.created)} · Updated ${dt(c.updated)}<br>Origin ${c.src||'Unknown'}</p>`;
- const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">‹</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">›</button></div><button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
-  +sec('About',c.about||strip(c.desc||'').slice(0,400))+meta;
+ const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">‹</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">›</button></div>${pv?`<button class="btn full" data-a="pimp" data-s="1" data-i="${gi}" style="margin-top:8px">💬 Import &amp; start with this opening</button>`:`<button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`}`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
+  +sec('About',c.about)+(c.about?'':`<h2 class="h2">About</h2><p class="ps">No About yet.${c.id?` <button class="lnk" style="color:var(--ac)" data-a="cfind" data-id="${c.id}">Find it on the hub</button>`:''}</p>`)+meta;
  const card=sec('Description',c.desc)+sec('Personality',c.pers)+sec('Scenario',c.scen)+sec('Definition',c.ex)+((S.links[c.id]||[]).length?`<h2 class="h2">Lorebooks</h2><div class="tags">${S.links[c.id].map(i=>S.books.find(b=>b.id===i)).filter(Boolean).map(b=>`<span class="chip">📖 ${esc(b.name)}</span>`).join('')}</div>`:'')
   ;
- return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><div class="hero">${img?`<img src="${img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}</div>
- <div class="ctr"><h1>${esc(c.name)}</h1><p class="ps" style="margin:0 0 4px">${esc(strip(c.about||c.desc||'').slice(0,110))}${(c.about||c.desc||'').length>110?'…':''}</p>${c.creator?`<p class="note" style="margin:0 0 14px">By ${esc(c.creator)}</p>`:'<div style="height:14px"></div>'}</div>
- <button class="btn full" data-a="open" data-id="${c.id}">💬 ${has?'Continue chat':'Chat now'}</button>
- <div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="editc">✎ Edit</button><button class="btn s" style="flex:1" data-a="cnew" data-id="${c.id}">＋ New chat</button></div>
- <div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div></div>
+ return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="${pv?'pback':'home'}" aria-label="Back">‹</button></header><main><div class="hero">${img?`<img src="${img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}</div>
+ <div class="ctr"><h1>${esc(c.name)}</h1><p class="ps" style="margin:0 0 4px">${esc(strip(c.about||'').slice(0,110))}${(c.about||'').length>110?'…':''}</p>${c.creator?`<p class="note" style="margin:0 0 14px">By ${esc(c.creator)}</p>`:'<div style="height:14px"></div>'}</div>
+ ${pv?`<button class="btn full" data-a="pimp">⬇ Import</button>`:`<button class="btn full" data-a="open" data-id="${c.id}">💬 ${has?'Continue chat':'Chat now'}</button>`}
+ ${pv?`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="pback">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`:`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="editc">✎ Edit</button><button class="btn s" style="flex:1" data-a="cnew" data-id="${c.id}">＋ New chat</button></div>`}
+ ${pv?`<div class="card2 stats" style="margin-top:18px"><div><b>${fmt(tk)}</b><span>tokens</span></div><div><b>${gs.length}</b><span>greetings</span></div><div><b>${pv.lore}</b><span>lore entries</span></div></div>${c.creator?`<div class="card2 pad" style="flex-direction:row;align-items:center;gap:14px"><div class="av">${esc(c.creator[0]||'?')}</div><div><b>${esc(c.creator)}</b><div class="note" style="margin:0">${[pv.stars?'⭐ '+pv.stars:'',pv.dl?'⬇ '+pv.dl:''].filter(Boolean).join(' · ')||'Creator'}</div></div></div>`:''}`:`<div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div></div>`}
  <p class="note" style="text-align:center">${fmt(tk)} tokens · Updated ${dt(c.updated)}</p>
- <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card:story}<div style="height:40px"></div></main>`}
+ <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card+(pv&&pv.lore?`<h2 class="h2">Lorebook</h2><p class="body">Includes ${pv.lore} lorebook entries.</p>`:''):story}<div style="height:40px"></div></main>`}
 function browseHtml(){const B=V.br;
  return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from a third-party hub.</p>
  <div class="rowh" style="gap:8px"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="pill" data-a="bsearch">Search</button></div>
@@ -358,7 +362,7 @@ function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook
   photos=`<label>Photos</label><div class="ph2"><div class="bx" data-a="pimg" data-t="banner">${o.banner?`<img src="${o.banner}" alt="">`:'<i>+</i>'}</div><div class="cr" data-a="pimg" data-t="img">${o.img?`<img src="${o.img}" alt="">`:'<i>+</i>'}</div></div>`,
   chk=(key,t,d)=>`<label class="card2 pad chk2"><input type="checkbox" id="f_${key}" ${o[key]?'checked':''}><b>${t}</b><span class="ps" style="margin:0;font-size:15px">${d}</span></label>`;
  let h=`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="edback" aria-label="Back">‹</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main><h1 class="pt">${isNew?'Build a':'Edit'} ${N}</h1>`;
- if(k==='c')h+=photos+box('Chat background','bgimg')+'<p class="ps">Shown behind the messages of every chat with this character.</p>'+inp('name','Character Name','Enter character name...')+ta('desc','Description','Who this character is',4)+ta('pers','Personality','Traits and temperament',3)+ta('scen','Scenario','Where and when this takes place',3)+tags('tags','Tags','What is this character into? Press Enter to add.','Add a tag...')
+ if(k==='c')h+=photos+box('Chat background','bgimg')+'<p class="ps">Shown behind the messages of every chat with this character.</p>'+inp('name','Character Name','Enter character name...')+ta('about','About','What other people see on the character page.',4)+ta('desc','Description','Who this character is',4)+ta('pers','Personality','Traits and temperament',3)+ta('scen','Scenario','Where and when this takes place',3)+tags('tags','Tags','What is this character into? Press Enter to add.','Add a tag...')
   +`<label>Greeting Messages</label><p class="ps" style="margin:0 0 8px">Users can swipe between these alternative greetings on the first message.</p>`+o.greets.map((g,i)=>`<div class="rowh"><label style="margin:12px 0 5px">Greeting Variation #${i+1}</label><span><button class="ib" data-a="gmv" data-i="${i}" data-d="-1">▲</button><button class="ib" data-a="gmv" data-i="${i}" data-d="1">▼</button><button class="ib" data-a="grm" data-i="${i}">✕</button></span></div><textarea id="gr_${i}" rows="4" placeholder="Greeting Variation #${i+1}...">${esc(g)}</textarea>`).join('')+`<button class="dash" data-a="gadd">+ Add Greeting Variation</button>`
   +ta('ex','Definition','Describe your character’s voice, syntax, rules, behaviors, and example dialogue.',8)+`<details><summary>System prompt override</summary><textarea id="f_sys" rows="3">${esc(o.sys)}</textarea></details>`+ta('rag','RAG Definition','World facts, history, and relationships, one paragraph per topic. Retrieved as needed.',8)
   +`<label>Lorebooks</label><p class="ps" style="margin:0 0 8px">Attach worlds you wrote once and reuse everywhere. Entries only enter a chat when the conversation calls for them.</p><p class="ps"><b>${o.links.length} attached</b></p>`+S.books.map(b=>`<label class="card2 lbk"><input type="checkbox" data-lk="${b.id}" ${o.links.includes(b.id)?'checked':''}>${b.cover?`<img src="${b.cover}" alt="">`:'<span class="lph">📖</span>'}<span><b>${esc(b.name)}</b><small>${b.entries.length} entries</small></span></label>`).join('');
@@ -403,7 +407,7 @@ function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
 const nc=(a,l,ic='+')=>`<div class="hc nc" data-a="${a}"><i>${ic}</i><b>${l}</b></div>`;
 function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
  const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
- if(T==='char')return charHtml();if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
+ if(T==='prev')return V.prev?charView(V.prev.c,V.prev):(V.tab='home',listHtml());if(T==='char')return charHtml();if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
  if(T==='settings'){const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
   return back('Settings')+`</header><main><div class="card2"><div class="srow" data-a="tab" data-id="pers"><div class="av">${esc((pn||'?')[0])}</div><div class="t"><b>${esc(pn||'No persona yet')}</b><small>Active persona</small></div><span class="chev">›</span></div></div>
   <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',S.models.length+' models')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}</div></main>`}
@@ -440,10 +444,16 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
-  bview:()=>{V.pq=null;V.prev=hubPrev(V.br.items[i]);V.sheet={t:'cprev'};render()},
-  pimp:()=>{const p=V.prev;if(p.src==='hub'){V.sheet=null;V.prev=null;render();return chubImport(p.fp,p.about)}
-   const it=V.pq.shift();addChar(it.j,it.img,'',(it.j.data||it.j).creator_notes);save();LASTC=S.chars[S.chars.length-1].id;if(V.pq.length)nextPrev();else goDetail(LASTC)},
-  pskip:()=>{if(V.pq?.length){V.pq.shift();nextPrev()}else{V.sheet=null;V.prev=null;render()}},
+  bview:async()=>{const n=V.br.items[i],fp=n.fullPath;toast('Loading preview…');try{const r=await hubCard(fp);openPrev(prevFrom({src:'hub',fp,bytes:r.bytes,j:r.j,node:n,img:n.max_res_url||n.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`}))}catch(e){toast('Couldn’t load preview: '+e.message)}},
+  pback:()=>{if(V.pq?.length){V.pq.shift();return nextPrev()}closePrev()},
+  pimp:async()=>{const p=V.prev,st=t.dataset.s,gi=+t.dataset.i||0;let nid=null;
+   if(p.src==='hub'){const n=S.chars.length;IMPOPT={direct:true,about:p.c.about};await importFiles([new File([p.bytes],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){nid=LASTC;if(V.br)V.br.done[p.fp]=1}}
+   else{const it=V.pq.shift();addChar(it.j,it.img,'',p.c.about);nid=S.chars[S.chars.length-1].id}
+   const c=S.chars.find(x=>x.id===nid);if(c&&p.fp)c.fp=p.fp;save();
+   if(V.pq?.length)return nextPrev();V.prev=null;V.pq=null;if(!nid)return closePrev();if(st)startWith(nid,gi);else goDetail(nid)},
+  cfind:async()=>{const c=S.chars.find(x=>x.id===id);toast('Searching the hub…');try{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(c.name)}&first=24&page=1&sort=download_count&asc=false&nsfw=true&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`),ns=j.data?.nodes||j.nodes||[],nm=x=>(x||'').toLowerCase().trim(),m=ns.filter(n=>nm(n.name)===nm(c.name)),best=m.find(n=>c.creator&&nm(n.fullPath.split('/')[0])===nm(c.creator))||m[0];
+   if(!best)return toast('Couldn’t find it on the hub. Use Edit to write an About.');const r=await hubCard(best.fullPath),d=r.j.data||r.j,nt=cleanNote(d.creator_notes);c.about=nt.length>15?nt:cleanNote(best.tagline||best.description);c.fp=best.fullPath;save();toast('About updated');render()}catch(e){toast('Failed: '+e.message)}},
+  
   cview:()=>{V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
   gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
   start:()=>startWith(id,i),cnew:()=>startWith(id,0),
@@ -467,7 +477,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   edback:()=>{const b=V.ed.back;V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render()},
   edsave:()=>{syncEd();const{k,id,o}=V.ed,b=V.ed.back,go=()=>{V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render()};
    if(k==='c'){if(!o.name.trim())return toast('Name is required');let c=S.chars.find(x=>x.id===id);if(!c){c={id:uid()};S.chars.push(c)}
-    Object.assign(c,{name:o.name.trim(),desc:o.desc,pers:o.pers,scen:o.scen,ex:o.ex,sys:o.sys,rag:o.rag,tags:o.tags,img:o.img,banner:o.banner,bgimg:o.bgimg,first:o.greets[0]||'',alts:o.greets.slice(1).filter(Boolean),updated:Date.now()});if(!c.created){c.created=Date.now();c.src='Created'}if(o.bgimg&&!c.bg)c.bg='img';S.links[c.id]=o.links;save();return go()}
+    Object.assign(c,{name:o.name.trim(),about:o.about||'',desc:o.desc,pers:o.pers,scen:o.scen,ex:o.ex,sys:o.sys,rag:o.rag,tags:o.tags,img:o.img,banner:o.banner,bgimg:o.bgimg,first:o.greets[0]||'',alts:o.greets.slice(1).filter(Boolean),updated:Date.now()});if(!c.created){c.created=Date.now();c.src='Created'}if(o.bgimg&&!c.bg)c.bg='img';S.links[c.id]=o.links;save();return go()}
    if(k==='p'){if(!o.name.trim())return toast('Name is required');let p=S.personas.find(x=>x.id===id);if(!p){p={id:uid()};S.personas.push(p)}Object.assign(p,{name:o.name.trim(),desc:o.desc,lore:o.lore,rag:o.rag,img:o.img,banner:o.banner});
     if(o.active)S.persona=p.id;else if(S.persona===p.id)S.persona=null;if(!S.persona&&V.ed.isNew)S.persona=p.id;save();return go()}
    if(k==='l'){if(!o.name.trim())return toast('Name is required');let l=S.books.find(x=>x.id===id);if(!l){l={id:uid(),entries:[]};S.books.push(l)}Object.assign(l,{name:o.name.trim(),desc:o.desc,tags:o.tags,cover:o.cover});save();V.bk=l.id;V.ed=null;V.tab='book';return render()}
