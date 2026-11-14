@@ -91,9 +91,10 @@ code{font-family:ui-monospace,monospace;font-size:13px;color:var(--mut);overflow
 .lock{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;max-width:420px;margin:0 auto}
 .brand{font:800 34px system-ui;letter-spacing:-1px;margin:0}.lock h2{font:700 26px system-ui;margin:0}.av.xl{width:120px;height:120px;font-size:44px;border:3px solid var(--ink)}
 .pw{position:relative;width:100%}.pw input{padding-right:48px}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:20px;filter:grayscale(1)}.btn.danger{background:#e5484d;color:#fff}
+.bc{display:flex;gap:12px;align-items:center;background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:10px;margin-bottom:10px}.bc img{width:64px;height:64px;border-radius:14px;object-fit:cover;flex:none;background:var(--ln)}.bc>div{flex:1;min-width:0}.bc b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bc small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--mut)}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=7;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<script>var VER=8;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -205,6 +206,22 @@ function lore(c,msgs){LF=[];const out=[],turns=i=>msgs.slice(i+1).filter(x=>x.r=
  return out.slice(0,8).join('\n\n').slice(0,3000)}
 function rag(t,h){if(!t)return'';const w=x=>x.toLowerCase().match(/[a-z0-9']{4,}/g)||[],q=new Set(w(h.slice(-6).map(m=>strip(m.t)).join(' ')));
  return t.split(/\n\s*\n/).map(p=>[p,w(p).filter(x=>q.has(x)).length]).filter(x=>x[1]>=2).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0].trim()).join('\n\n')}
+async function nfetch(url,o={},bin){const CH=window.Capacitor?.Plugins?.CapacitorHttp;
+ try{const r=await fetch(url,o);if(!r.ok)throw Error(r.status);return bin?new Uint8Array(await r.arrayBuffer()):await r.json()}
+ catch(e){if(!CH)throw e;const r=await CH.request({url,method:o.method||'GET',headers:o.headers||{},data:o.body?JSON.parse(o.body):undefined,responseType:bin?'arraybuffer':'json'});if(r.status>=400)throw Error(r.status);return bin?Uint8Array.from(atob(r.data),c=>c.charCodeAt(0)):r.data}}
+async function chubSearch(more){const B=V.br,qi=$('#bq');if(qi)B.q=qi.value;if(!more){B.page=1;B.items=[]}B.err='';B.busy=true;render();
+ try{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(B.q)}&first=24&page=${B.page}&sort=${B.sort}&asc=false&nsfw=${B.nsfw}&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`),n=j.data?.nodes||j.nodes||[];B.items=B.items.concat(n);B.more=n.length>=24;B.page++}
+ catch(e){B.err=e.message}B.busy=false;render()}
+async function chubImport(fp){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);await importFiles([new File([b],'card.png',{type:'image/png'})]);if(V.br&&S.chars.length>n)V.br.done[fp]=1;render()}catch(e){toast('Import failed: '+e.message)}}
+async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');const m=u.match(/(?:chub\.ai|characterhub\.org)\/characters\/([^?#\s]+)/i);if(m)return chubImport(m[1].replace(/\/$/,''));
+ try{toast('Downloading…');const b=await nfetch(u,{},true),png=b[0]===137&&b[1]===80;await importFiles([new File([b],png?'card.png':'card.json',{type:png?'image/png':'application/json'})])}catch(e){toast('Import failed: '+e.message)}}
+function browseHtml(){const B=V.br;
+ return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from a third-party hub.</p>
+ <div class="rowh" style="gap:8px"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="pill" data-a="bsearch">Search</button></div>
+ <div class="rowh" style="margin:12px 0"><select id="bs" style="width:auto">${[['download_count','Most downloaded'],['star_count','Most starred'],['created_at','Newest']].map(([v,n])=>`<option value="${v}" ${B.sort===v?'selected':''}>${n}</option>`).join('')}</select><label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label></div>
+ <label>Or paste a link</label><div class="rowh" style="gap:8px"><input id="bu" placeholder="chub.ai link, or direct .png / .json URL" autocomplete="off"><button class="pill" data-a="burl">Import</button></div><div style="height:18px"></div>`
+ +B.items.map(n=>{const fp=n.fullPath,im=n.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`;return`<div class="bc"><img src="${esc(im)}" alt="" loading="lazy" referrerpolicy="no-referrer"><div><b>${esc(n.name)}</b><small>${esc(n.tagline||'')}</small></div><button class="btn s" data-a="bimp" data-id="${esc(fp)}" style="flex:none">${B.done[fp]?'Added ✓':'Import'}</button></div>`}).join('')
+ +(B.err?`<p class="note">Couldn’t reach the hub (${esc(B.err)}). The Android app usually can; you can also paste a link above.</p>`:'')+(B.busy?'<p class="note">Loading…</p>':'')+(B.more&&!B.busy?'<button class="dash" data-a="bmore" style="width:100%">Load more</button>':'')+'<div style="height:40px"></div></main>'}
 const hs=t=>{let h=0;for(let i=0;i<t.length;i++)h=(Math.imul(31,h)+t.charCodeAt(i))|0;return h};
 const cos=(a,b)=>{let d=0,x=0,y=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i]}return d/Math.sqrt(x*y||1)};
 async function embed(g,texts){const r=await fetch(g.url.replace(/\/$/,'')+'/embeddings',{method:'POST',headers:{'content-type':'application/json',...(g.key?{authorization:'Bearer '+g.key}:{})},body:JSON.stringify({model:g.model,input:texts})});if(!r.ok)throw Error(r.status);return(await r.json()).data.map(d=>d.embedding)}
@@ -330,7 +347,7 @@ function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="h
  title=(t,d)=>`<h1 class="pt">${t}</h1><p class="ps">${d}</p>`;
  if(SUB[T]){const f=cfgForm(T);return hd+title(f[0],SUB[T])+f[1]+'</main>'}
  if(T==='import'){const ic=(t,d,a,l)=>`<div class="card2 pad"><div class="rowh" style="align-items:flex-start;gap:14px"><div><b>${t}</b><p class="ps" style="margin:6px 0 0;font-size:15px">${d}</p></div><button class="btn s" data-a="${a}" style="flex:none">${l}</button></div></div>`;
-  return hd+title('Import','Bring characters and lorebooks from other apps.')+ic('Back up this device','Save everything to one file. API keys are never included.','bak','Save backup')+ic('Restore a backup','Load a file saved with Save backup. Your keys stay as they are.','rest','Choose file')+ic('SillyTavern characters','Character cards: JSON or PNG (V2, V3). Embedded lorebooks are imported too.','imp','Choose file')+ic('SillyTavern lorebooks','World Info JSON files.','imp','Choose file')+'</main>'}
+  return hd+title('Import','Bring characters and lorebooks from other apps.')+ic('Back up this device','Save everything to one file. API keys are never included.','bak','Save backup')+ic('Restore a backup','Load a file saved with Save backup. Your keys stay as they are.','rest','Choose file')+ic('SillyTavern characters','Character cards: JSON or PNG (V2, V3). Embedded lorebooks are imported too.','imp','Choose file')+ic('SillyTavern lorebooks','World Info JSON files.','imp','Choose file')+ic('Discover characters','Browse public characters and import them in one tap.','browse','Open')+'</main>'}
  if(T==='memory'){const mc=S.cfg.mem,stp=(k,t,d)=>`<h2 class="h2">${t}</h2><div class="card2 pad"><div class="rowh"><p class="ps" style="margin:0;font-size:15px;flex:1">${d}</p><div class="step"><button data-a="st" data-k="${k}" data-d="-1">−</button><b>${mc[k]}</b><button data-a="st" data-k="${k}" data-d="1">+</button></div></div></div>`;
   return hd+title('Memory','Older messages are summarized into memories so long chats stay coherent.')+`<h2 class="h2">Embedding model</h2><p class="ps" style="margin-top:-4px">Retrieves RAG paragraphs and keyword-less lorebook entries by meaning. Mark a model as an embedding model in Providers. Empty uses keyword matching.</p><select id="emb_m"><option value="">None (keyword matching)</option>${S.models.filter(m=>m.emb).map(m=>`<option value="${m.id}" ${S.cfg.emb===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select><h2 class="h2">Long-term memory</h2><select id="mem_on"><option ${mc.on?'':'selected'}>Off</option><option ${mc.on?'selected':''}>On</option></select><h2 class="h2">Summary model</h2><p class="ps" style="margin-top:-4px">Empty means each chat’s own reply model.</p><select id="mem_m"><option value="">Chat’s own reply model</option>${S.models.map(m=>`<option value="${m.id}" ${mc.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select>`+stp('every','Messages per memory run','New memories are written after this many older messages pile up.')+stp('per','Messages summarized per run','How many of the oldest waiting messages each run summarizes.')+stp('keep','Memories kept per chat','Older memories are dropped past this. Zero keeps everything.')+'</main>'}
  if(T==='sec'){const L=S.lock?.hash,f=(id,l)=>`<label>${l}</label><div class="pw"><input id="${id}" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="${id}">👁</button></div>`;
@@ -347,21 +364,21 @@ function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
  if(k==='c')return`<div class="hc" data-a="open" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(x.name[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
  if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc((x.name||'?')[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
  return`<div class="hc" data-a="book" data-id="${x.id}">${x.cover?`<img src="${x.cover}" alt="">`:'<div class="ph">📖</div>'}<div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
-const nc=(a,l)=>`<div class="hc nc" data-a="${a}"><i>+</i><b>${l}</b></div>`;
+const nc=(a,l,ic='+')=>`<div class="hc nc" data-a="${a}"><i>${ic}</i><b>${l}</b></div>`;
 function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
  const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
- if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
+ if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
  if(T==='settings'){const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
   return back('Settings')+`</header><main><div class="card2"><div class="srow" data-a="tab" data-id="pers"><div class="av">${esc((pn||'?')[0])}</div><div class="t"><b>${esc(pn||'No persona yet')}</b><small>Active persona</small></div><span class="chev">›</span></div></div>
   <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',S.models.length+' models')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}</div></main>`}
  if(T!=='home'){const k={chars:'c',lore:'l',pers:'p'}[T],items=k==='c'?[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)):k==='l'?S.books:S.personas;
-  return back({chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T])+`${T!=='pers'?'<button class="ib" data-a="imp">Import</button>':''}</header><main>${k==='c'&&items.length>6?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc(k==='c'?'newc':k==='p'?'newp':'newl',k==='c'?'New character':k==='p'?'New persona':'New lorebook')}${items.map(x=>card(k,x)).join('')}</div></main>`}
+  return back({chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T])+`${T!=='pers'?'<button class="ib" data-a="imp">Import</button>':''}</header><main>${k==='c'&&items.length>6?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc(k==='c'?'newc':k==='p'?'newp':'newl',k==='c'?'New character':k==='p'?'New persona':'New lorebook')}${k==='c'?nc('browse','Discover','🔍'):''}${items.map(x=>card(k,x)).join('')}</div></main>`}
  const sec=(t,n,k,items,add)=>`<div class="sh2" data-a="tab" data-id="${k}"><h2>${t}<span>${n}</span></h2><i>›</i></div><div class="hs">${add}${items.slice(0,12).map(x=>card({chars:'c',lore:'l',pers:'p'}[k],x)).join('')}</div>`;
  const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
  return`<header><h1 class="wm">Hearth</h1><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>
  <div class="hello"><div class="av big">${esc((pn||'H')[0])}</div><div><h1>${gr}${pn?', '+esc(pn):''}</h1><small>${S.chars.length} characters</small></div></div>
  ${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
- ${sec('Your Characters',S.chars.length,'chars',rc,nc('newc','New character')+(S.chars.length?'':nc('imp','Import')))}
+ ${sec('Your Characters',S.chars.length,'chars',rc,nc('newc','New character')+nc('browse','Discover','🔍')+(S.chars.length?'':nc('imp','Import')))}
  ${sec('Your Personas',S.personas.length,'pers',S.personas,nc('newp','New persona'))}
  ${sec('Lorebooks',S.books.length,'lore',S.books,nc('newl','New lorebook'))}</main>`}
 function render(scroll){const a=$('#app');if(V.loading||V.locked){a.innerHTML=lockHtml();return}
@@ -387,6 +404,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
+  browse:()=>{V.br=V.br||{q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
+  bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
   eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
   lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={salt,hash:await hsh(n,salt)};save();toast('Password saved');render()},
   lockrm:async()=>{if(await hsh($('#s_cur').value,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');S.lock=null;save();toast('Password removed');render()},
@@ -457,6 +476,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   delp:()=>{const p=V.sheet.p;S.personas=S.personas.filter(x=>x!==p);if(S.persona===p.id)S.persona=null;V.sheet=null;save();render()}
  })[a]?.()});
 document.addEventListener('change',e=>{const t=e.target;
+ if(t.id==='bs'){V.br.sort=t.value;chubSearch()}
+ if(t.id==='bn'){V.br.nsfw=t.checked;chubSearch()}
  if(/^g_/.test(t.id)){readCfg();save();applyTheme()}
  if(t.dataset.tag&&t.value.trim())addTag(t);
  if(t.dataset.lk&&V.ed){const l=V.ed.o.links;if(t.checked){if(!l.includes(t.dataset.lk))l.push(t.dataset.lk)}else V.ed.o.links=l.filter(x=>x!==t.dataset.lk)}
@@ -474,7 +495,7 @@ setTimeout(()=>{if(V.loading){V.loading=false;V.locked=!!S.lock?.hash;render()}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.lock?.hash&&!V.loading){V.locked=true;render()}});
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.target.value.toLowerCase().trim(),c=C();
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
 applyTheme();setTimeout(()=>{if(Date.now()-(S.lastUpd||0)>216e5){S.lastUpd=Date.now();save();checkUpdate(false)}},3000);document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
 addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab!=='home')V.tab='home';render()});
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
