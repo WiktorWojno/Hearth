@@ -148,7 +148,7 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .hc.on{outline:3px solid var(--ac);outline-offset:2px}.chev{color:var(--mut);font-size:22px}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=19;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=20;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -284,7 +284,14 @@ function stage(j,img,msg){const d=j.data||j;if(!d.name)throw Error('No character
  if(IMPOPT?.direct){addChar(j,img,'',IMPOPT.about);LASTC=S.chars[S.chars.length-1].id;msg.push('Added '+d.name)}else(V.pq=V.pq||[]).push({j,img})}
 function goDetail(id){V.sheet=null;V.prev=null;V.pq=null;V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()}
 function cleanNote(t){return(t||'').replace(/<[^>]*>/g,'').replace(/\n{3,}/g,'\n\n').trim().slice(0,1500)}
-async function hubCard(fp){const b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true),t=pngText(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)),k=t.ccv3||t.chara;if(!k)throw Error('no card data');return{bytes:b,j:b64json(k)}}
+const pngJson=b=>{if(!(b[0]===137&&b[1]===80))throw Error('not a PNG');const t=pngText(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)),k=t.ccv3||t.chara;if(!k)throw Error('PNG has no card data');return b64json(k)};
+async function firstCard(urls){let err;for(const u of urls){try{const b=await nfetch(u,{},true);return{bytes:b,j:pngJson(b),url:u}}catch(e){err=e}}throw err||Error('no card found')}
+async function scrape(url){const b=await nfetch(url,{},true),h=new TextDecoder().decode(b),og=(h.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)/i)||[])[1];
+ return[...new Set([og,...(h.match(/https?:\/\/[^"'\s<>)]+\.png[^"'\s<>)]*/gi)||[])].filter(Boolean).map(x=>x.replace(/&amp;/g,'&')))].slice(0,8)}
+async function hubCard(fp,src='chub'){if(src==='ct'){try{return await firstCard([`https://cards.character-tavern.com/${fp}.png`,`https://cards.character-tavern.com/${fp}.png?action=download`])}catch(e){return await firstCard(await scrape(`https://character-tavern.com/character/${fp}`))}}
+ return firstCard([`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`])}
+async function ctSearch(B){const j=await nfetch(`https://character-tavern.com/api/search/cards?query=${encodeURIComponent(B.q)}&page=${B.page}&limit=24&sort=${B.sort==='created_at'?'newest':'most_popular'}&hideNsfw=${!B.nsfw}`),l=j.hits||j.results||j.cards||j.data||(Array.isArray(j)?j:[]);
+ return l.map(x=>{const p=x.path||x.fullPath||(x.author&&(x.slug||x.id)?`${x.author}/${x.slug||x.id}`:x.id);return{src:'ct',fullPath:p,name:x.name||x.inChatName||p,tagline:x.tagline||x.description||'',avatar_url:x.avatar||x.imageUrl||`https://cards.character-tavern.com/${p}.png`,topics:x.tags||[],starCount:x.likes||x.starCount||0,downloadCount:x.views||x.downloads||0,nTokens:x.tokenTotal||x.tokens||0,createdAt:x.createdAt,lastActivityAt:x.updatedAt||x.lastUpdatedAt}}).filter(n=>n.fullPath)}
 function prevFrom(p){const d=p.j.data||p.j,n=p.node||{},nt=cleanNote(d.creator_notes),fp=p.fp,
  c={name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',ex:d.mes_example||'',first:d.first_mes||'',alts:d.alternate_greetings||[],tags:d.tags||n.topics||[],creator:d.creator||(fp?fp.split('/')[0]:''),about:nt.length>15?nt:cleanNote(n.tagline||n.description)||nt,img:p.img,created:n.createdAt?Date.parse(n.createdAt):0,updated:n.lastActivityAt?Date.parse(n.lastActivityAt):0,src:'Imported'};
  return{...p,c,lore:(d.character_book?.entries||[]).length,stars:n.starCount||0,dl:n.downloadCount||0}}
@@ -295,11 +302,15 @@ async function nfetch(url,o={},bin){const CH=window.Capacitor?.Plugins?.Capacito
  try{const r=await fetch(url,o);if(!r.ok)throw Error(r.status);return bin?new Uint8Array(await r.arrayBuffer()):await r.json()}
  catch(e){if(!CH)throw e;const r=await CH.request({url,method:o.method||'GET',headers:o.headers||{},data:o.body?JSON.parse(o.body):undefined,responseType:bin?'arraybuffer':'json'});if(r.status>=400)throw Error(r.status);return bin?Uint8Array.from(atob(r.data),c=>c.charCodeAt(0)):r.data}}
 async function chubSearch(more){const B=V.br,qi=$('#bq');if(qi)B.q=qi.value;if(!more){B.page=1;B.items=[]}B.err='';B.busy=true;render();
- try{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(B.q)}&first=24&page=${B.page}&sort=${B.sort}&asc=false&nsfw=${B.nsfw}&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`),n=j.data?.nodes||j.nodes||[];B.items=B.items.concat(n);B.more=n.length>=24;B.page++}
- catch(e){B.err=e.message}B.busy=false;render()}
+ try{let n;if(B.src==='ct')n=await ctSearch(B);else{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(B.q)}&first=24&page=${B.page}&sort=${B.sort}&asc=false&nsfw=${B.nsfw}&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`);n=(j.data?.nodes||j.nodes||[]).map(x=>({...x,src:'chub'}))}
+  B.items=B.items.concat(n);B.more=n.length>=24;B.page++}catch(e){B.err=e.message}B.busy=false;render()}
 async function chubImport(fp,about){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);IMPOPT={direct:true,about};await importFiles([new File([b],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){if(V.br)V.br.done[fp]=1;goDetail(LASTC)}else toast('That card had no character data')}catch(e){IMPOPT=null;toast('Import failed: '+e.message)}}
-async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');const m=u.match(/(?:chub\.ai|characterhub\.org)\/characters\/([^?#\s]+)/i);if(m)return chubImport(m[1].replace(/\/$/,''));
- try{toast('Downloading…');const b=await nfetch(u,{},true),png=b[0]===137&&b[1]===80;await importFiles([new File([b],png?'card.png':'card.json',{type:png?'image/png':'application/json'})])}catch(e){toast('Import failed: '+e.message)}}
+async function previewFp(fp,src,node){toast('Loading preview…');try{const r=await hubCard(fp,src);openPrev(prevFrom({src:'hub',fp,bytes:r.bytes,j:r.j,node:node||{},img:node?.max_res_url||node?.avatar_url||(src==='ct'?`https://cards.character-tavern.com/${fp}.png`:`https://avatars.charhub.io/avatars/${fp}/avatar.webp`)}))}catch(e){toast('Couldn’t load preview: '+e.message)}}
+async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');
+ let m=u.match(/(?:chub\.ai|characterhub\.org)\/characters\/([^?#\s]+)/i);if(m)return previewFp(m[1].replace(/\/$/,''),'chub');
+ m=u.match(/character-tavern\.com\/character\/([^?#\s]+)/i);if(m)return previewFp(m[1].replace(/\/$/,''),'ct');
+ try{toast('Downloading…');let b=await nfetch(u,{},true);if(!(b[0]===137&&b[1]===80)&&b[0]!==123)b=(await firstCard(await scrape(u))).bytes;
+  const png=b[0]===137&&b[1]===80;await importFiles([new File([b],png?'card.png':'card.json',{type:png?'image/png':'application/json'})])}catch(e){toast('Import failed: '+e.message)}}
 function startWith(id,i){const c=S.chars.find(x=>x.id===id),cur=S.chats[id];if(cur?.some(m=>m.r==='u'))(S.old[id]=S.old[id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});
  const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[i]||g[0],s:g,i:Math.min(i,g.length-1)}]:[];(S.act=S.act||{})[id]=Date.now();save();openChat(id)}
 function charHtml(){const c=S.chars.find(x=>x.id===V.cd);if(!c){V.tab='home';return listHtml()}return charView(c,null)}
@@ -322,12 +333,12 @@ function charView(c,pv){
  <p class="note" style="text-align:center">${fmt(tk)} tokens · Updated ${dt(c.updated)}</p>
  <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card+(pv&&pv.lore?`<h2 class="h2">Lorebook</h2><p class="body">Includes ${pv.lore} lorebook entries.</p>`:''):story}<div style="height:40px"></div></main>`}
 function browseHtml(){const B=V.br;
- return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from a third-party hub.</p>
+ return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from third-party sites.</p><div class="tabs" style="margin:0 0 16px"><button class="${B.src!=='ct'?'on':''}" data-a="bsrc" data-id="chub">Chub</button><button class="${B.src==='ct'?'on':''}" data-a="bsrc" data-id="ct">Character Tavern</button></div>
  <div class="rowh" style="gap:8px"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="pill" data-a="bsearch">Search</button></div>
  <div class="rowh" style="margin:12px 0"><select id="bs" style="width:auto">${[['download_count','Most downloaded'],['star_count','Most starred'],['created_at','Newest']].map(([v,n])=>`<option value="${v}" ${B.sort===v?'selected':''}>${n}</option>`).join('')}</select><label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label></div>
  <label>Or paste a link</label><div class="rowh" style="gap:8px"><input id="bu" placeholder="chub.ai link, or direct .png / .json URL" autocomplete="off"><button class="pill" data-a="burl">Import</button></div><div style="height:18px"></div>`
  +B.items.map((n,ix)=>{const fp=n.fullPath,im=n.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`;return`<div class="bc" data-a="bview" data-i="${ix}"><img src="${esc(im)}" alt="" loading="lazy" referrerpolicy="no-referrer"><div><b>${esc(n.name)}</b><small>${esc(n.tagline||'')}</small></div><span class="${B.done[fp]?'badge ok':'chev'}">${B.done[fp]?'Added ✓':'›'}</span></div>`}).join('')
- +(B.err?`<p class="note">Couldn’t reach the hub (${esc(B.err)}). The Android app usually can; you can also paste a link above.</p>`:'')+(B.busy?'<p class="note">Loading…</p>':'')+(B.more&&!B.busy?'<button class="dash" data-a="bmore" style="width:100%">Load more</button>':'')+'<div style="height:40px"></div></main>'}
+ +(B.err?`<p class="note">Couldn’t reach the hub (${esc(B.err)}). The Android app usually can; try the other source or paste a link above.</p>`:'')+(B.busy?'<p class="note">Loading…</p>':'')+(B.more&&!B.busy?'<button class="dash" data-a="bmore" style="width:100%">Load more</button>':'')+'<div style="height:40px"></div></main>'}
 const hs=t=>{let h=0;for(let i=0;i<t.length;i++)h=(Math.imul(31,h)+t.charCodeAt(i))|0;return h};
 const cos=(a,b)=>{let d=0,x=0,y=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i]}return d/Math.sqrt(x*y||1)};
 async function embed(g,texts){const r=await fetch(g.url.replace(/\/$/,'')+'/embeddings',{method:'POST',headers:{'content-type':'application/json',...(g.key?{authorization:'Bearer '+g.key}:{})},body:JSON.stringify({model:g.model,input:texts})});if(!r.ok)throw Error(r.status);return(await r.json()).data.map(d=>d.embedding)}
@@ -538,7 +549,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
-  bview:async()=>{const n=V.br.items[i],fp=n.fullPath;toast('Loading preview…');try{const r=await hubCard(fp);openPrev(prevFrom({src:'hub',fp,bytes:r.bytes,j:r.j,node:n,img:n.max_res_url||n.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`}))}catch(e){toast('Couldn’t load preview: '+e.message)}},
+  bview:()=>{const n=V.br.items[i];previewFp(n.fullPath,n.src||'chub',n)},
+  bsrc:()=>{V.br.src=id;chubSearch()},
   pback:()=>{if(V.pq?.length){V.pq.shift();return nextPrev()}closePrev()},
   pimp:async()=>{const p=V.prev,st=t.dataset.s,gi=+t.dataset.i||0;let nid=null;
    if(p.src==='hub'){const n=S.chars.length;IMPOPT={direct:true,about:p.c.about};await importFiles([new File([p.bytes],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){nid=LASTC;if(V.br)V.br.done[p.fp]=1}}
@@ -551,7 +563,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   cview:()=>{V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
   gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
   start:()=>startWith(id,i),cnew:()=>startWith(id,0),
-  browse:()=>{V.br=V.br||{q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
+  browse:()=>{V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
   bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
   eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
   lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={...S.lock,salt,hash:await hsh(n,salt)};save();toast('Password saved');render()},
