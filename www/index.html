@@ -146,9 +146,11 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .pcard .t{flex:1;min-width:0}.pcard b{display:block;font-size:20px}.pcard small{color:var(--mut)}.pcard:active{transform:scale(.99)}
 .h3{font:600 12px Inter,system-ui;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin:22px 8px 8px}
 .hc.on{outline:3px solid var(--ac);outline-offset:2px}.chev{color:var(--mut);font-size:22px}
+.md{white-space:pre-wrap;line-height:1.6}.md h1,.md h2,.md h3,.md h4{font:700 18px Inter,system-ui,sans-serif;margin:.9em 0 .3em}.md ul,.md ol{margin:.4em 0;padding-left:1.4em;white-space:normal}.md hr{border:0;border-top:1px solid var(--ln);margin:12px 0}.md blockquote{border-left:3px solid var(--ln);margin:.5em 0;padding-left:12px;color:var(--mut)}.md img{max-width:100%;height:auto;border-radius:12px}.md a{color:var(--ac)}.md pre{background:var(--bg);padding:10px;border-radius:12px;overflow-x:auto}
+.bub h1,.bub h2,.bub h3,.bub h4{font:700 1.1em Inter,system-ui,sans-serif;margin:.6em 0 .2em}.bub ul,.bub ol{margin:.3em 0;padding-left:1.3em;white-space:normal}.bub hr{border:0;border-top:1px solid var(--ln)}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=20;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=21;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -222,8 +224,20 @@ function clean(n){for(const c of [...n.childNodes]){if(c.nodeType===3)continue;i
 function md(n){for(const c of [...n.childNodes]){if(c.nodeType===3){if(/[*`]/.test(c.data)){const s=document.createElement('span');
   s.innerHTML=esc(c.data).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\*([^*\n]+)\*/g,'<i>$1</i>');c.replaceWith(...s.childNodes)}}
   else if(c.nodeType===1&&!/^(code|pre)$/i.test(c.tagName))md(c)}}
+function mdBlocks(t){const o=[];let ul=0,ol=0,code=0,bq=0;const close=()=>{if(ul){o.push('</ul>');ul=0}if(ol){o.push('</ol>');ol=0}if(bq){o.push('</blockquote>');bq=0}};
+ for(const l of String(t).split('\n')){let m;
+  if(/^```/.test(l)){close();o.push(code?'</pre>':'<pre>');code=!code;continue}
+  if(code){o.push(l.replace(/</g,'&lt;')+'\n');continue}
+  if(m=/^(#{1,6})\s+(.*)$/.exec(l)){close();o.push(`<h${m[1].length}>${m[2]}</h${m[1].length}>`);continue}
+  if(/^\s*([-*_])(\s*\1){2,}\s*$/.test(l)){close();o.push('<hr>');continue}
+  if(m=/^\s*[-*+]\s+(.*)$/.exec(l)){if(!ul){close();o.push('<ul>');ul=1}o.push(`<li>${m[1]}</li>`);continue}
+  if(m=/^\s*\d+[.)]\s+(.*)$/.exec(l)){if(!ol){close();o.push('<ol>');ol=1}o.push(`<li>${m[1]}</li>`);continue}
+  if(m=/^>\s?(.*)$/.exec(l)){if(!bq){close();o.push('<blockquote>');bq=1}o.push(m[1]+'\n');continue}
+  close();o.push(l+'\n')}
+ close();if(code)o.push('</pre>');
+ return o.join('').replace(/!\[([^\]]*)\]\(\s*(https?:\/\/[^\s)]+|data:image\/[^\s)]+)(?:\s+"[^"]*")?\s*\)/g,(_,a,u)=>`<img src="${u}" alt="${a.replace(/"/g,'')}">`).replace(/\[([^\]]+)\]\(\s*(https?:\/\/[^\s)]+)\s*\)/g,(_,a,u)=>`<a href="${u}">${a}</a>`).replace(/~~([^~\n]+)~~/g,'<del>$1</del>')}
 function rich(t){if(S.cfg.html===false)return esc(t);
- const b=new DOMParser().parseFromString('<body>'+t,'text/html').body;clean(b);md(b);return b.innerHTML}
+ const b=new DOMParser().parseFromString('<body>'+mdBlocks(t),'text/html').body;clean(b);md(b);return b.innerHTML}
 const readCfg=()=>{const g=S.cfg;for(const[k,id]of Object.entries({prov:'prov',url:'g_url',key:'g_key',model:'g_model',temp:'g_temp',max:'g_max',top:'g_top',sys:'g_sys',html:'g_html',theme:'g_theme',fs:'g_fs',ff:'g_ff',repo:'g_repo',gh:'g_gh',auto:'g_auto',hist:'g_hist',autoc:'g_autoc'})){const e=document.getElementById(id);if(!e)continue;
  g[k]=e.type==='checkbox'?e.checked:['temp','max','top','fs','hist'].includes(k)?(e.value===''?g[k]:+e.value):k==='sys'?e.value:e.value.trim()}};
 
@@ -283,15 +297,17 @@ let IMPOPT=null,LASTC=null;
 function stage(j,img,msg){const d=j.data||j;if(!d.name)throw Error('No character data found');
  if(IMPOPT?.direct){addChar(j,img,'',IMPOPT.about);LASTC=S.chars[S.chars.length-1].id;msg.push('Added '+d.name)}else(V.pq=V.pq||[]).push({j,img})}
 function goDetail(id){V.sheet=null;V.prev=null;V.pq=null;V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()}
-function cleanNote(t){return(t||'').replace(/<[^>]*>/g,'').replace(/\n{3,}/g,'\n\n').trim().slice(0,1500)}
+function cleanNote(t){return(t||'').replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim().slice(0,30000)}
 const pngJson=b=>{if(!(b[0]===137&&b[1]===80))throw Error('not a PNG');const t=pngText(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)),k=t.ccv3||t.chara;if(!k)throw Error('PNG has no card data');return b64json(k)};
 async function firstCard(urls){let err;for(const u of urls){try{const b=await nfetch(u,{},true);return{bytes:b,j:pngJson(b),url:u}}catch(e){err=e}}throw err||Error('no card found')}
 async function scrape(url){const b=await nfetch(url,{},true),h=new TextDecoder().decode(b),og=(h.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)/i)||[])[1];
  return[...new Set([og,...(h.match(/https?:\/\/[^"'\s<>)]+\.png[^"'\s<>)]*/gi)||[])].filter(Boolean).map(x=>x.replace(/&amp;/g,'&')))].slice(0,8)}
 async function hubCard(fp,src='chub'){if(src==='ct'){try{return await firstCard([`https://cards.character-tavern.com/${fp}.png`,`https://cards.character-tavern.com/${fp}.png?action=download`])}catch(e){return await firstCard(await scrape(`https://character-tavern.com/character/${fp}`))}}
  return firstCard([`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`])}
-async function ctSearch(B){const j=await nfetch(`https://character-tavern.com/api/search/cards?query=${encodeURIComponent(B.q)}&page=${B.page}&limit=24&sort=${B.sort==='created_at'?'newest':'most_popular'}&hideNsfw=${!B.nsfw}`),l=j.hits||j.results||j.cards||j.data||(Array.isArray(j)?j:[]);
- return l.map(x=>{const p=x.path||x.fullPath||(x.author&&(x.slug||x.id)?`${x.author}/${x.slug||x.id}`:x.id);return{src:'ct',fullPath:p,name:x.name||x.inChatName||p,tagline:x.tagline||x.description||'',avatar_url:x.avatar||x.imageUrl||`https://cards.character-tavern.com/${p}.png`,topics:x.tags||[],starCount:x.likes||x.starCount||0,downloadCount:x.views||x.downloads||0,nTokens:x.tokenTotal||x.tokens||0,createdAt:x.createdAt,lastActivityAt:x.updatedAt||x.lastUpdatedAt}}).filter(n=>n.fullPath)}
+function firstArr(o,d=0){if(Array.isArray(o))return o;if(o&&typeof o==='object'&&d<3)for(const v of Object.values(o)){const r=firstArr(v,d+1);if(r&&r.length&&typeof r[0]==='object')return r}return null}
+async function ctSearch(B){const q=encodeURIComponent(B.q),pg=B.page,h=!B.nsfw,eps=[`https://character-tavern.com/api/search/cards?query=${q}&page=${pg}&limit=24&hideNsfw=${h}`,`https://character-tavern.com/api/search?q=${q}&page=${pg}&limit=24`,`https://character-tavern.com/api/cards?search=${q}&page=${pg}&limit=24`,`https://character-tavern.com/api/characters?search=${q}&page=${pg}&limit=24`,`https://character-tavern.com/api/catalog/search?query=${q}&page=${pg}`];let last='no response';
+ for(const u of eps){try{const l=firstArr(await nfetch(u))||[];if(l.length)return l.map(x=>{const p=x.path||x.fullPath||(x.author&&(x.slug||x.id)?`${x.author}/${x.slug||x.id}`:x.id);return{src:'ct',fullPath:p,name:x.name||x.inChatName||p,tagline:x.tagline||x.description||'',avatar_url:x.avatar||x.imageUrl||`https://cards.character-tavern.com/${p}.png`,topics:x.tags||[],starCount:x.likes||x.starCount||0,downloadCount:x.views||x.downloads||0,nTokens:x.tokenTotal||x.tokens||0,createdAt:x.createdAt,lastActivityAt:x.updatedAt||x.lastUpdatedAt}}).filter(n=>n.fullPath);last='empty result'}catch(e){last=e.message}}
+ throw Error(`Character Tavern search isn’t available right now (tried ${eps.length} addresses, last: ${last}). Paste a character-tavern.com link instead`)}
 function prevFrom(p){const d=p.j.data||p.j,n=p.node||{},nt=cleanNote(d.creator_notes),fp=p.fp,
  c={name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',ex:d.mes_example||'',first:d.first_mes||'',alts:d.alternate_greetings||[],tags:d.tags||n.topics||[],creator:d.creator||(fp?fp.split('/')[0]:''),about:nt.length>15?nt:cleanNote(n.tagline||n.description)||nt,img:p.img,created:n.createdAt?Date.parse(n.createdAt):0,updated:n.lastActivityAt?Date.parse(n.lastActivityAt):0,src:'Imported'};
  return{...p,c,lore:(d.character_book?.entries||[]).length,stars:n.starCount||0,dl:n.downloadCount||0}}
@@ -305,7 +321,7 @@ async function chubSearch(more){const B=V.br,qi=$('#bq');if(qi)B.q=qi.value;if(!
  try{let n;if(B.src==='ct')n=await ctSearch(B);else{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(B.q)}&first=24&page=${B.page}&sort=${B.sort}&asc=false&nsfw=${B.nsfw}&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`);n=(j.data?.nodes||j.nodes||[]).map(x=>({...x,src:'chub'}))}
   B.items=B.items.concat(n);B.more=n.length>=24;B.page++}catch(e){B.err=e.message}B.busy=false;render()}
 async function chubImport(fp,about){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);IMPOPT={direct:true,about};await importFiles([new File([b],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){if(V.br)V.br.done[fp]=1;goDetail(LASTC)}else toast('That card had no character data')}catch(e){IMPOPT=null;toast('Import failed: '+e.message)}}
-async function previewFp(fp,src,node){toast('Loading preview…');try{const r=await hubCard(fp,src);openPrev(prevFrom({src:'hub',fp,bytes:r.bytes,j:r.j,node:node||{},img:node?.max_res_url||node?.avatar_url||(src==='ct'?`https://cards.character-tavern.com/${fp}.png`:`https://avatars.charhub.io/avatars/${fp}/avatar.webp`)}))}catch(e){toast('Couldn’t load preview: '+e.message)}}
+async function previewFp(fp,src,node){toast('Loading preview…');try{const r=await hubCard(fp,src);openPrev(prevFrom({src:'hub',site:src,fp,bytes:r.bytes,j:r.j,node:node||{},img:node?.max_res_url||node?.avatar_url||(src==='ct'?`https://cards.character-tavern.com/${fp}.png`:`https://avatars.charhub.io/avatars/${fp}/avatar.webp`)}))}catch(e){toast('Couldn’t load preview: '+e.message)}}
 async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');
  let m=u.match(/(?:chub\.ai|characterhub\.org)\/characters\/([^?#\s]+)/i);if(m)return previewFp(m[1].replace(/\/$/,''),'chub');
  m=u.match(/character-tavern\.com\/character\/([^?#\s]+)/i);if(m)return previewFp(m[1].replace(/\/$/,''),'ct');
@@ -319,10 +335,10 @@ function charView(c,pv){
   tk=Math.round(['name','desc','pers','scen','ex','sys','first'].map(k=>c[k]||'').join('').length/4),fmt=n=>n>=1e3?(n/1e3).toFixed(1)+'K':n,
   dt=t=>t?new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—',
   gs=[c.first,...(c.alts||[])].filter(Boolean),gi=Math.min(V.gi||0,Math.max(gs.length-1,0)),img=c.banner||c.img,
-  sec=(t,x)=>x?`<h2 class="h2">${t}</h2><p class="body">${esc(x)}</p>`:'';
+  sec=(t,x)=>x?`<h2 class="h2">${t}</h2><div class="body md">${rich(x)}</div>`:'';
  const meta=((c.tags||[]).length?`<div class="tags" style="margin-top:14px">${c.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+`<p class="ps" style="margin-top:18px">Created ${dt(c.created)} · Updated ${dt(c.updated)}<br>Origin ${c.src||'Unknown'}</p>`;
  const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">‹</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">›</button></div>${pv?`<button class="btn full" data-a="pimp" data-s="1" data-i="${gi}" style="margin-top:8px">💬 Import &amp; start with this opening</button>`:`<button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`}`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
-  +sec('About',c.about)+(c.about?'':`<h2 class="h2">About</h2><p class="ps">No About yet.${c.id?` <button class="lnk" style="color:var(--ac)" data-a="cfind" data-id="${c.id}">Find it on the hub</button>`:''}</p>`)+meta;
+  +sec('About',c.about)+(c.about?(c.id?`<button class="lnk" style="color:var(--ac);margin-top:6px" data-a="cfind" data-id="${c.id}">↻ Refresh About from the hub</button>`:''):`<h2 class="h2">About</h2><p class="ps">No About yet.${c.id?` <button class="lnk" style="color:var(--ac)" data-a="cfind" data-id="${c.id}">Find it on the hub</button>`:''}</p>`)+meta;
  const card=sec('Description',c.desc)+sec('Personality',c.pers)+sec('Scenario',c.scen)+sec('Definition',c.ex)+((S.links[c.id]||[]).length?`<h2 class="h2">Lorebooks</h2><div class="tags">${S.links[c.id].map(i=>S.books.find(b=>b.id===i)).filter(Boolean).map(b=>`<span class="chip">📖 ${esc(b.name)}</span>`).join('')}</div>`:'')
   ;
  return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="${pv?'pback':'home'}" aria-label="Back">‹</button></header><main><div class="hero">${img?`<img src="${img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}</div>
@@ -555,10 +571,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   pimp:async()=>{const p=V.prev,st=t.dataset.s,gi=+t.dataset.i||0;let nid=null;
    if(p.src==='hub'){const n=S.chars.length;IMPOPT={direct:true,about:p.c.about};await importFiles([new File([p.bytes],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){nid=LASTC;if(V.br)V.br.done[p.fp]=1}}
    else{const it=V.pq.shift();addChar(it.j,it.img,'',p.c.about);nid=S.chars[S.chars.length-1].id}
-   const c=S.chars.find(x=>x.id===nid);if(c&&p.fp)c.fp=p.fp;save();
+   const c=S.chars.find(x=>x.id===nid);if(c&&p.fp){c.fp=p.fp;c.site=p.site}save();
    if(V.pq?.length)return nextPrev();V.prev=null;V.pq=null;if(!nid)return closePrev();if(st)startWith(nid,gi);else goDetail(nid)},
-  cfind:async()=>{const c=S.chars.find(x=>x.id===id);toast('Searching the hub…');try{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(c.name)}&first=24&page=1&sort=download_count&asc=false&nsfw=true&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`),ns=j.data?.nodes||j.nodes||[],nm=x=>(x||'').toLowerCase().trim(),m=ns.filter(n=>nm(n.name)===nm(c.name)),best=m.find(n=>c.creator&&nm(n.fullPath.split('/')[0])===nm(c.creator))||m[0];
-   if(!best)return toast('Couldn’t find it on the hub. Use Edit to write an About.');const r=await hubCard(best.fullPath),d=r.j.data||r.j,nt=cleanNote(d.creator_notes);c.about=nt.length>15?nt:cleanNote(best.tagline||best.description);c.fp=best.fullPath;save();toast('About updated');render()}catch(e){toast('Failed: '+e.message)}},
+  cfind:async()=>{const c=S.chars.find(x=>x.id===id);toast('Fetching About…');try{let fp=c.fp,site=c.site||'chub',nd={};
+   if(!fp){const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(c.name)}&first=24&page=1&sort=download_count&asc=false&nsfw=true&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`),ns=j.data?.nodes||j.nodes||[],nm=x=>(x||'').toLowerCase().trim(),m=ns.filter(n=>nm(n.name)===nm(c.name)),best=m.find(n=>c.creator&&nm(n.fullPath.split('/')[0])===nm(c.creator))||m[0];
+    if(!best)return toast('Couldn’t find it on the hub. Use Edit to write an About.');fp=best.fullPath;nd=best}
+   const r=await hubCard(fp,site),d=r.j.data||r.j,nt=cleanNote(d.creator_notes);c.about=nt.length>15?nt:(cleanNote(nd.tagline||nd.description)||nt);c.fp=fp;c.site=site;save();toast('About updated');render()}catch(e){toast('Failed: '+e.message)}},
   
   cview:()=>{V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
   gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
