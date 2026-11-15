@@ -134,9 +134,21 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .comp .ib.big,.comp .send{width:46px;height:46px;min-height:46px;padding:0;display:grid;place-items:center;border-radius:50%;flex:none;font-size:22px;line-height:1}
 .comp .ib.big{color:var(--ac)}
 .trow{margin:-4px 0 12px 40px}.trow.u{margin-left:0;display:flex;justify-content:flex-end}.trow .tools{margin-top:0}
+
+nav.tb{padding:6px 8px;background:color-mix(in srgb,var(--sf) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);position:relative;z-index:5}
+nav.tb button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 5px;font-size:11px;font-weight:600;border-radius:14px}
+nav.tb button::before{display:none!important}
+nav.tb svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var(--ac) 20%,transparent)}
+.row time{color:var(--mut);font-size:12px;flex:none;align-self:flex-start;margin-top:5px}
+.row{padding:12px 8px}.row b{font-size:16px}.row small{margin-top:1px}
+.pcard{display:flex;align-items:center;gap:16px;padding:16px;margin-bottom:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--g1) 22%,var(--sf)),var(--sf));border:1px solid var(--ln);border-radius:24px;box-shadow:var(--sh2)}
+.pcard .t{flex:1;min-width:0}.pcard b{display:block;font-size:20px}.pcard small{color:var(--mut)}.pcard:active{transform:scale(.99)}
+.h3{font:600 12px Inter,system-ui;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin:22px 8px 8px}
+.hc.on{outline:3px solid var(--ac);outline-offset:2px}.chev{color:var(--mut);font-size:22px}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=16;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<script>var VER=17;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -453,20 +465,34 @@ const nc=(a,l,ic='+')=>`<div class="hc nc" data-a="${a}"><i>${ic}</i><b>${l}</b>
 function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
  const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
  if(T==='prev')return V.prev?charView(V.prev.c,V.prev):(V.tab='home',listHtml());if(T==='char')return charHtml();if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
- if(T==='settings'){const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic" style="background:hsl(${(id.charCodeAt(0)*47)%360} 60% 55%/.18)">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
-  return back('Settings')+`</header><main><div class="card2"><div class="srow" data-a="tab" data-id="pers"><div class="av">${esc((pn||'?')[0])}</div><div class="t"><b>${esc(pn||'No persona yet')}</b><small>Active persona</small></div><span class="chev">›</span></div></div>
-  <div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('prov','🔑','Providers',S.models.length+' models')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}${row('upd','🔄','Updates','v'+VER)}${row('imp','📥','Import','Cards and lorebooks')}</div>
-   <div class="card2">${row('acct','👤','Accounts',(ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||'Default')+' · '+ACCOUNTS.length+' total')}</div></main>`}
- if(T!=='home'){const k={chars:'c',lore:'l',pers:'p'}[T],items=k==='c'?[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0)):k==='l'?S.books:S.personas;
-  return back({chars:'Characters',lore:'Lorebooks',pers:'Personas'}[T])+`${T!=='pers'?'<button class="ib" data-a="imp">Import</button>':''}</header><main>${k==='c'&&items.length>6?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc(k==='c'?'newc':k==='p'?'newp':'newl',k==='c'?'New character':k==='p'?'New persona':'New lorebook')}${k==='c'?nc('browse','Discover','🔍'):''}${items.map(x=>card(k,x)).join('')}</div></main>`}
- const sec=(t,n,k,items,add)=>`<div class="sh2" data-a="tab" data-id="${k}"><h2>${t}<span>${n}</span></h2><i>›</i></div><div class="hs">${add}${items.slice(0,12).map(x=>card({chars:'c',lore:'l',pers:'p'}[k],x)).join('')}</div>`;
- const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
- return`<header><h1 class="wm">Hearth</h1><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>
- <div class="hello"><div class="av big">${esc((pn||'H')[0])}</div><div><h1>${gr}${pn?', '+esc(pn):''}</h1><small>${S.chars.length} characters</small></div></div>
+ const tab=({settings:'me',pers:'me'})[T]||T;
+ const topbar=(t,r='')=>`<header><h1 class="wm" style="font-size:24px;flex:1">${t}</h1>${r}</header>`;
+ if(tab==='me'){const g=S.cfg,ap=S.persona?P():null,acct=ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||'Default';
+  const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic" style="background:hsl(${(id.charCodeAt(0)*47)%360} 60% 55%/.18)">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
+  const pcards=S.personas.map(x=>card('p',x).replace('data-a="editp"','data-a="use"').replace('class="hc"',`class="hc${x.id===S.persona?' on':''}"`)).join('');
+  return topbar('Profile')+`<main>
+ <div class="pcard" data-a="${ap?'editp':'newp'}" data-id="${ap?ap.id:''}">${av(ap||{name:'?'},'big')}<div class="t"><b>${esc(ap?ap.name:'Create your persona')}</b><small>${ap?'Active persona · tap to edit':'This is who you are in chats'}</small></div><span class="chev">›</span></div>
+ <div class="card2"><div class="srow" data-a="tab" data-id="accounts"><span class="ic" style="background:hsl(200 60% 55%/.18)">👤</span><div class="t"><b>${esc(acct)}</b><small>Account · ${ACCOUNTS.length>1?'tap to switch or manage':'tap to add another'}</small></div><span class="chev">›</span></div></div>
+ <div class="sh2"><h2>Personas<span>${S.personas.length}</span></h2>${pill('newp','New')}</div>
+ ${pcards?`<div class="hs">${pcards}</div><p class="ps" style="margin:8px 0 0;font-size:13px">Tap a persona to switch to it.</p>`:''}
+ <h2 class="h3">Models</h2><div class="card2">${row('prov','🔑','Providers',S.models.length+' model'+(S.models.length!==1?'s':''))}</div>
+ <h2 class="h3">Chat</h2><div class="card2">${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}</div>
+ <h2 class="h3">App</h2><div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('upd','🔄','Updates','v'+VER)}</div>
+ <h2 class="h3">Data</h2><div class="card2">${row('imp','📥','Import &amp; backup','Cards, lorebooks, backups')}</div>
+ <p class="ps" style="text-align:center;font-size:13px;margin-top:6px">Hearth v${VER}</p></main>`}
+ if(tab==='chars'){const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
+  return topbar('Characters',`<button class="ib" data-a="imp">Import</button>`)+`<main>${rc.length>4?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc('newc','New character')}${nc('browse','Discover','🔍')}${rc.map(x=>card('c',x)).join('')}</div></main>`}
+ if(tab==='lore')return topbar('Lorebooks',`<button class="ib" data-a="imp">Import</button>`)+`<main>${S.books.length?'':'<p class="ps">Lorebooks add world details to a chat whenever their keywords come up.</p>'}<div class="grid">${nc('newl','New lorebook')}${S.books.map(x=>card('l',x)).join('')}</div></main>`;
+ const ago=ts=>{if(!ts)return'';const m=(Date.now()-ts)/6e4;return m<1?'now':m<60?Math.floor(m)+'m':m<1440?Math.floor(m/60)+'h':m<10080?Math.floor(m/1440)+'d':new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})};
+ const chats=S.chars.filter(c=>(S.chats[c.id]||[]).some(x=>x.r==='u')).sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
+ const rows=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="row" data-a="open" data-id="${c.id}">${av(c)}<div class="t"><b>${esc(c.name)}</b><small>${l?.r==='u'?'You: ':''}${esc(strip(String(l?.t||'')))}</small></div><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
+ const empty=`<div class="empty" style="padding:28px 20px;text-align:center"><b style="font-size:18px">No conversations yet</b><p class="ps" style="margin:8px 0 16px">Pick a character to start chatting.</p><div class="acts" style="justify-content:center"><button class="btn" data-a="tab" data-id="chars">Choose a character</button><button class="btn s" data-a="browse">Discover</button></div></div>`;
+ return topbar('Hearth',`<button class="ib big" data-a="tab" data-id="chars" aria-label="New chat">✎</button><button class="ib" data-a="tab" data-id="me" aria-label="Profile" style="padding:0">${av(S.persona?P():{name:'H'},'sm')}</button>`)+`<main>
+ <p class="ps" style="margin:2px 2px 12px">${gr}${pn?', '+esc(pn):''}</p>
  ${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
- ${sec('Your Characters',S.chars.length,'chars',rc,nc('newc','New character')+nc('browse','Discover','🔍')+(S.chars.length?'':nc('imp','Import')))}
- ${sec('Your Personas',S.personas.length,'pers',S.personas,nc('newp','New persona'))}
- ${sec('Lorebooks',S.books.length,'lore',S.books,nc('newl','New lorebook'))}</main>`}
+ ${rows||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
+const NAVI=[['home','Chats','<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-4.6A8 8 0 1 1 21 12z"/></svg>'],['chars','Characters','<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.3 3.5 5.2"/></svg>'],['lore','Lorebooks','<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/></svg>'],['me','Profile','<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></svg>']];
+const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">${NAVI.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
 function render(scroll){const a=$('#app');if(V.loading||V.locked){a.innerHTML=lockHtml();return}
  if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
@@ -480,8 +506,8 @@ function render(scroll){const a=$('#app');if(V.loading||V.locked){a.innerHTML=lo
   const mn=$('main');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
   mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
   mn.querySelectorAll('.bub').forEach((b,i)=>b.onclick=e=>{if(e.target.closest('a'))return;V.edit=V.edit===i?null:i;render()})}
- else{v.innerHTML=listHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;
-  const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.card').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
+ else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;
+  const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
  const sh=$('#sh'),hh=sheetHtml();if(sh.dataset.h!==hh){sh.innerHTML=hh;sh.dataset.h=hh}
  syncHist()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,id=t.dataset.id,i=+t.dataset.i;
