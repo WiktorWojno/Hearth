@@ -129,9 +129,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .banner{background:linear-gradient(135deg,color-mix(in srgb,var(--g1) 20%,var(--sf)),var(--sf));border-radius:18px;font-weight:500}
 .chip{background:color-mix(in srgb,var(--ac) 10%,var(--sf))}.pill{box-shadow:var(--sh2)}
 .empty{background:var(--sf);border:1px dashed var(--ln);border-radius:24px;margin-top:10px}
+.comp{align-items:flex-end;gap:8px}.comp textarea{min-height:46px;padding:12px 18px;line-height:1.4;flex:1;min-width:0}
+.comp #cb{display:flex;gap:6px;align-items:flex-end}
+.comp .ib.big,.comp .send{width:46px;height:46px;min-height:46px;padding:0;display:grid;place-items:center;border-radius:50%;flex:none;font-size:22px;line-height:1}
+.comp .ib.big{color:var(--ac)}
+.trow{margin:-4px 0 12px 40px}.trow.u{margin-left:0;display:flex;justify-content:flex-end}.trow .tools{margin-top:0}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=12;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
+<script>var VER=13;try{const o=localStorage.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/);if(m&&+m[1]>VER){document.open();document.write(o);document.close()}}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,10);
@@ -375,7 +380,7 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
   `<div class="acts"><button class="btn" data-a="close">Done</button><button class="btn d" data-a="delbook">Delete lorebook</button></div>`}
  return`<div class="sheet" data-a="bg"><div><i class="grab"></i>${h}</div></div>`}
 const msgHtml=(x,i,m,c)=>{const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
- const gp=i>0&&m[i-1].r===x.r;return `<div class="msg ${x.r}${gp?' gp':''}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${last&&x.r==='c'&&!V.busy?swb(x):''}${V.edit===i?`<div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">▶</button>`:''}</div>`:''}</div></div>`};
+ const gp=i>0&&m[i-1].r===x.r;return `<div class="msg ${x.r}${gp?' gp':''}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">▶</button>`:''}</div></div>`:''}`};
 async function img2(file,w,h){const an=file.size<1.5e6&&(/gif|webp/.test(file.type)||(file.type==='image/png'&&new TextDecoder('latin1').decode(new Uint8Array(await file.arrayBuffer())).includes('acTL')));if(an)return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});return new Promise(r=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/i.width,h/i.height),dw=i.width*k,dh=i.height*k;x.drawImage(i,(w-dw)/2,(h-dh)/2,dw,dh);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.8))};i.onerror=()=>r('');i.src=u})}
 function syncEd(){if(!V.ed)return;const o=V.ed.o;document.querySelectorAll('[id^="f_"]').forEach(e=>{const k=e.id.slice(2);o[k]=e.type==='checkbox'?e.checked:e.type==='number'?(+e.value||0):e.value});
  const g=[...document.querySelectorAll('[id^="gr_"]')];if(g.length)o.greets=g.map(e=>e.value)}
@@ -461,7 +466,7 @@ function render(scroll){const a=$('#app');if(V.loading||V.locked){a.innerHTML=lo
   const hd=`<header><button class="ib big" data-a="back" aria-label="Back">‹</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">⋯</button></header>`,
    body=m.map((x,i)=>msgHtml(x,i,m,c)).join(''),
    cb=V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">■</button>':'<button class="ib big" data-a="regen" aria-label="Retry">↻</button><button class="btn send" data-a="send" aria-label="Send">↑</button>';
-  if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Message ${esc(c.name)}"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
+  if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
    const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
   else{$('#hd').innerHTML=hd;$('main').innerHTML=body;$('#cb').innerHTML=cb}
   const mn=$('main');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
