@@ -150,7 +150,7 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .bub h1,.bub h2,.bub h3,.bub h4{font:700 1.1em Inter,system-ui,sans-serif;margin:.6em 0 .2em}.bub ul,.bub ol{margin:.3em 0;padding-left:1.3em;white-space:normal}.bub hr{border:0;border-top:1px solid var(--ln)}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=23;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=24;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -281,7 +281,7 @@ $('#fi').onchange=async e=>{const f=e.target.files[0];if(f&&V.ed){const d={banne
 $('#fa').onchange=async e=>{const c=C(),f=e.target.files[0];if(c&&f){c.img=await thumb(f);save();render()}e.target.value=''};
 
 /* ---------- chat ---------- */
-const P=()=>S.personas.find(p=>p.id===S.persona)||{name:'You',desc:''};
+const P=()=>{const id=(V.chat&&S.cp?.[V.chat])||S.persona;return S.personas.find(p=>p.id===id)||{name:'You',desc:''}};
 const C=()=>S.chars.find(c=>c.id===V.chat);
 const rep=(s,c)=>(s||'').replace(/{{char}}/gi,c.name).replace(/{{user}}/gi,P().name);
 let LF=[];
@@ -330,17 +330,20 @@ function importLLAI(d,o){const R={c:0,p:0,l:0,ch:0,m:0},dt=t=>t?Date.parse(t)||D
  const cm={};
  (d.characters||[]).forEach(x=>{let c=S.chars.find(q=>q.llai===x.id);if(!c){c={id:uid(),llai:x.id,img:'',banner:''};S.chars.push(c);R.c++}const g=(x.greetings||[]).filter(Boolean);
   Object.assign(c,{name:x.name||'Character',about:cleanNote(x.description),desc:x.core_definition||'',pers:'',scen:'',ex:'',sys:'',rag:x.lore_definition||'',first:g[0]||'',alts:g.slice(1),tags:x.tags||[],creator:'',created:dt(x.created_at),updated:dt(x.updated_at),src:'Imported from LLAI'});cm[x.id]=c.id});
+ S.chars.forEach(c=>{if(c.llai&&!cm[c.llai])cm[c.llai]=c.id});
+ const bf=ch=>{const cid=cm[ch.character_id],pid=pm[ch.persona_id];if(!cid||!pid||!ch.messages.length)return;const lm=ch.messages[ch.messages.length-1],ts=lm.texts&&lm.texts.length?lm.texts:[''],lt=ts[Math.min(lm.swipe_index||0,ts.length-1)]||'',same=ms=>ms&&ms.length===ch.messages.length&&ms[ms.length-1].t===lt;
+  if(same(S.chats[cid])){S.cp=S.cp||{};if(!S.cp[cid])S.cp[cid]=pid;return}const it=(S.old[cid]||[]).find(x=>same(x.msgs));if(it&&!it.pid)it.pid=pid};
  const by={},pc={};
- for(const ch of d.chats||[]){if(S.llaiDone[ch.id]||!(ch.messages||[]).length)continue;let id=cm[ch.character_id];
+ for(const ch of d.chats||[]){if(S.llaiDone[ch.id]){bf(ch);continue}if(!(ch.messages||[]).length)continue;let id=cm[ch.character_id];
   if(!id){if(!o.stub)continue;let c=S.chars.find(q=>q.llai===ch.character_id);if(!c){c={id:uid(),llai:ch.character_id,name:(ch.title||'').replace(/^Chat with\s+/i,'')||'Unknown',about:'',desc:'',pers:'',scen:'',ex:'',sys:'',rag:'',first:'',alts:[],tags:[],img:'',banner:'',created:dt(ch.created_at),updated:dt(ch.updated_at),src:'Placeholder from LLAI chats'};S.chars.push(c);R.c++}id=cm[ch.character_id]=c.id}
   (by[id]=by[id]||[]).push(ch);if(ch.persona_id)pc[ch.persona_id]=(pc[ch.persona_id]||0)+1}
  for(const id in by){const L=by[id].sort((a,b)=>dt(b.updated_at)-dt(a.updated_at)).map(ch=>{S.llaiDone[ch.id]=1;R.ch++;R.m+=ch.messages.length;
-   return{id:uid(),t:dt(ch.updated_at),title:ch.title||'',msgs:ch.messages.map(m=>{const s=(m.texts&&m.texts.length)?m.texts:[''],i=Math.min(m.swipe_index||0,s.length-1),x={r:m.sender==='user'?'u':'c',t:s[i]||''};if(s.length>1){x.s=s;x.i=i}return x})}});
-  const cur=S.chats[id];S.old[id]=S.old[id]||[];if(!cur?.some(m=>m.r==='u')){S.chats[id]=L[0].msgs;L.slice(1).forEach(x=>S.old[id].push(x))}else L.forEach(x=>S.old[id].push(x))}
+   return{id:uid(),t:dt(ch.updated_at),title:ch.title||'',pid:pm[ch.persona_id],msgs:ch.messages.map(m=>{const s=(m.texts&&m.texts.length)?m.texts:[''],i=Math.min(m.swipe_index||0,s.length-1),x={r:m.sender==='user'?'u':'c',t:s[i]||''};if(s.length>1){x.s=s;x.i=i}return x})}});
+  const cur=S.chats[id];S.old[id]=S.old[id]||[];if(!cur?.some(m=>m.r==='u')){S.chats[id]=L[0].msgs;if(L[0].pid)(S.cp=S.cp||{})[id]=L[0].pid;L.slice(1).forEach(x=>S.old[id].push(x))}else L.forEach(x=>S.old[id].push(x))}
  if(!S.persona){const top=Object.entries(pc).sort((a,b)=>b[1]-a[1])[0];if(top&&pm[top[0]])S.persona=pm[top[0]]}
  if(o.instr&&d.user?.ai_instructions&&!S.cfg.sys)S.cfg.sys=d.user.ai_instructions;
  save();return R}
-function startWith(id,i){const c=S.chars.find(x=>x.id===id),cur=S.chats[id];if(cur?.some(m=>m.r==='u'))(S.old[id]=S.old[id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});
+function startWith(id,i){const c=S.chars.find(x=>x.id===id),cur=S.chats[id];if(cur?.some(m=>m.r==='u'))(S.old[id]=S.old[id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[id]});delete S.cp?.[id];
  const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[i]||g[0],s:g,i:Math.min(i,g.length-1)}]:[];(S.act=S.act||{})[id]=Date.now();save();openChat(id)}
 function charHtml(){const c=S.chars.find(x=>x.id===V.cd);if(!c){V.tab='home';return listHtml()}return charView(c,null)}
 function charView(c,pv){
@@ -447,8 +450,8 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
  if(s.t==='cprev'){const p=V.prev;h=`<div class="phero">${p.img?`<img src="${esc(p.img)}" alt="" referrerpolicy="no-referrer">`:`<div class="ph">${esc(p.name[0])}</div>`}</div><h2 style="text-align:center;margin:14px 0 2px;font-size:24px">${esc(p.name)}</h2>${p.creator?`<p class="note" style="text-align:center;margin:0 0 6px">By ${esc(p.creator)}</p>`:''}<h2 class="h2" style="margin-top:16px">About</h2><p class="body">${esc(p.about||'No description provided.')}</p>`+(p.tags?.length?`<div class="tags" style="margin-top:12px">${p.tags.slice(0,14).map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+(p.stats?`<p class="ps" style="margin:10px 0 0">${esc(p.stats)}</p>`:'')+`<div class="acts"><button class="btn wide" data-a="pimp" style="flex:2">Import</button><button class="btn s" data-a="pskip" style="flex:1">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`}
  if(s.t==='llai'){const d=V.llai.d,cn=d.chats||[],ids=new Set((d.characters||[]).map(x=>x.id)),have=cn.filter(x=>ids.has(x.character_id)).length,mc=cn.reduce((a,x)=>a+(x.messages||[]).length,0);
   h=`<h2>Import from LLAI</h2><p class="ps">Account export for ${esc(d.user?.display_name||d.user?.username||'your account')}.</p><div class="card2 pad"><div class="rowh"><span>Characters</span><b>${(d.characters||[]).length}</b></div><div class="rowh"><span>Personas</span><b>${(d.personas||[]).length}</b></div><div class="rowh"><span>Lorebooks</span><b>${(d.lorebooks||[]).length}</b></div><div class="rowh"><span>Chats</span><b>${cn.length} (${mc} messages)</b></div></div><label class="chk"><input type="checkbox" id="l_stub" checked>Include the ${cn.length-have} chats whose characters aren’t in the export (creates placeholder characters)</label><label class="chk"><input type="checkbox" id="l_instr" checked>Use your AI instructions as the system prompt</label><p class="note">Images aren’t part of the export, so avatars and covers are left blank. Importing the same file again skips what’s already there.</p><div class="acts"><button class="btn wide" data-a="llaigo">Import</button><button class="btn s" data-a="close">Cancel</button></div>`}
- if(s.t==='chats'){const c=C(),o=S.old[c.id]||[];h=`<h2>Chats with ${esc(c.name)}</h2>`+(o.length?o.map(x=>`<div class="row" data-a="sw" data-id="${x.id}"><div class="t"><b>${esc(x.title||strip(x.msgs.find(m=>m.r==='u')?.t||'Chat').slice(0,50))}</b><small>${new Date(x.t).toLocaleDateString()} · ${x.msgs.length} messages</small></div><button class="ib" data-a="delold" data-id="${x.id}">Delete</button></div>`).join(''):'<p class="note">No other chats yet. Use New chat to start another one; this chat is kept here.</p>')+`<div class="acts"><button class="btn" data-a="close">Done</button></div>`}
- if(s.t==='set'){const c=C();h=`<h2>${esc(c.name)}</h2><label>Persona</label><select id="ps"><option value="">You (default)</option>${S.personas.map(p=>`<option value="${p.id}" ${p.id===S.persona?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
+ if(s.t==='chats'){const c=C(),o=S.old[c.id]||[];h=`<h2>Chats with ${esc(c.name)}</h2>`+(o.length?o.map(x=>`<div class="row" data-a="sw" data-id="${x.id}"><div class="t"><b>${esc(x.title||strip(x.msgs.find(m=>m.r==='u')?.t||'Chat').slice(0,50))}</b><small>${new Date(x.t).toLocaleDateString()} · ${x.msgs.length} messages${S.personas.find(p=>p.id===x.pid)?' · '+esc(S.personas.find(p=>p.id===x.pid).name):''}</small></div><button class="ib" data-a="delold" data-id="${x.id}">Delete</button></div>`).join(''):'<p class="note">No other chats yet. Use New chat to start another one; this chat is kept here.</p>')+`<div class="acts"><button class="btn" data-a="close">Done</button></div>`}
+ if(s.t==='set'){const c=C();h=`<h2>${esc(c.name)}</h2><label>Persona for this chat</label><select id="ps"><option value="">Default (${esc(S.personas.find(p=>p.id===S.persona)?.name||'You')})</option>${S.personas.map(p=>`<option value="${p.id}" ${p.id===S.cp?.[c.id]?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
   <label>Reply model</label><select id="rm"><option value="">Default</option>${S.models.map(m=>`<option value="${m.id}" ${c.model===m.id?'selected':''}>${esc(m.name||m.mid)}</option>`).join('')}</select><label>Chat background</label><select id="bgs">${[['','None'],['dusk','Dusk'],['forest','Forest'],['ember','Ember'],['avatar','Avatar blur'],['img','Custom image']].map(([v,n])=>`<option value="${v}" ${(c.bg||'')===v?'selected':''}>${n}</option>`).join('')}</select><label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
   <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="find">Search</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="newchat">New chat</button><button class="btn s" data-a="chats">Chats (${(S.old[c.id]||[]).length})</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
  if(s.t==='persona'){const p=s.p;h=`<h2>${p.id?'Edit':'New'} persona</h2><label>Name</label><input id="pn" value="${esc(p.name)}"><label>Description</label><textarea id="pd" rows="5" placeholder="Who are you in the story?">${esc(p.desc)}</textarea>
@@ -623,7 +626,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    if(k==='l'){if(!o.name.trim())return toast('Name is required');let l=S.books.find(x=>x.id===id);if(!l){l={id:uid(),entries:[]};S.books.push(l)}Object.assign(l,{name:o.name.trim(),desc:o.desc,tags:o.tags,cover:o.cover});save();V.bk=l.id;V.ed=null;V.tab='book';return render()}
    const bk=S.books.find(x=>x.id===V.bk),e={name:o.name,keys:o.keys,content:o.content,constant:!!o.constant,delay:o.delay,cooldown:o.cooldown,sticky:o.sticky,on:o.on!==false};if(id==null)bk.entries.push(e);else bk.entries[id]=e;save();go()},
   eddel:()=>{const{k,id}=V.ed,b=V.ed.back;
-   if(k==='c'){S.chars=S.chars.filter(x=>x.id!==id);delete S.chats[id];delete S.links[id];delete S.old[id]}
+   if(k==='c'){S.chars=S.chars.filter(x=>x.id!==id);delete S.chats[id];delete S.links[id];delete S.old[id];delete S.cp?.[id]}
    if(k==='p'){S.personas=S.personas.filter(x=>x.id!==id);if(S.persona===id)S.persona=null}
    if(k==='l'){S.books=S.books.filter(x=>x.id!==id);for(const q in S.links)S.links[q]=S.links[q].filter(x=>x!==id);V.ed=null;V.tab='lore';save();return render()}
    if(k==='e')S.books.find(x=>x.id===V.bk).entries.splice(id,1);
@@ -646,9 +649,9 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   goto:()=>{V.sheet=null;render();const e=document.querySelectorAll('main .msg')[i];e?.scrollIntoView({block:'center'});e?.classList.add('hl')},
   say:()=>{if(!window.speechSynthesis)return toast('Speech not available on this device');if(speechSynthesis.speaking){speechSynthesis.cancel();return}speechSynthesis.speak(new SpeechSynthesisUtterance(strip(S.chats[c.id][i].t)));V.edit=null;render()},upd:()=>{readCfg();save();checkUpdate(true)},
   vsw:()=>{const m=S.chats[c.id][i],n=(m.i||0)+(+t.dataset.d);if(m.s&&n>=0&&n<m.s.length){m.i=n;m.t=m.s[n];save();render()}},
-  newchat:()=>{const cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))(S.old[c.id]=S.old[c.id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur});delete S.chats[c.id];V.sheet=null;save();openChat(c.id);toast('New chat started')},
+  newchat:()=>{const cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))(S.old[c.id]=S.old[c.id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id]});delete S.chats[c.id];delete S.cp?.[c.id];V.sheet=null;save();openChat(c.id);toast('New chat started')},
   chats:()=>{V.sheet={t:'chats'};render()},
-  sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur});S.chats[c.id]=it.msgs;V.sheet=null;save();render(true)},
+  sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id]});S.chats[c.id]=it.msgs;if(it.pid)(S.cp=S.cp||{})[c.id]=it.pid;else delete S.cp?.[c.id];V.sheet=null;save();render(true)},
   delold:()=>{S.old[c.id]=(S.old[c.id]||[]).filter(x=>x.id!==id);save();V.sheet={t:'chats'};render()},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.tab='settings';render()},
   savecfg:()=>{readCfg();save();applyTheme();V.sheet=null;render()},
   savec:()=>{for(const k of['name','desc','pers','scen','first','ex','sys'])c[k]=$('#c_'+k).value;save();V.sheet=null;render()},
@@ -659,7 +662,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   edit:()=>{V.sheet={t:'edit',i};V.edit=null;render()},
   savem:()=>{const v=$('#em').value.trim();if(v){const m=S.chats[c.id][V.sheet.i];m.s=m.s||[m.t];if(v!==m.t){m.s.push(v);m.i=m.s.length-1;m.t=v}save()}V.sheet=null;render()},
   reset:()=>{delete S.chats[c.id];V.sheet=null;save();openChat(c.id)},
-  delchar:()=>{S.chars=S.chars.filter(x=>x.id!==c.id);delete S.chats[c.id];delete S.links[c.id];delete S.old[c.id];V.chat=null;V.sheet=null;save();render()},
+  delchar:()=>{S.chars=S.chars.filter(x=>x.id!==c.id);delete S.chats[c.id];delete S.links[c.id];delete S.old[c.id];delete S.cp?.[c.id];V.chat=null;V.sheet=null;save();render()},
   
   delbook:()=>{S.books=S.books.filter(b=>b.id!==V.sheet.id);for(const k in S.links)S.links[k]=S.links[k].filter(x=>x!==V.sheet.id);V.sheet=null;save();render()},
   
@@ -688,7 +691,7 @@ document.addEventListener('change',e=>{const t=e.target;
  if(/^g_/.test(t.id)){readCfg();save();applyTheme()}
  if(t.dataset.tag&&t.value.trim())addTag(t);
  if(t.dataset.lk&&V.ed){const l=V.ed.o.links;if(t.checked){if(!l.includes(t.dataset.lk))l.push(t.dataset.lk)}else V.ed.o.links=l.filter(x=>x!==t.dataset.lk)}
- if(t.id==='ps'){S.persona=t.value||null;save()}
+ if(t.id==='ps'){const c=C();if(t.value)(S.cp=S.cp||{})[c.id]=t.value;else delete S.cp?.[c.id];save();render()}
  if(t.id==='bgs'){C().bg=t.value;save();render()}
  if(t.id==='rm'){C().model=t.value;save();render()}
  if(t.id==='emb_m'){S.cfg.emb=t.value;save()}
