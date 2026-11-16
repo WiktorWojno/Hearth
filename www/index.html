@@ -148,9 +148,11 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .hc.on{outline:3px solid var(--ac);outline-offset:2px}.chev{color:var(--mut);font-size:22px}
 .md{white-space:pre-wrap;line-height:1.6}.md h1,.md h2,.md h3,.md h4{font:700 18px Inter,system-ui,sans-serif;margin:.9em 0 .3em}.md ul,.md ol{margin:.4em 0;padding-left:1.4em;white-space:normal}.md hr{border:0;border-top:1px solid var(--ln);margin:12px 0}.md blockquote{border-left:3px solid var(--ln);margin:.5em 0;padding-left:12px;color:var(--mut)}.md img{max-width:100%;height:auto;border-radius:12px}.md a{color:var(--ac)}.md pre{background:var(--bg);padding:10px;border-radius:12px;overflow-x:auto}
 .bub h1,.bub h2,.bub h3,.bub h4{font:700 1.1em Inter,system-ui,sans-serif;margin:.6em 0 .2em}.bub ul,.bub ol{margin:.3em 0;padding-left:1.3em;white-space:normal}.bub hr{border:0;border-top:1px solid var(--ln)}
+.pick{display:grid;grid-template-columns:repeat(2,1fr);gap:26px 18px;width:100%;margin-top:10px}.pk{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--ink);font-size:17px}
+.av.lg{width:96px;height:96px;font-size:36px;border:3px solid var(--ln);transition:border-color .15s}.pk:active .av.lg{border-color:var(--ac)}.pk small{color:var(--mut);font-size:13px}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=24;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=25;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -201,7 +203,7 @@ async function checkUpdate(manual){const g=S.cfg,L=localStorage;if(!g.repo)retur
    if(manual){await flushSave();toast('Update v'+nv+' installed. Restarting…');setTimeout(()=>location.reload(),1200)}else{toast('Update v'+nv+' is ready');render()}}
   else{if(tag)L.setItem('hearth_ota_etag',tag);next(true);if(manual)toast(nv>VER?'v'+nv+' failed to start before. Waiting for a newer fix.':'You’re up to date (v'+VER+')')}}
  catch(e){next(false);if(manual)toast('Update check failed: '+e.message)}finally{updBusy=false}}
-const autoUpd=()=>{if(V.loading||V.busy||S.cfg.auto===false)return;try{if(Date.now()<(+localStorage.getItem('hearth_upd_next')||0))return}catch(e){}checkUpdate(false)};
+const autoUpd=()=>{if(V.loading||V.picker||V.busy||S.cfg.auto===false)return;try{if(Date.now()<(+localStorage.getItem('hearth_upd_next')||0))return}catch(e){}checkUpdate(false)};
 async function fetchModels(){readCfg();const g=S.cfg,an=g.prov==='anthropic';
  try{const r=await fetch(g.url.replace(/\/$/,'')+'/models',{headers:an?{'x-api-key':g.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}:(g.key?{authorization:'Bearer '+g.key}:{})});
   if(!r.ok)throw Error(r.status);const j=await r.json();M=(j.data||j.models||[]).map(m=>m.id||m.name||m).filter(x=>typeof x==='string').sort();
@@ -493,10 +495,11 @@ function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab='lore';ret
  return `<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">‹</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">✎ Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">▲</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">▼</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
 const PG2=['providers','import','memory','appr','instr','lim','upd','sec','accounts'];
 async function hsh(p,salt){if(!crypto.subtle)return btoa(unescape(encodeURIComponent(salt+p)));return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+p)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
-function lockHtml(){const pn=S.persona?P().name:'',ini=esc((pn||'H')[0]),br='<h1 class="brand">Hearth</h1>';
+function lockHtml(){const pn=S.persona?P().name:'',ini=esc(((ACCOUNTS.find(a=>a.id===ACCT_ID)?.name)||pn||'H')[0]),br='<h1 class="brand">Hearth</h1>';
  if(V.loading)return`<div class="lock">${br}</div>`;
+ if(V.picker)return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="pick">${ACCOUNTS.map(a=>`<button class="pk" data-a="pickacct" data-id="${a.id}"><span class="av lg">${esc((a.name||'?')[0])}</span><b>${esc(a.name)}</b>${a.locked?'<small>🔒 Password</small>':''}</button>`).join('')}</div></div>`;
  if(V.forgot)return`<div class="lock">${br}<h2>Forgot password?</h2><p class="ps" style="text-align:center">There is no recovery. Erasing deletes every chat, character, lorebook and key in this account (other accounts are not affected).</p><input id="er" placeholder="Type ERASE to confirm" autocomplete="off"><button class="btn wide danger" data-a="erase" style="width:100%">Erase everything</button><button class="lnk" data-a="unforgot">Back</button></div>`;
- return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="av xl">${ini}</div><b style="font-size:20px">${esc(pn||'Hearth')}</b><label style="align-self:flex-start;margin:6px 0 0">Password</label><div class="pw"><input id="lk" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="lk">👁</button></div><button class="btn wide" data-a="unlock" style="width:100%">Unlock</button><button class="lnk" data-a="forgot">Forgot password?</button></div>`}
+ return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="av xl">${ini}</div>${ACCOUNTS.length>1?'<button class="ib big" data-a="backpick" aria-label="Choose a different account" style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px">‹</button>':''}<b style="font-size:20px">${esc(ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||pn||'Hearth')}</b><label style="align-self:flex-start;margin:6px 0 0">Password</label><div class="pw"><input id="lk" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="lk">👁</button></div><button class="btn wide" data-a="unlock" style="width:100%">Unlock</button><button class="lnk" data-a="forgot">Forgot password?</button>${ACCOUNTS.length>1?'<button class="lnk" data-a="backpick" style="color:var(--ac)">‹ Choose a different account</button>':''}</div>`}
 const PG={prov:'providers',imp:'import',mem:'memory',appr:'appr',instr:'instr',lim:'lim',upd:'upd',sec:'sec',acct:'accounts'};
 const mask=k=>k?(k.length>9?k.slice(0,4)+'…'+k.slice(-4):'••••'):'no key';
 const pill=(a,l)=>`<button class="pill" data-a="${a}">+ ${l}</button>`;
@@ -512,7 +515,7 @@ function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="h
   let fm='';if(F?.k==='acct'){const tg=ACCOUNTS.find(x=>x.id===F.id);
    if(F.mode==='del')fm=`<div class="card2 pad" style="margin-bottom:12px"><b>Delete “${esc(tg?.name||'')}”?</b><p class="ps" style="margin:6px 0 12px">This permanently removes all of its characters, chats, lorebooks, personas and keys. This can’t be undone.</p><div class="acts"><button class="btn d" data-a="acctdelok">Delete account</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`;
    else fm=`<div class="card2 pad" style="margin-bottom:12px"><div class="rowh"><b>${F.mode==='ren'?'Rename account':'New account'}</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>NAME *</label><input id="a_n" value="${esc(F.mode==='ren'?tg?.name:'')}" placeholder="e.g. Alt" autocomplete="off" maxlength="40"><div class="acts"><button class="btn" data-a="acctsave">${F.mode==='ren'?'Save':'Create and switch'}</button></div></div>`}
-  return hd+title('Accounts','Each account has its own characters, chats, lorebooks, personas, providers and password. A new account starts with your current appearance.')+fm+rows+(F?.k==='acct'&&F.mode!=='del'&&F.mode!=='ren'?'':`<div class="acts" style="margin-top:4px"><button class="btn" data-a="acctadd">+ Add account</button></div>`)+'</main>'}
+  return hd+title('Accounts','Each account has its own characters, chats, lorebooks, personas, providers and password. A new account starts with your current appearance.')+(ACCOUNTS.length>1?`<button class="btn s" data-a="backpick" style="width:100%;margin-bottom:14px">⇄ Go to the account picker</button>`:'')+fm+rows+(F?.k==='acct'&&F.mode!=='del'&&F.mode!=='ren'?'':`<div class="acts" style="margin-top:4px"><button class="btn" data-a="acctadd">+ Add account</button></div>`)+'</main>'}
  if(T==='sec'){const L=S.lock?.hash,f=(id,l)=>`<label>${l}</label><div class="pw"><input id="${id}" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="${id}">👁</button></div>`;
   return hd+title('Security','Lock Hearth with a password. The lock hides your chats when the app opens or returns from the background.')+(L?f('s_cur','Current password'):'')+f('s_new',L?'New password':'Password')+f('s_cf','Confirm password')+(L?`<label>Lock after leaving the app</label><select id="la">${[[0,'Immediately'],[1,'1 minute'],[5,'5 minutes'],[15,'15 minutes'],[-1,'Never (only at launch)']].map(([v,n])=>`<option value="${v}" ${(S.lock.after??5)===v?'selected':''}>${n}</option>`).join('')}</select>`:'')+`<div class="acts"><button class="btn wide" data-a="lockset">${L?'Update password':'Set password'}</button>${L?'<button class="btn s" data-a="locknow">Lock now</button>':''}</div>`+(L?`<div class="card2 pad" style="margin-top:24px;border-color:var(--dg)"><b style="color:var(--dg)">Remove password</b><span class="ps" style="margin:0">Turns the lock off. Requires your current password.</span><button class="btn d" data-a="lockrm" style="align-self:flex-start">Remove password</button></div>`:'')+'<p class="ps" style="margin-top:22px">This is a screen lock. Data on the device is not encrypted, and there is no recovery if you forget the password except erasing the app’s data.</p></main>'}
  const pn=id=>S.provs.find(p=>p.id===id)?.name||'?',ib=(a,id,i,x='')=>`<button class="ib ${x}" data-a="${a}" data-id="${id}">${i}</button>`;
@@ -560,7 +563,7 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  ${rows||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
 const NAVI=[['home','Chats','<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-4.6A8 8 0 1 1 21 12z"/></svg>'],['chars','Characters','<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.3 3.5 5.2"/></svg>'],['lore','Lorebooks','<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/></svg>'],['me','Profile','<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></svg>']];
 const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">${NAVI.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
-function render(scroll){const a=$('#app');if(V.loading||V.locked){a.innerHTML=lockHtml();return}
+function render(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();return}
  if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
@@ -583,6 +586,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  const c=V.chat&&C();
  ({imp:pick,tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;render()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
+  pickacct:async()=>{const id=t.dataset.id;try{V.ctl?.abort()}catch(e){}if(idbOK)await flushSave();await loadAcct(id)},
+  backpick:async()=>{try{V.ctl?.abort()}catch(e){}if(idbOK)await flushSave();V.locked=false;V.forgot=false;V.chat=null;V.sheet=null;V.picker=true;render()},
   llaigo:()=>{const o={stub:$('#l_stub').checked,instr:$('#l_instr').checked},d=V.llai.d;V.sheet=null;V.llai=null;render();toast('Importing…');setTimeout(()=>{const r=importLLAI(d,o);toast(`Imported ${r.c} characters, ${r.p} personas, ${r.l} lorebooks, ${r.ch} chats`);render()},60)},
   bview:()=>{const n=V.br.items[i];previewFp(n.fullPath,n.src||'chub',n)},
   
@@ -603,8 +608,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   browse:()=>{V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
   bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
   eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
-  lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={...S.lock,salt,hash:await hsh(n,salt)};save();toast('Password saved');render()},
-  lockrm:async()=>{if(await hsh($('#s_cur').value,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');S.lock=null;save();toast('Password removed');render()},
+  lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={...S.lock,salt,hash:await hsh(n,salt)};save();{const A=ACCOUNTS.find(a=>a.id===ACCT_ID);if(A){A.locked=true;saveAccounts()}}toast('Password saved');render()},
+  lockrm:async()=>{if(await hsh($('#s_cur').value,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');S.lock=null;save();{const A=ACCOUNTS.find(a=>a.id===ACCT_ID);if(A){A.locked=false;saveAccounts()}}toast('Password removed');render()},
   locknow:()=>{V.locked=true;render()},
   unlock:async()=>{if(await hsh($('#lk').value,S.lock.salt)===S.lock.hash){V.locked=false;V.forgot=false;render()}else{toast('Wrong password');$('#lk').value=''}},
   forgot:()=>{V.forgot=true;render()},unforgot:()=>{V.forgot=false;render()},
@@ -702,12 +707,13 @@ document.addEventListener('change',e=>{const t=e.target;
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
 async function flushSave(){clearTimeout(tm);if(!idbOK)return;S.ts=Date.now();await idbSet(S)}
 async function loadAcct(id,tab){try{V.ctl?.abort()}catch(e){}await new Promise(r=>setTimeout(r,60));ACCT_ID=id;try{localStorage.setItem('hearth_acct',id)}catch(e){}
- const d=await idbGet().catch(()=>null);S=Object.assign(fresh(),d||{});fix();applyTheme();
- Object.assign(V,{chat:null,sheet:null,form:null,edit:null,ed:null,prev:null,busy:false,ctl:null,forgot:false,tab:tab||'home'});V.locked=!!S.lock?.hash;render()}
+ const d=await idbGet().catch(()=>null);S=Object.assign(fresh(),d||{});fix();applyTheme();idbOK=true;{const A0=ACCOUNTS.find(a=>a.id===id);if(A0&&!!S.lock?.hash!==!!A0.locked){A0.locked=!!S.lock?.hash;saveAccounts()}}
+ Object.assign(V,{chat:null,sheet:null,form:null,edit:null,ed:null,prev:null,busy:false,ctl:null,forgot:false,picker:false,tab:tab||'home'});V.locked=!!S.lock?.hash;render()}
 idbRaw('accounts').then(async accs=>{
  if(!accs||!accs.length){accs=[{id:'default',name:'Default'}];await saveAccountsTo(accs)}
  ACCOUNTS=accs;let a=null;try{a=localStorage.getItem('hearth_acct')}catch(e){}
  ACCT_ID=accs.find(x=>x.id===a)?a:accs[0].id;
+ if(accs.length>1){V.loading=false;V.picker=true;render();bootOK();return}
  let d=await idbGet();
  if(!d&&ACCT_ID==='default'){const r=await idbRaw('S_default');if(r){d=r;await idbRaw('S',r)}}
  if(d&&(ACCT_ID!=='default'||(d.ts||0)>=(S.ts||0))){S=Object.assign(fresh(),d);fix();applyTheme()}
