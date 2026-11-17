@@ -154,7 +154,7 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .lock{overflow-y:auto;justify-content:safe center}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=27;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=28;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -613,7 +613,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
     if(!best)return toast('Couldn’t find it on the hub. Use Edit to write an About.');fp=best.fullPath;nd=best}
    const r=await hubCard(fp,site),d=r.j.data||r.j,nt=cleanNote(d.creator_notes);c.about=nt.length>15?nt:(cleanNote(nd.tagline||nd.description)||nt);c.fp=fp;c.site=site;save();toast('About updated');render()}catch(e){toast('Failed: '+e.message)}},
   
-  cview:()=>{V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
+  cview:()=>{V.charBack=V.tab;V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
   gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
   start:()=>startWith(id,i),cnew:()=>startWith(id,0),
   browse:()=>{if(V.sy)delete V.sy.lbrowse;V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
@@ -738,6 +738,15 @@ document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.tar
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
 applyTheme();setTimeout(autoUpd,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoUpd()});document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
+function goBack(){if(V.loading)return true;if(V.picker)return false;
+ if(V.locked){if(V.forgot){V.forgot=false;render();return true}if(ACCOUNTS.length>1){(async()=>{try{V.ctl?.abort()}catch(e){}if(idbOK)await flushSave();V.locked=false;V.forgot=false;V.chat=null;V.sheet=null;V.picker=true;render()})();return true}return false}
+ if(V.sheet){if(V.sheet.t==='rphrase')return true;V.sheet=null;V.prev=null;V.llai=null;render();return true}
+ if(V.chat){try{V.ctl?.abort()}catch(e){}V.chat=null;V.edit=null;render();return true}
+ const t=V.tab;if(t==='home')return false;
+ if(t==='editor'){const b=V.ed?.back||{tab:'home'};V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render();return true}
+ if(t==='prev'){if(V.pq?.length){V.pq.shift();nextPrev();return true}V.prev=null;V.pq=null;V.tab=V.prevBack||'home';render();return true}
+ V.form=null;V.tab=t==='char'?(V.charBack||'home'):t==='book'?'lore':['providers','import','memory','appr','instr','lim','upd','sec','accounts'].includes(t)?'settings':'home';render();return true}
+(()=>{const A=window.Capacitor?.Plugins?.App;if(!A?.addListener)return;A.addListener('backButton',()=>{if(goBack())return;if(Date.now()-(V.exitT||0)<2000)A.exitApp();else{V.exitT=Date.now();toast('Press back again to exit')}})})();
 addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab==='prev'){V.prev=null;V.pq=null;V.tab=V.prevBack||'home'}else if(V.tab!=='home')V.tab='home';render()});
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 render();
