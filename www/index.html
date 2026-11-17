@@ -154,7 +154,7 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .lock{overflow-y:auto;justify-content:safe center}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=26;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=27;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -572,6 +572,7 @@ const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">$
 function render(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();return}
  if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
+ if(!same&&v.dataset.k&&/^l(home|chars|lore|pers|browse)$/.test(v.dataset.k))(V.sy=V.sy||{})[v.dataset.k]=st||0;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
   const hd=`<header><button class="ib big" data-a="back" aria-label="Back">‹</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">⋯</button></header>`,
    body=m.map((x,i)=>msgHtml(x,i,m,c)).join(''),
@@ -582,7 +583,7 @@ function render(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.in
   const mn=$('main');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
   mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
   mn.querySelectorAll('.bub').forEach((b,i)=>b.onclick=e=>{if(e.target.closest('a'))return;V.edit=V.edit===i?null:i;render()})}
- else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;
+ else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
   const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
  const sh=$('#sh'),hh=sheetHtml();if(sh.dataset.h!==hh){sh.innerHTML=hh;sh.dataset.h=hh}
  syncHist()}
@@ -615,7 +616,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   cview:()=>{V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
   gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
   start:()=>startWith(id,i),cnew:()=>startWith(id,0),
-  browse:()=>{V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
+  browse:()=>{if(V.sy)delete V.sy.lbrowse;V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
   bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
   eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
   lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={...S.lock,salt,hash:await hsh(n,salt)};save();{const A=ACCOUNTS.find(a=>a.id===ACCT_ID);if(A){A.locked=true;saveAccounts()}}toast('Password saved');if(!S.lock.rhash)await mkPhrase();render()},
@@ -737,7 +738,7 @@ document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.tar
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
 applyTheme();setTimeout(autoUpd,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoUpd()});document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
-addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab!=='home')V.tab='home';render()});
+addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab==='prev'){V.prev=null;V.pq=null;V.tab=V.prevBack||'home'}else if(V.tab!=='home')V.tab='home';render()});
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 render();
 </script></body></html>
