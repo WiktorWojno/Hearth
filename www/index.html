@@ -154,7 +154,7 @@ nav.tb button.on{color:var(--ac)}nav.tb button.on svg{fill:color-mix(in srgb,var
 .lock{overflow-y:auto;justify-content:safe center}
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=29;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+<script>var VER=30;try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
 if(o&&ov<VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag')}
 else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
  if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
@@ -232,6 +232,77 @@ function rich(t){if(S.cfg.html===false)return esc(t);
  const b=new DOMParser().parseFromString('<body>'+mdBlocks(t),'text/html').body;clean(b);md(b);return b.innerHTML}
 const readCfg=()=>{const g=S.cfg;for(const[k,id]of Object.entries({prov:'prov',url:'g_url',key:'g_key',model:'g_model',temp:'g_temp',max:'g_max',top:'g_top',sys:'g_sys',html:'g_html',theme:'g_theme',fs:'g_fs',ff:'g_ff',repo:'g_repo',gh:'g_gh',auto:'g_auto',hist:'g_hist',autoc:'g_autoc'})){const e=document.getElementById(id);if(!e)continue;
  g[k]=e.type==='checkbox'?e.checked:['temp','max','top','fs','hist'].includes(k)?(e.value===''?g[k]:+e.value):k==='sys'?e.value:e.value.trim()}};
+
+/* ---------- updates ---------- */
+function ghRepo(){
+ const r=String(S.cfg?.repo||'').trim().replace(/^https?:\/\/(?:www\.)?github\.com\//,'').replace(/\/+$/,'');
+ return r;
+}
+function updStatus(){
+ const bad=localStorage.getItem('hearth_ota_bad');
+ const pending=localStorage.getItem('hearth_ota');
+ if(bad)return `Update v${esc(bad)} was blocked after a failed startup. It will not be retried until a newer version is found.`;
+ if(pending){const m=pending.match(/var VER=(\d+)/);if(m)return `Update v${m[1]} is ready to install on the next reload.`}
+ return `Current version: v${VER}.`
+}
+function ghHeaders(){
+ const h={Accept:'application/vnd.github+json'};
+ if(S.cfg?.gh)h.Authorization='Bearer '+S.cfg.gh;
+ return h;
+}
+function decodeB64(b){
+ const bin=atob(String(b).replace(/\s/g,''));
+ const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+ return new TextDecoder('utf-8').decode(bytes);
+}
+async function fetchLatestHtml(){
+ const repo=ghRepo();
+ if(!/^[^/]+\/[^/]+$/.test(repo))throw Error('GitHub owner/repo is invalid');
+ const raw=`https://raw.githubusercontent.com/${repo}/main/www/index.html`;
+ const headers=S.cfg?.gh?ghHeaders():{};
+ let r=await fetch(raw,{cache:'no-store',headers});
+ if(r.ok)return await r.text();
+ const api=`https://api.github.com/repos/${repo}/contents/www/index.html?ref=main`;
+ r=await fetch(api,{cache:'no-store',headers:ghHeaders()});
+ if(!r.ok)throw Error(`GitHub returned ${r.status}`);
+ const j=await r.json();
+ if(!j.content)throw Error('GitHub did not return index.html');
+ return decodeB64(j.content);
+}
+async function checkUpdate(manual=false){
+ try{
+  const html=await fetchLatestHtml();
+  const m=html.match(/(?:var|let|const)\s+VER\s*=\s*(\d+)/);
+  if(!m)throw Error('Downloaded index.html has no version number');
+  const remote=+m[1];
+  localStorage.removeItem('hearth_ota_bad');
+  if(remote<=VER){
+   if(manual)toast(`Hearth is up to date (v${VER})`);
+   return false;
+  }
+  localStorage.setItem('hearth_ota',html);
+  localStorage.removeItem('hearth_ota_try');
+  localStorage.removeItem('hearth_ota_etag');
+  if(manual){
+   const apply=confirm(`Hearth v${remote} is available. Install it now?`);
+   if(apply){await flushSave();location.reload();}
+   else toast(`Update v${remote} is ready. Reload to install it.`);
+  }
+  return true;
+ }catch(e){
+  if(manual)toast('Update check failed: '+(e?.message||e));
+  return false;
+ }
+}
+async function autoUpd(){
+ if(S.cfg?.auto===false)return;
+ if(localStorage.getItem('hearth_ota'))return;
+ const last=+(localStorage.getItem('hearth_ota_check')||0);
+ if(Date.now()-last<6*60*60*1000)return;
+ localStorage.setItem('hearth_ota_check',String(Date.now()));
+ await checkUpdate(false);
+}
+
 
 /* ---------- import ---------- */
 const lat=b=>{let s='';for(const x of b)s+=String.fromCharCode(x);return s};
