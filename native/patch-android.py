@@ -106,7 +106,9 @@ for colour_file in colour_files:
             '<color name="ic_launcher_background">#12051F</color>',
             colours,
         )
-    if "launch_bg" not in colours:
+    # launch_bg must live in exactly one file: aapt fails the build on
+    # duplicate resources across values/*.xml.
+    if colour_file == COLORS and "launch_bg" not in colours:
         colours = colours.replace(
             "</resources>", '    <color name="launch_bg">#12051F</color>\n</resources>'
         )
