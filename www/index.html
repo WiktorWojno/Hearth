@@ -60,14 +60,14 @@ body{
   max-width:680px;margin:0 auto;position:relative;isolation:isolate;
   background:transparent;
 }
+/* Soft glows instead of a tiled, masked dot pattern. The tiled layer plus
+   mask-image produced flickering rectangular artifacts on some Android
+   WebViews while scrolling. */
 #app::before{
-  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.55;
-  background-image:
-    radial-gradient(circle at 12% 18%,color-mix(in srgb,var(--ac) 20%,transparent) 0 1.5px,transparent 2.5px),
-    radial-gradient(circle at 72% 64%,color-mix(in srgb,var(--ac2) 18%,transparent) 0 1.5px,transparent 2.5px);
-  background-size:150px 150px,210px 210px;
-  -webkit-mask-image:linear-gradient(180deg,#000,transparent 62%);
-  mask-image:linear-gradient(180deg,#000,transparent 62%);
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(62% 38% at 14% 6%,color-mix(in srgb,var(--ac) 10%,transparent),transparent 72%),
+    radial-gradient(54% 34% at 88% 44%,color-mix(in srgb,var(--ac2) 9%,transparent),transparent 74%);
 }
 #v{flex:1;display:flex;flex-direction:column;min-height:0;position:relative;z-index:1}
 *{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ac2) 55%,var(--ln)) transparent}
@@ -83,8 +83,7 @@ a{color:var(--ac)}
 header{
   display:flex;align-items:center;gap:8px;
   padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;
-  background:color-mix(in srgb,var(--bg) 70%,transparent);
-  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 96%,var(--sf)),color-mix(in srgb,var(--bg) 90%,var(--sf)));
   border-bottom:1px solid color-mix(in srgb,var(--ln) 70%,transparent);
   position:relative;z-index:5;
 }
@@ -98,9 +97,19 @@ main{flex:1;overflow-y:auto;padding:14px 16px 24px;overscroll-behavior:contain}
 .logo{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:none;
   box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 42%,transparent),0 6px 18px rgba(0,0,0,.35)}
 .wm{font:700 28px/1 "Cormorant Garamond",Literata,Georgia,serif;letter-spacing:.01em;flex:1;min-width:0}
-.ib{border:0;background:none;color:var(--ac);font-size:15px;padding:8px 10px;border-radius:12px;min-height:42px}
+.ib{border:0;background:none;color:var(--ac);font-size:15px;padding:8px 10px;border-radius:12px;min-height:42px;flex:none}
 .ib.big{font-size:28px;line-height:1;padding:2px 10px}
 .ib:active{background:color-mix(in srgb,var(--ac) 14%,transparent)}
+/* Inline SVG icons. Glyph characters such as ⌕ and ✎ are missing from many
+   system fonts and show up as empty boxes, so every control icon is drawn. */
+.i{width:22px;height:22px;display:block;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ib.big .i{width:25px;height:25px}
+.send .i{width:21px;height:21px;stroke-width:2.1}
+.ib .i.sm{width:18px;height:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn .i,.lnk .i{display:inline-block;width:16px;height:16px;stroke-width:2}
+.btn.full .i,.btn.wide .i{width:18px;height:18px}
+button .i{pointer-events:none}
 .btn{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border:0;border-radius:14px;padding:13px 20px;font-size:15px;font-weight:650;letter-spacing:.01em;box-shadow:0 8px 22px color-mix(in srgb,var(--g1) 28%,transparent)}
 .btn.s{background:var(--sf);color:var(--ink);border:1px solid var(--ln);box-shadow:var(--sh2)}
 .btn.d{background:var(--sf);color:var(--dg);border:1px solid color-mix(in srgb,var(--dg) 42%,var(--ln));box-shadow:none}
@@ -157,11 +166,11 @@ main{flex:1;overflow-y:auto;padding:14px 16px 24px;overscroll-behavior:contain}
 .trow .tools{margin-top:0}
 .comp{display:flex;gap:8px;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));align-items:flex-end;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--bg) 82%,transparent));position:relative;z-index:4}
 .comp textarea{flex:1;border-radius:24px;padding:12px 16px;max-height:120px;background:var(--sf);border:1px solid var(--ln);box-shadow:var(--sh2)}
-#cb{display:flex;gap:8px;align-items:flex-end}
+#cb{display:flex;gap:8px;align-items:flex-end;flex:none}
 textarea,input,select{width:100%;font:16px inherit;font-family:inherit;color:var(--ink);background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:12px 13px;outline:0;transition:border-color .15s,box-shadow .15s}
 textarea:focus,input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 18%,transparent)}
 textarea{resize:none}
-.sheet{position:fixed;inset:0;background:rgba(7,2,14,.62);display:flex;align-items:flex-end;z-index:20;animation:fade .2s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.sheet{position:fixed;inset:0;background:rgba(7,2,14,.72);display:flex;align-items:flex-end;z-index:20;animation:fade .2s}
 #sh2 .sheet{z-index:30;background:rgba(7,2,14,.5)}
 .sheet>div{position:relative;background:linear-gradient(180deg,var(--sf2),var(--sf) 38%);width:100%;max-width:680px;margin:0 auto;border-radius:28px 28px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:88%;overflow-y:auto;box-shadow:var(--sh);animation:up .22s ease-out;border-top:1px solid color-mix(in srgb,var(--ac) 28%,transparent)}
 .sheet>div::before{content:"";position:absolute;top:0;left:22%;right:22%;height:1px;background:linear-gradient(90deg,transparent,var(--ac),transparent);opacity:.8}
@@ -209,7 +218,7 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
 .srow .t{flex:1;min-width:0}
 .srow b{display:block}
 .srow small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ic{width:46px;height:46px;border-radius:15px;background:var(--sf2);display:grid;place-items:center;font-size:20px;flex:none;border:1px solid color-mix(in srgb,var(--ln) 65%,transparent)}
+.ic{width:46px;height:46px;border-radius:15px;background:var(--sf2);display:grid;place-items:center;font-size:20px;flex:none;border:1px solid color-mix(in srgb,var(--ln) 65%,transparent);font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",system-ui,sans-serif;line-height:1}
 .chev{color:var(--mut);font-size:22px;flex:none}
 /* themed select: a real <select> stays hidden so every existing
    readCfg()/change handler keeps working, while a styled button opens the
@@ -329,7 +338,7 @@ details summary{cursor:pointer;color:var(--mut);margin-top:10px}
 .hello h1{font:700 25px/1.15 Inter,system-ui;margin:0}
 .hello small{color:var(--mut)}
 .hero,.phero{isolation:isolate}
-nav.tb{display:flex;gap:4px;margin:8px 12px calc(8px + env(safe-area-inset-bottom,0px));padding:6px;border-radius:24px;background:color-mix(in srgb,var(--sf) 80%,transparent);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid color-mix(in srgb,var(--ln) 80%,transparent);box-shadow:var(--sh2);position:relative;z-index:5}
+nav.tb{display:flex;gap:4px;margin:8px 12px calc(8px + env(safe-area-inset-bottom,0px));padding:6px;border-radius:24px;background:linear-gradient(180deg,color-mix(in srgb,var(--sf) 96%,var(--bg)),var(--sf));border:1px solid color-mix(in srgb,var(--ln) 80%,transparent);box-shadow:var(--sh2);position:relative;z-index:5}
 nav.tb button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;font-size:11px;font-weight:650;border:0;border-radius:18px;background:none;color:var(--mut);position:relative}
 nav.tb svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.tb button.on{color:var(--ac);background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 17%,transparent),color-mix(in srgb,var(--ac) 4%,transparent))}
@@ -349,13 +358,53 @@ nav.tb button.on svg{fill:color-mix(in srgb,var(--ac) 18%,transparent);filter:dr
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=34,PUB='0.1';try{const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
-if(o&&ov<=VER){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.removeItem('hearth_ota_etag');const b=+(L.getItem('hearth_ota_bad')||0);if(b&&b<=VER)L.removeItem('hearth_ota_bad')}
-else if(o&&ov>VER){const p=(L.getItem('hearth_ota_try')||'').split(':');
- if(+p[0]===ov&&+p[1]>=1){L.removeItem('hearth_ota');L.removeItem('hearth_ota_try');L.setItem('hearth_ota_bad',String(ov))}
- else{L.setItem('hearth_ota_try',ov+':1');document.open();document.write(o);document.close()}}}catch(e){}</script>
+<script>var VER=35,PUB='0.1';try{
+ const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
+ /* A truncated download must never be written over the running app: that is
+    how you get a half-rendered screen with pieces missing. */
+ const drop=()=>{['hearth_ota','hearth_ota_try','hearth_ota_etag'].forEach(k=>{try{L.removeItem(k)}catch(e){}})};
+ if(o&&ov<=VER){drop();const b=+(L.getItem('hearth_ota_bad')||0);if(b&&b<=VER)L.removeItem('hearth_ota_bad')}
+ else if(o&&ov>VER){
+  const p=(L.getItem('hearth_ota_try')||'').split(':');
+  const complete=/^\s*<!doctype html/i.test(o)&&/<\/html>\s*$/i.test(o)&&o.length>20000;
+  if(!complete){try{L.setItem('hearth_ota_bad',String(ov))}catch(e){}drop()}
+  else if(+p[0]===ov&&+p[1]>=1){try{L.setItem('hearth_ota_bad',String(ov))}catch(e){}drop()}
+  else{
+   L.setItem('hearth_ota_try',ov+':1');
+   let wrote=false;
+   try{document.open();document.write(o);document.close();wrote=!!document.querySelector('#app')}catch(e){wrote=false}
+   if(!wrote){try{L.setItem('hearth_ota_bad',String(ov))}catch(e){}drop();location.reload()}
+  }
+ }
+}catch(e){}</script>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* Icon paths, drawn as SVG so no button depends on a font having the glyph. */
+const IP={
+ search:'<circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16.2 16.2"/>',
+ pen:'<path d="M4 20h4L19.1 8.9a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M14.2 5.9l3 3"/>',
+ retry:'<path d="M20 11.5A8 8 0 1 0 17.7 17"/><path d="M20 4.8v6.7h-6.6"/>',
+ send:'<path d="M12 19.5V5"/><path d="M5.8 11 12 4.8 18.2 11"/>',
+ stop:'<rect x="7" y="7" width="10" height="10" rx="2.2" fill="currentColor" stroke="none"/>',
+ home:'<path d="M3.6 11.2 12 4l8.4 7.2"/><path d="M6.2 9.8V20h11.6V9.8"/>',
+ back:'<path d="M15 4.8 8 12l7 7.2"/>',
+ next:'<path d="M9 4.8 16 12l-7 7.2"/>',
+ left:'<path d="M14.5 5.5 8 12l6.5 6.5"/>',
+ right:'<path d="M9.5 5.5 16 12l-6.5 6.5"/>',
+ more:'<circle cx="5.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.5" fill="currentColor" stroke="none"/>',
+ close:'<path d="M6 6l12 12M18 6 6 18"/>',
+ download:'<path d="M12 4v11"/><path d="M7 10.5 12 15.5 17 10.5"/><path d="M5 20h14"/>',
+ up:'<path d="M6 14.5 12 8.5l6 6"/>',
+ dn:'<path d="M6 9.5 12 15.5l6-6"/>',
+ gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3.2v2.2M12 18.6v2.2M4.8 12H2.6M21.4 12h-2.2M6.9 6.9 5.3 5.3M18.7 18.7l-1.6-1.6M17.1 6.9l1.6-1.6M5.3 18.7l1.6-1.6"/>',
+ trash:'<path d="M4 7h16"/><path d="M9 7V4.8h6V7"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v5M14 11v5"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ check:'<path d="M4.5 12.5 9.5 17.5 19.5 6.5"/>'
+};
+const I=(n,cls='')=>`<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${IP[n]||''}</svg>`;
+/* First visible character, safe for names that start with an emoji: a lone
+   UTF-16 surrogate would render as a replacement square. */
+const first=s=>Array.from(String(s??'?').trim())[0]||'?';
 const uid=()=>Math.random().toString(36).slice(2,10);
 let S={chars:[],books:[],personas:[],chats:{},links:{},persona:null};
 try{S=Object.assign(S,JSON.parse(localStorage.getItem('hearth')||'{}'))}catch(e){}
@@ -458,6 +507,7 @@ async function checkUpdate(manual=false){
   const m=r.text.match(/var VER=(\d+)/);
   if(!m)throw Error('The update file has no build number');
   const nv=+m[1];
+  if(!/^\s*<!doctype html/i.test(r.text)||!/<\/html>\s*$/i.test(r.text)||r.text.length<20000)throw Error('The update download was incomplete. Try again.');
   setUpdMeta({latest:nv});
   if(nv<=VER){if(manual)toast('You’re up to date (build '+VER+')');return}
   if(String(localStorage.getItem(UPD_BAD)||'')===String(nv))throw Error('Build '+nv+' failed to start before. Waiting for a newer build.');
@@ -662,19 +712,19 @@ function charView(c,pv){
   gs=[c.first,...(c.alts||[])].filter(Boolean),gi=Math.min(V.gi||0,Math.max(gs.length-1,0)),img=c.banner||c.img,
   sec=(t,x)=>x?`<h2 class="h2">${t}</h2><div class="body md">${rich(x)}</div>`:'';
  const meta=((c.tags||[]).length?`<div class="tags" style="margin-top:14px">${c.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+`<p class="ps" style="margin-top:18px">Created ${dt(c.created)} · Updated ${dt(c.updated)}<br>Origin ${c.src||'Unknown'}</p>`;
- const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">‹</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">›</button></div>${pv?`<button class="btn full" data-a="pimp" data-s="1" data-i="${gi}" style="margin-top:8px">💬 Import &amp; start with this opening</button>`:`<button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`}`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
-  +sec('About',c.about)+(c.about?(c.id?`<button class="lnk" style="color:var(--ac);margin-top:6px" data-a="cfind" data-id="${c.id}">↻ Refresh About from the hub</button>`:''):`<h2 class="h2">About</h2><p class="ps">No About yet.${c.id?` <button class="lnk" style="color:var(--ac)" data-a="cfind" data-id="${c.id}">Find it on the hub</button>`:''}</p>`)+meta;
+ const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">${I('left')}</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">${I('right')}</button></div>${pv?`<button class="btn full" data-a="pimp" data-s="1" data-i="${gi}" style="margin-top:8px">💬 Import &amp; start with this opening</button>`:`<button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`}`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
+  +sec('About',c.about)+(c.about?(c.id?`<button class="lnk" style="color:var(--ac);margin-top:6px" data-a="cfind" data-id="${c.id}">${I('retry','sm')} Refresh About from the hub</button>`:''):`<h2 class="h2">About</h2><p class="ps">No About yet.${c.id?` <button class="lnk" style="color:var(--ac)" data-a="cfind" data-id="${c.id}">Find it on the hub</button>`:''}</p>`)+meta;
  const card=sec('Description',c.desc)+sec('Personality',c.pers)+sec('Scenario',c.scen)+sec('Definition',c.ex)+((S.links[c.id]||[]).length?`<h2 class="h2">Lorebooks</h2><div class="tags">${S.links[c.id].map(i=>S.books.find(b=>b.id===i)).filter(Boolean).map(b=>`<span class="chip">📖 ${esc(b.name)}</span>`).join('')}</div>`:'')
   ;
- return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="${pv?'pback':'home'}" aria-label="Back">‹</button></header><main><div class="hero">${img?`<img src="${img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}</div>
+ return`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="${pv?'pback':'home'}" aria-label="Back">${I('back')}</button></header><main><div class="hero">${img?`<img src="${img}" alt="">`:`<div class="ph">${esc(c.name[0])}</div>`}</div>
  <div class="ctr"><h1>${esc(c.name)}</h1><p class="ps" style="margin:0 0 4px">${esc(strip(c.about||'').slice(0,110))}${(c.about||'').length>110?'…':''}</p>${c.creator?`<p class="note" style="margin:0 0 14px">By ${esc(c.creator)}</p>`:'<div style="height:14px"></div>'}</div>
- ${pv?`<button class="btn full" data-a="pimp">⬇ Import</button>`:`<button class="btn full" data-a="open" data-id="${c.id}">💬 ${has?'Continue chat':'Chat now'}</button>`}
- ${pv?`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="pback">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`:`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="editc">✎ Edit</button><button class="btn s" style="flex:1" data-a="cnew" data-id="${c.id}">＋ New chat</button></div>`}
- ${pv?`<div class="card2 stats" style="margin-top:18px"><div><b>${fmt(tk)}</b><span>tokens</span></div><div><b>${gs.length}</b><span>greetings</span></div><div><b>${pv.lore}</b><span>lore entries</span></div></div>${c.creator?`<div class="card2 pad" style="flex-direction:row;align-items:center;gap:14px"><div class="av">${esc(c.creator[0]||'?')}</div><div><b>${esc(c.creator)}</b><div class="note" style="margin:0">${[pv.stars?'⭐ '+pv.stars:'',pv.dl?'⬇ '+pv.dl:''].filter(Boolean).join(' · ')||'Creator'}</div></div></div>`:''}`:`<div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div></div>`}
+ ${pv?`<button class="btn full" data-a="pimp">${I('download')} Import</button>`:`<button class="btn full" data-a="open" data-id="${c.id}">💬 ${has?'Continue chat':'Chat now'}</button>`}
+ ${pv?`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="pback">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`:`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="editc">${I('pen','sm')} Edit</button><button class="btn s" style="flex:1" data-a="cnew" data-id="${c.id}">＋ New chat</button></div>`}
+ ${pv?`<div class="card2 stats" style="margin-top:18px"><div><b>${fmt(tk)}</b><span>tokens</span></div><div><b>${gs.length}</b><span>greetings</span></div><div><b>${pv.lore}</b><span>lore entries</span></div></div>${c.creator?`<div class="card2 pad" style="flex-direction:row;align-items:center;gap:14px"><div class="av">${esc(c.creator[0]||'?')}</div><div><b>${esc(c.creator)}</b><div class="note" style="margin:0">${[pv.stars?'⭐ '+pv.stars:'',pv.dl?pv.dl+' downloads':''].filter(Boolean).join(' · ')||'Creator'}</div></div></div>`:''}`:`<div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div></div>`}
  <p class="note" style="text-align:center">${fmt(tk)} tokens · Updated ${dt(c.updated)}</p>
  <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card+(pv&&pv.lore?`<h2 class="h2">Lorebook</h2><p class="body">Includes ${pv.lore} lorebook entries.</p>`:''):story}<div style="height:40px"></div></main>`}
 function browseHtml(){const B=V.br;
- return`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="home" aria-label="Back">‹</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from third-party sites.</p>
+ return`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="home" aria-label="Back">${I('back')}</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from third-party sites.</p>
  <div class="rowh" style="gap:8px"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="pill" data-a="bsearch">Search</button></div>
  <div class="rowh" style="margin:12px 0">${selBox('bs','',[['download_count','Most downloaded'],['star_count','Most starred'],['created_at','Newest']],B.sort,'Sort','sm')}<label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label></div>
  <label>Or paste a link</label><div class="rowh" style="gap:8px"><input id="bu" placeholder="chub.ai link, or direct .png / .json URL" autocomplete="off"><button class="pill" data-a="burl">Import</button></div><div style="height:18px"></div>`
@@ -745,8 +795,8 @@ async function impersonate(){const c=C(),h=S.chats[c.id],g=resolve(c);if(!g)retu
  const hist=h.filter(y=>!y.mm);
  const m=[];for(const x of hist.slice(-(S.cfg.hist||40))){const r=x.r==='u'?'assistant':'user';if(m.length&&m[m.length-1].role===r)m[m.length-1].content+='\n\n'+x.t;else m.push({role:r,content:x.t})}
  if(!m.length||m[m.length-1].role!=='user')m.push({role:'user',content:`[Write ${u}’s next message.]`});
- V.busy=true;V.ctl=new AbortController();render();
- try{let out='';await llm(sys,m,t=>{out=t;const i=$('#in');if(i){i.value=t;i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}},V.ctl.signal,{...g,stop:[]});
+ V.busy=true;V.lastTok=Date.now();V.ctl=new AbortController();render();
+ try{let out='';await llm(sys,m,t=>{V.lastTok=Date.now();out=t;const i=$('#in');if(i){i.value=t;i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}},V.ctl.signal,{...g,stop:[]});
   const i=$('#in');if(i&&out){i.value=out.trim();i.focus();i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}
   if(!out)toast('The model returned nothing. Try again.')}
  catch(e){if(e.name!=='AbortError')toast('Could not write your line: '+e.message)}
@@ -782,9 +832,9 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(mode==='new'){m={r:'c',t:'',s:[''],i:0};h.push(m);hist=h.slice(0,-1)}
  else if(mode==='swipe'){m=h[h.length-1];m.s=m.s||[m.t];m.s.push('');m.i=m.s.length-1;m.t='';hist=h.slice(0,-1)}
  else{m=h[h.length-1];base=m.t;hist=h}
- V.busy=true;V.stick=true;V.ctl=new AbortController();render(true);
+ V.busy=true;V.lastTok=Date.now();V.stick=true;V.ctl=new AbortController();render(true);
  const set=t=>{m.t=base+(t.startsWith(c.name+':')?t.slice(c.name.length+1).trimStart():t);m.s&&(m.s[m.i||0]=m.t)};
- let cut='';try{V.sem=await sem(c,hist).catch(()=>null);const{sys,msgs}=build(c,hist,mode==='cont');m.fl=LF.slice();await llm(sys,msgs,t=>{set(t);upd()},V.ctl.signal,g);cut=LLM_END.fin==='length'?'length':(m.t&&!LLM_END.fin&&!LLM_END.done&&!/[.!?…"'”’*)\]»~]\s*$/.test(m.t.trim())?'early':'')}
+ let cut='';try{V.sem=await sem(c,hist).catch(()=>null);const{sys,msgs}=build(c,hist,mode==='cont');m.fl=LF.slice();await llm(sys,msgs,t=>{V.lastTok=Date.now();set(t);upd()},V.ctl.signal,g);cut=LLM_END.fin==='length'?'length':(m.t&&!LLM_END.fin&&!LLM_END.done&&!/[.!?…"'”’*)\]»~]\s*$/.test(m.t.trim())?'early':'')}
  catch(e){if(e.name!=='AbortError')V.sheet={t:'info',m:'Request failed: '+e.message+(/Failed to fetch|Load failed/.test(e.message)?'\nCheck the URL and key, and that the server allows browser (CORS) requests.':'')}}
  if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
  V.busy=false;V.ctl=null;save();render(V.stick);summarize(c);
@@ -793,12 +843,12 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(cut==='early')toast('The connection ended early. Tap Continue to finish the reply.')}
 function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
  if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
-const swb=x=>`<div class="tools"><button data-a="sl">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">▶</button><button data-a="cont">Continue</button></div>`;
+const swb=x=>`<div class="tools"><button data-a="sl">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">${I('right','sm')}</button><button data-a="cont">Continue</button></div>`;
 function upd(){const b=document.querySelector('.msg:last-child .bub');if(b){b.innerHTML=rich(S.chats[V.chat].slice(-1)[0].t);const m=$('main');if(V.stick)m.scrollTop=m.scrollHeight}}
 function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t});(S.act=S.act||{})[V.chat]=Date.now();i.value='';i.style.height='auto';save();gen()}
 
 /* ---------- views ---------- */
-const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc((c.name||'?')[0])}</div>`;
+const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc(first(c.name))}</div>`;
 function cfgForm(t){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`,sel=(i,l,o,v)=>selBox('g_'+i,l,o,v,l);
   const T={appr:['Appearance',sel('theme','Theme',[['auto','Match system'],['light','Light'],['dark','Dark']],g.theme)+sel('fs','Text size',[[14,'14 px'],[16,'16 px'],[18,'18 px'],[20,'20 px']],g.fs)+sel('ff','Font',[['serif','Serif'],['sans','Sans']],g.ff)+`<label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label>`],
    prov:['Providers',selBox('prov','Provider',[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']],g.prov,'Provider')+f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('top','Top P',g.top,'type="number" step="0.05"')+`<p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>`],
@@ -816,7 +866,7 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
   h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="avp">Avatar</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='add')h=`<h2>Add</h2><div class="acts" style="flex-direction:column;margin-top:0"><button class="btn" data-a="imp2">Import cards or lorebooks</button><button class="btn s" data-a="newc">Create a character</button></div>`;
  if(s.t==='find')h=`<h2>Search chat</h2><input id="fq" placeholder="Search messages" autocomplete="off"><div id="fr" style="margin-top:8px"></div><div class="acts"><button class="btn s" data-a="close">Close</button></div>`;
- if(s.t==='cprev'){const p=V.prev;h=`<div class="phero">${p.img?`<img src="${esc(p.img)}" alt="" referrerpolicy="no-referrer">`:`<div class="ph">${esc(p.name[0])}</div>`}</div><h2 style="text-align:center;margin:14px 0 2px;font-size:24px">${esc(p.name)}</h2>${p.creator?`<p class="note" style="text-align:center;margin:0 0 6px">By ${esc(p.creator)}</p>`:''}<h2 class="h2" style="margin-top:16px">About</h2><p class="body">${esc(p.about||'No description provided.')}</p>`+(p.tags?.length?`<div class="tags" style="margin-top:12px">${p.tags.slice(0,14).map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+(p.stats?`<p class="ps" style="margin:10px 0 0">${esc(p.stats)}</p>`:'')+`<div class="acts"><button class="btn wide" data-a="pimp" style="flex:2">Import</button><button class="btn s" data-a="pskip" style="flex:1">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`}
+ if(s.t==='cprev'){const p=V.prev;h=`<div class="phero">${p.img?`<img src="${esc(p.img)}" alt="" referrerpolicy="no-referrer">`:`<div class="ph">${esc(first(p.name))}</div>`}</div><h2 style="text-align:center;margin:14px 0 2px;font-size:24px">${esc(p.name)}</h2>${p.creator?`<p class="note" style="text-align:center;margin:0 0 6px">By ${esc(p.creator)}</p>`:''}<h2 class="h2" style="margin-top:16px">About</h2><p class="body">${esc(p.about||'No description provided.')}</p>`+(p.tags?.length?`<div class="tags" style="margin-top:12px">${p.tags.slice(0,14).map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+(p.stats?`<p class="ps" style="margin:10px 0 0">${esc(p.stats)}</p>`:'')+`<div class="acts"><button class="btn wide" data-a="pimp" style="flex:2">Import</button><button class="btn s" data-a="pskip" style="flex:1">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`}
  if(s.t==='llai'){const d=V.llai.d,cn=d.chats||[],ids=new Set((d.characters||[]).map(x=>x.id)),have=cn.filter(x=>ids.has(x.character_id)).length,mc=cn.reduce((a,x)=>a+(x.messages||[]).length,0);
   h=`<h2>Import from LLAI</h2><p class="ps">Account export for ${esc(d.user?.display_name||d.user?.username||'your account')}.</p><div class="card2 pad"><div class="rowh"><span>Characters</span><b>${(d.characters||[]).length}</b></div><div class="rowh"><span>Personas</span><b>${(d.personas||[]).length}</b></div><div class="rowh"><span>Lorebooks</span><b>${(d.lorebooks||[]).length}</b></div><div class="rowh"><span>Chats</span><b>${cn.length} (${mc} messages)</b></div></div><label class="chk"><input type="checkbox" id="l_stub" checked>Include the ${cn.length-have} chats whose characters aren’t in the export (creates placeholder characters)</label><label class="chk"><input type="checkbox" id="l_instr" checked>Use your AI instructions as the system prompt</label><p class="note">Images aren’t part of the export, so avatars and covers are left blank. Importing the same file again skips what’s already there.</p><div class="acts"><button class="btn wide" data-a="llaigo">Import</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='rphrase'){const w=(V.rphrase||'').split(' ');h=`<h2>Your recovery phrase</h2><p class="ps">Write these 12 words down, in order, and keep them somewhere safe. They are the only way back in if you forget your password. They won’t be shown again.</p><div class="words">${w.map((x,i)=>`<span><i>${i+1}</i>${x}</span>`).join('')}</div><div class="acts"><button class="btn s" data-a="rcopy">Copy</button><button class="btn wide" data-a="rdone">I’ve saved it</button></div>`}
@@ -846,7 +896,7 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
 function ctxBar(c,h){const e=ctxEst(c,h);if(!e)return'';
  return`<div class="ctxbar" data-a="prompt" title="See what gets sent"><i style="width:${e.pct}%;${e.pct>85?'background:var(--dg)':''}"></i></div>`}
 const msgHtml=(x,i,m,c)=>{const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
- const gp=i>0&&m[i-1].r===x.r;return `<div class="msg ${x.r}${gp?' gp':''}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div></div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">◀</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">▶</button>`:''}</div></div>`:''}`};
+ const gp=i>0&&m[i-1].r===x.r;return `<div class="msg ${x.r}${gp?' gp':''}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div></div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
 async function img2(file,w,h){const an=file.size<1.5e6&&(/gif|webp/.test(file.type)||(file.type==='image/png'&&new TextDecoder('latin1').decode(new Uint8Array(await file.arrayBuffer())).includes('acTL')));if(an)return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});return new Promise(r=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/i.width,h/i.height),dw=i.width*k,dh=i.height*k;x.drawImage(i,(w-dw)/2,(h-dh)/2,dw,dh);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.8))};i.onerror=()=>r('');i.src=u})}
 function syncEd(){if(!V.ed)return;const o=V.ed.o;document.querySelectorAll('[id^="f_"]').forEach(e=>{const k=e.id.slice(2);o[k]=e.type==='checkbox'?e.checked:e.type==='number'?(+e.value||0):e.value});
  const g=[...document.querySelectorAll('[id^="gr_"]')];if(g.length)o.greets=g.map(e=>e.value)}
@@ -865,9 +915,9 @@ function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook
   box=(t,key)=>`<label>${t}</label><div class="bx" data-a="pimg" data-t="${key}">${o[key]?`<img src="${o[key]}" alt="">`:'<i>+</i>'}</div>`,
   photos=`<label>Photos</label><div class="ph2"><div class="bx" data-a="pimg" data-t="banner">${o.banner?`<img src="${o.banner}" alt="">`:'<i>+</i>'}</div><div class="cr" data-a="pimg" data-t="img">${o.img?`<img src="${o.img}" alt="">`:'<i>+</i>'}</div></div>`,
   chk=(key,t,d)=>`<label class="card2 pad chk2"><input type="checkbox" id="f_${key}" ${o[key]?'checked':''}><b>${t}</b><span class="ps" style="margin:0;font-size:15px">${d}</span></label>`;
- let h=`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="edback" aria-label="Back">‹</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main><h1 class="pt">${isNew?'Build a':'Edit'} ${N}</h1>`;
+ let h=`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="edback" aria-label="Back">${I('back')}</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings">${I('gear')}</button></header><main><h1 class="pt">${isNew?'Build a':'Edit'} ${N}</h1>`;
  if(k==='c')h+=photos+box('Chat background','bgimg')+'<p class="ps">Shown behind the messages of every chat with this character.</p>'+inp('name','Character Name','Enter character name...')+ta('about','About','What other people see on the character page.',4)+ta('desc','Description','Who this character is',4)+ta('pers','Personality','Traits and temperament',3)+ta('scen','Scenario','Where and when this takes place',3)+tags('tags','Tags','What is this character into? Press Enter to add.','Add a tag...')
-  +`<label>Greeting Messages</label><p class="ps" style="margin:0 0 8px">Users can swipe between these alternative greetings on the first message.</p>`+o.greets.map((g,i)=>`<div class="rowh"><label style="margin:12px 0 5px">Greeting Variation #${i+1}</label><span><button class="ib" data-a="gmv" data-i="${i}" data-d="-1">▲</button><button class="ib" data-a="gmv" data-i="${i}" data-d="1">▼</button><button class="ib" data-a="grm" data-i="${i}">✕</button></span></div><textarea id="gr_${i}" rows="4" placeholder="Greeting Variation #${i+1}...">${esc(g)}</textarea>`).join('')+`<button class="dash" data-a="gadd">+ Add Greeting Variation</button>`
+  +`<label>Greeting Messages</label><p class="ps" style="margin:0 0 8px">Users can swipe between these alternative greetings on the first message.</p>`+o.greets.map((g,i)=>`<div class="rowh"><label style="margin:12px 0 5px">Greeting Variation #${i+1}</label><span><button class="ib" data-a="gmv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="gmv" data-i="${i}" data-d="1">${I('dn','sm')}</button><button class="ib" data-a="grm" data-i="${i}">${I('close','sm')}</button></span></div><textarea id="gr_${i}" rows="4" placeholder="Greeting Variation #${i+1}...">${esc(g)}</textarea>`).join('')+`<button class="dash" data-a="gadd">+ Add Greeting Variation</button>`
   +ta('ex','Definition','Describe your character’s voice, syntax, rules, behaviors, and example dialogue.',8)+`<details><summary>System prompt override</summary><textarea id="f_sys" rows="3">${esc(o.sys)}</textarea></details>`+ta('rag','RAG Definition','World facts, history, and relationships, one paragraph per topic. Retrieved as needed.',8)
   +`<label>Lorebooks</label><p class="ps" style="margin:0 0 8px">Attach worlds you wrote once and reuse everywhere. Entries only enter a chat when the conversation calls for them.</p><p class="ps"><b>${o.links.length} attached</b></p>`+S.books.map(b=>`<label class="card2 lbk"><input type="checkbox" data-lk="${b.id}" ${o.links.includes(b.id)?'checked':''}>${b.cover?`<img src="${b.cover}" alt="">`:'<span class="lph">📖</span>'}<span><b>${esc(b.name)}</b><small>${b.entries.length} entries</small></span></label>`).join('');
  if(k==='p')h+=photos+inp('name','Name','Who are you in this story?')+ta('desc','Description','How this persona talks and acts.',4)+ta('lore','Lore','Backstory and facts the AI should know about you.',8)+ta('rag','RAG lore','Facts to look up mid-chat, one paragraph per topic.',8)+chk('active','Use this persona','Sets it as your active persona.');
@@ -876,17 +926,17 @@ function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook
   +`<div class="three"><div><label>Delay</label><input id="f_delay" type="number" value="${o.delay||0}"></div><div><label>Cooldown</label><input id="f_cooldown" type="number" value="${o.cooldown||0}"></div><div><label>Sticky</label><input id="f_sticky" type="number" value="${o.sticky||0}"></div></div><p class="ps" style="margin-top:10px">Delay: turns to wait after keyword first appears. Cooldown: turns it stays silent after firing. Sticky: turns it lingers after keyword disappears.</p>`+chk('on','Enabled','Disabled entries never fire.');
  return h+`<div class="foot"><button class="lnk big" data-a="edback">Cancel</button><button class="btn wide" data-a="edsave">${isNew?'Create':'Save'} ${N}</button></div>${isNew?'':'<button class="btn d" style="width:100%;margin-top:12px" data-a="eddel">Delete</button>'}<div style="height:40px"></div></main>`}
 function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab='lore';return listHtml()}
- return `<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">‹</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings" style="font-size:24px">⚙</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">✎ Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">▲</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">▼</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
+ return `<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">${I('back')}</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings">${I('gear')}</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">${I('pen','sm')} Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">${I('dn','sm')}</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
 const PG2=['providers','import','memory','appr','instr','lim','upd','sec','accounts'];
 const WL='apple anchor arrow atlas autumn badge bamboo basket beach berry bridge brook cabin candle canyon castle cedar cherry circle cliff cloud clover coast comet coral cotton crane crystal dawn delta desert diamond dragon dream eagle ember falcon feather field flame forest fossil garden garnet glacier grove harbor hazel heron honey island ivory jade jungle kettle lagoon lantern lemon lily lotus lunar maple marble meadow mirror moss mountain nectar ocean olive onyx orchid otter oyster panda pearl pebble pepper pine planet plum prairie quartz quill rabbit raven reef river robin saffron sage sand shadow silver sketch spruce stone storm summer sunset swan thistle thunder tiger timber topaz tulip valley velvet violet walnut willow winter wolf zephyr acorn alder amber aspen aurora basil beacon birch blossom boulder breeze cactus canoe cascade cinder citrus compass copper cove cricket cypress dune dusk echo elm fern fjord flint fog frost galaxy ginger granite gust harvest haven horizon hollow iris juniper kayak lark lavender ledge lichen lilac lynx magnet mango mesa mint mist monsoon nebula nutmeg oak oasis opal orbit pasture petal pier pollen poppy quail rapids ridge ripple rose rowan rune salmon sequoia shore skylark slate sparrow spring sterling stream sundial tundra turtle twilight vine vista wander warbler wheat whisper wren yarrow yew zenith almond bronze cobalt dahlia ebony fable glen hickory indigo jasmine laurel linen magnolia marigold mulberry nimbus orchard paddle peony pewter quince reed sable sienna tamarind teal thyme umber vanilla wisp wisteria zinnia ash bay bluff brisk cairn clay dell drift ferry gale gorge heath inlet knoll loam'.split(' '),normPh=t=>String(t||'').toLowerCase().trim().split(/\s+/).join(' ');
 async function verifyAuth(lk,inp){if(!lk?.hash)return true;inp=String(inp||'');if(await hsh(inp,lk.salt)===lk.hash)return true;if(lk.rhash){const n=normPh(inp);if(n.split(' ').length>=12&&await hsh(n,lk.rsalt)===lk.rhash)return true}return false}
 async function mkPhrase(){const a=crypto.getRandomValues(new Uint8Array(12)),ph=[...a].map(x=>WL[x]).join(' '),salt=uid()+uid();S.lock.rsalt=salt;S.lock.rhash=await hsh(ph,salt);save();V.rphrase=ph;V.sheet={t:'rphrase'}}
 async function hsh(p,salt){if(!crypto.subtle)return btoa(unescape(encodeURIComponent(salt+p)));return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+p)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
-function lockHtml(){const pn=S.persona?P().name:'',ini=esc(((ACCOUNTS.find(a=>a.id===ACCT_ID)?.name)||pn||'H')[0]),br=`<div class="brand"><img src="icon-192.png" alt=""><b>Hearth</b><small>v${PUB}</small></div>`;
+function lockHtml(){const pn=S.persona?P().name:'',ini=esc(first((ACCOUNTS.find(a=>a.id===ACCT_ID)?.name)||pn||'H')),br=`<div class="brand"><img src="icon-192.png" alt=""><b>Hearth</b><small>v${PUB}</small></div>`;
  if(V.loading)return`<div class="lock">${br}</div>`;
- if(V.picker)return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="pick">${ACCOUNTS.map(a=>`<button class="pk" data-a="pickacct" data-id="${a.id}"><span class="av lg">${esc((a.name||'?')[0])}</span><b>${esc(a.name)}</b>${a.locked?'<small>🔒 Password</small>':''}</button>`).join('')}</div></div>`;
+ if(V.picker)return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="pick">${ACCOUNTS.map(a=>`<button class="pk" data-a="pickacct" data-id="${a.id}"><span class="av lg">${esc(first(a.name))}</span><b>${esc(a.name)}</b>${a.locked?'<small>🔒 Password</small>':''}</button>`).join('')}</div></div>`;
  if(V.forgot){const rc=!!S.lock?.rhash;return`<div class="lock">${br}<h2>Forgot password?</h2>${rc?`<p class="ps" style="text-align:center">Enter your 12-word recovery phrase and choose a new password.</p><textarea id="rp" rows="3" placeholder="word1 word2 word3 …" autocomplete="off" autocapitalize="none" style="width:100%"></textarea><div class="pw"><input id="np" type="password" placeholder="New password" autocomplete="off"><button class="eye" data-a="eye" data-t="np">👁</button></div><div class="pw"><input id="nc" type="password" placeholder="Confirm new password" autocomplete="off"><button class="eye" data-a="eye" data-t="nc">👁</button></div><button class="btn wide" data-a="recover" style="width:100%">Reset password</button>`:`<p class="ps" style="text-align:center">This account has no recovery phrase, so its password can’t be reset.</p>`}<details style="width:100%;margin-top:6px"><summary style="text-align:center;color:var(--mut)">Erase this account instead</summary><p class="ps" style="text-align:center;margin-top:10px">Deletes every chat, character, lorebook and key in this account on this device.</p><input id="er" placeholder="Type ERASE to confirm" autocomplete="off"><button class="btn wide danger" data-a="erase" style="width:100%;margin-top:10px">Erase everything</button></details><button class="lnk" data-a="unforgot">Back</button></div>`}
- return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="av xl">${ini}</div>${ACCOUNTS.length>1?'<button class="ib big" data-a="backpick" aria-label="Choose a different account" style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px">‹</button>':''}<b style="font-size:20px">${esc(ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||pn||'Hearth')}</b><label style="align-self:flex-start;margin:6px 0 0">Password</label><div class="pw"><input id="lk" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="lk">👁</button></div><button class="btn wide" data-a="unlock" style="width:100%">Unlock</button><button class="lnk" data-a="forgot">Forgot password?</button>${ACCOUNTS.length>1?'<button class="lnk" data-a="backpick" style="color:var(--ac)">‹ Choose a different account</button>':''}</div>`}
+ return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="av xl">${ini}</div>${ACCOUNTS.length>1?'<button class="ib big" data-a="backpick" aria-label="Choose a different account" style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px">'+I('left')+'</button>':''}<b style="font-size:20px">${esc(ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||pn||'Hearth')}</b><label style="align-self:flex-start;margin:6px 0 0">Password</label><div class="pw"><input id="lk" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="lk">👁</button></div><button class="btn wide" data-a="unlock" style="width:100%">Unlock</button><button class="lnk" data-a="forgot">Forgot password?</button>${ACCOUNTS.length>1?'<button class="lnk" data-a="backpick" style="color:var(--ac)">'+I('left','sm')+' Choose a different account</button>':''}</div>`}
 const PG={prov:'providers',imp:'import',mem:'memory',appr:'appr',instr:'instr',lim:'lim',upd:'upd',sec:'sec',acct:'accounts'};
 const mask=k=>k?(k.length>9?k.slice(0,4)+'…'+k.slice(-4):'••••'):'no key';
 const pill=(a,l)=>`<button class="pill" data-a="${a}">+ ${l}</button>`;
@@ -896,7 +946,7 @@ function selBox(id,label,opts,val,title,cls=''){
  const o=opts.map(x=>{const p=Array.isArray(x)?x:[x,x];return`<option value="${esc(String(p[0]))}" ${String(p[0])===String(val??'')?'selected':''}>${esc(String(p[1]))}</option>`}).join('');
  const cur=optText(opts,val)||'Choose…';
  const pv=id==='ps'?S.personas.find(x=>x.id===val):null;
- const lead=pv?(pv.img?`<img class="sw" src="${pv.img}" alt="">`:`<span class="sw" style="display:grid;place-items:center;background:var(--sf2);color:var(--ac);font-weight:700;font-size:12px">${esc((pv.name||'?')[0])}</span>`):(id==='bgs'&&BG[val]?`<span class="sw" style="background:${BG[val]},var(--bg)"></span>`:'');
+ const lead=pv?(pv.img?`<img class="sw" src="${pv.img}" alt="">`:`<span class="sw" style="display:grid;place-items:center;background:var(--sf2);color:var(--ac);font-weight:700;font-size:12px">${esc(first(pv.name))}</span>`):(id==='bgs'&&BG[val]?`<span class="sw" style="background:${BG[val]},var(--bg)"></span>`:'');
  return (label?`<label>${label}</label>`:'')+`<select id="${id}" class="nsel" tabindex="-1" aria-hidden="true">${o}</select><button type="button" class="selbtn ${cls}" data-a="sel" data-id="${id}" data-title="${esc(title||label||'Choose')}">${lead}<span class="lb">${esc(cur)}</span><span class="chev">›</span></button>`}
 function pickRows(id){
  const el=document.getElementById(id);if(!el)return[];
@@ -908,14 +958,14 @@ function pickRows(id){
  if(id==='bgs')rows.forEach(r=>{if(BG[r.v])r.dot=BG[r.v]+',var(--bg)'});
  return rows}
 const SUB={appr:'Theme, text size and font. Changes save automatically.',instr:'How the AI is told to roleplay.',lim:'History length and reply size.',upd:'Check for a new release from the update source.'};
-function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="home" aria-label="Home">⌂</button><button class="ib big" data-a="tab" data-id="settings" aria-label="Back">‹</button></header><main>`,
+function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="settings" aria-label="Back">${I('back')}</button></header><main>`,
  title=(t,d)=>`<h1 class="pt">${t}</h1><p class="ps">${d}</p>`;
  if(SUB[T]){const f=cfgForm(T);return hd+title(f[0],SUB[T])+f[1]+'</main>'}
  if(T==='import'){const ic=(t,d,a,l)=>`<div class="card2 pad"><div class="rowh" style="align-items:flex-start;gap:14px"><div><b>${t}</b><p class="ps" style="margin:6px 0 0;font-size:15px">${d}</p></div><button class="btn s" data-a="${a}" style="flex:none">${l}</button></div></div>`;
   return hd+title('Import','Bring characters and lorebooks from other apps.')+ic('Back up this account','Save everything to one file. API keys are never included.','bak','Save backup')+ic('Restore a backup','Load a file saved with Save backup. Your keys stay as they are.','rest','Choose file')+ic('Termux backup server','Optional: Hearth can start server.py in Termux automatically before a backup. This needs Termux, Python, and the RUN_COMMAND permission.','termux','Start now')+`<label class="chk" style="padding:0 4px 14px"><input type="checkbox" id="g_termux" ${S.cfg.termux!==false?'checked':''}>Start the Termux server automatically when backing up</label>`+ic('SillyTavern characters','Character cards: JSON or PNG (V2, V3). Embedded lorebooks are imported too.','imp','Choose file')+ic('SillyTavern lorebooks','World Info JSON files.','imp','Choose file')+ic('LLAI export','Your LLAI account export (.json): characters, personas, lorebooks and all chats.','imp','Choose file')+ic('Discover characters','Browse public characters and import them in one tap.','browse','Open')+'</main>'}
  if(T==='memory'){const mc=S.cfg.mem,stp=(k,t,d)=>`<h2 class="h2">${t}</h2><div class="card2 pad"><div class="rowh"><p class="ps" style="margin:0;font-size:15px;flex:1">${d}</p><div class="step"><button data-a="st" data-k="${k}" data-d="-1">−</button><b>${mc[k]}</b><button data-a="st" data-k="${k}" data-d="1">+</button></div></div></div>`;
   return hd+title('Memory','Older messages are summarized into memories so long chats stay coherent.')+`<h2 class="h2">Embedding model</h2><p class="ps" style="margin-top:-4px">Retrieves RAG paragraphs and keyword-less lorebook entries by meaning. Mark a model as an embedding model in Providers. Empty uses keyword matching.</p>`+selBox('emb_m','',[['','None (keyword matching)'],...S.models.filter(m=>m.emb).map(m=>[m.id,m.name||m.mid])],S.cfg.emb||'','Embedding model')+`<h2 class="h2">Long-term memory</h2>`+selBox('mem_on','',[['Off','Off'],['On','On']],mc.on?'On':'Off','Long-term memory')+`<h2 class="h2">Summary model</h2><p class="ps" style="margin-top:-4px">Empty means each chat’s own reply model.</p>`+selBox('mem_m','',[['','Chat’s own reply model'],...S.models.map(m=>[m.id,m.name||m.mid])],mc.model||'','Summary model')+stp('every','Messages per memory run','New memories are written after this many older messages pile up.')+stp('per','Messages summarized per run','How many of the oldest waiting messages each run summarizes.')+stp('keep','Memories kept per chat','Older memories are dropped past this. Zero keeps everything.')+'</main>'}
- if(T==='accounts'){const rows=ACCOUNTS.map(a=>`<div class="card2 pad" style="margin-bottom:12px"><div class="rowh"><div style="display:flex;align-items:center;gap:12px;min-width:0"><div class="av">${esc((a.name||'?')[0])}</div><div style="min-width:0"><b>${esc(a.name)}</b>${a.id===ACCT_ID?'<small style="display:block;color:var(--mut)">Active</small>':''}</div></div><span style="display:flex;gap:4px;align-items:center;flex:none">${a.id!==ACCT_ID?`<button class="btn s" data-a="acctswitch" data-id="${a.id}">Switch</button>`:''}<button class="ib" data-a="acctren" data-id="${a.id}">Rename</button>${ACCOUNTS.length>1?`<button class="ib" data-a="acctdel" data-id="${a.id}" style="color:var(--dg)">Delete</button>`:''}</span></div></div>`).join('');
+ if(T==='accounts'){const rows=ACCOUNTS.map(a=>`<div class="card2 pad" style="margin-bottom:12px"><div class="rowh"><div style="display:flex;align-items:center;gap:12px;min-width:0"><div class="av">${esc(first(a.name))}</div><div style="min-width:0"><b>${esc(a.name)}</b>${a.id===ACCT_ID?'<small style="display:block;color:var(--mut)">Active</small>':''}</div></div><span style="display:flex;gap:4px;align-items:center;flex:none">${a.id!==ACCT_ID?`<button class="btn s" data-a="acctswitch" data-id="${a.id}">Switch</button>`:''}<button class="ib" data-a="acctren" data-id="${a.id}">Rename</button>${ACCOUNTS.length>1?`<button class="ib" data-a="acctdel" data-id="${a.id}" style="color:var(--dg)">Delete</button>`:''}</span></div></div>`).join('');
   let fm='';if(F?.k==='acct'){const tg=ACCOUNTS.find(x=>x.id===F.id);
    if(F.mode==='del')fm=`<div class="card2 pad" style="margin-bottom:12px"><b>Delete “${esc(tg?.name||'')}”?</b><p class="ps" style="margin:6px 0 12px">This permanently removes all of its characters, chats, lorebooks, personas and keys. This can’t be undone.</p>${F.lk?.hash?`<label>Password or recovery phrase</label><div class="pw"><input id="a_pw" type="password" autocomplete="off" placeholder="Required to delete this account"><button class="eye" data-a="eye" data-t="a_pw">👁</button></div>`:''}<div class="acts"><button class="btn d" data-a="acctdelok">Delete account</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`;
    else fm=`<div class="card2 pad" style="margin-bottom:12px"><div class="rowh"><b>${F.mode==='ren'?'Rename account':'New account'}</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>NAME *</label><input id="a_n" value="${esc(F.mode==='ren'?tg?.name:'')}" placeholder="e.g. Alt" autocomplete="off" maxlength="40"><div class="acts"><button class="btn" data-a="acctsave">${F.mode==='ren'?'Save':'Create and switch'}</button></div></div>`}
@@ -925,26 +975,27 @@ function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="h
  const pn=id=>S.provs.find(p=>p.id===id)?.name||'?',ib=(a,id,i,x='')=>`<button class="ib ${x}" data-a="${a}" data-id="${id}">${i}</button>`;
  let h=hd+title('Providers','Connect providers and register the models you chat with.')+`<div class="rowh"><h2 class="h2" style="margin:0">Custom providers</h2>${pill('addprov','Add provider')}</div>`;
  if(F?.k==='prov'){const p=F.p;h+=`<div class="card2 pad" style="margin-top:14px"><div class="rowh"><b>${p.id?'Edit':'Add custom'} provider</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>PROVIDER NAME *</label><input id="p_n" value="${esc(p.name)}" placeholder="e.g. My local LLM"><label>API KEY</label><input id="p_k" type="password" value="${esc(p.key)}" placeholder="Optional for local endpoints"><label>BASE URL *</label><input id="p_u" value="${esc(p.url)}" placeholder="e.g. http://localhost:1234/v1"><label>API FORMAT</label>${selBox('p_f','',[['openai','OpenAI'],['anthropic','Anthropic']],p.fmt,'API format')}<div class="acts"><button class="btn" data-a="savep2">Save provider</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`}
- h+=`<div style="height:14px"></div>`+(S.provs.map(p=>`<div class="card2 pad"><div class="rowh"><b>🌐 ${esc(p.name)}</b><span>${ib('editprov',p.id,'⚙')}${ib('delprov',p.id,'🗑','dg')}</span></div><code>${esc(p.url)}</code><div><span class="badge">${p.fmt==='anthropic'?'Anthropic':'OpenAI'}</span> <code>${esc(mask(p.key))}</code></div></div>`).join('')||'<p class="ps">No providers yet. Add one to get started.</p>');
+ h+=`<div style="height:14px"></div>`+(S.provs.map(p=>`<div class="card2 pad"><div class="rowh"><b>🌐 ${esc(p.name)}</b><span>${ib('editprov',p.id,I('gear','sm'))}${ib('delprov',p.id,I('trash','sm'),'dg')}</span></div><code>${esc(p.url)}</code><div><span class="badge">${p.fmt==='anthropic'?'Anthropic':'OpenAI'}</span> <code>${esc(mask(p.key))}</code></div></div>`).join('')||'<p class="ps">No providers yet. Add one to get started.</p>');
  h+=`<div class="rowh" style="margin-top:26px"><h2 class="h2" style="margin:0">Model registry</h2>${pill('addmodel','Add model')}</div><div style="height:14px"></div>`;
  if(F?.k==='model'){const m=F.m;h+=`<div class="card2 pad"><div class="rowh"><b>${m.id?'Edit':'Configure'} model</b><button class="lnk" data-a="fcancel">Cancel</button></div><label>SELECT PROVIDER</label>${selBox('m_p','',S.provs.map(p=>[p.id,p.name]),m.pid,'Provider')}<label>MODEL ID</label><input id="m_i" value="${esc(m.mid)}" placeholder="e.g. gpt-4o"><label>DISPLAY NAME</label><input id="m_n" value="${esc(m.name)}" placeholder="e.g. My Claude"><label class="chk"><input type="checkbox" id="m_e" ${m.emb?'checked':''}>Embedding model (for retrieval, not chat)</label><details><summary>Advanced: sampling (empty means default)</summary><label>TEMPERATURE</label><input id="m_t" type="number" step="0.05" value="${m.temp??''}"><label>TOP P</label><input id="m_o" type="number" step="0.05" value="${m.top??''}"><label>MAX REPLY TOKENS</label><input id="m_x" type="number" value="${m.max??''}"></details><div class="acts"><button class="btn" data-a="savem2">Save model</button><button class="btn s" data-a="fcancel">Cancel</button></div></div>`}
- h+=S.models.map(m=>`<div class="card2 pad ${m.id===S.cfg.am?'act':''}" data-a="usem" data-id="${m.id}"><b>${esc(m.name||m.mid)}</b><span class="ps" style="margin:0">${esc(pn(m.pid))}</span><code>${esc(m.mid)}</code><div class="rowh"><span class="badge ok">${m.emb?'Embedding':m.id===S.cfg.am?'Active':'Ready'}</span><span>${ib('editmodel',m.id,'⚙')}${ib('delmodel',m.id,'🗑','dg')}</span></div></div>`).join('')||'<p class="ps">No models yet. Tap Add model after adding a provider.</p>';
+ h+=S.models.map(m=>`<div class="card2 pad ${m.id===S.cfg.am?'act':''}" data-a="usem" data-id="${m.id}"><b>${esc(m.name||m.mid)}</b><span class="ps" style="margin:0">${esc(pn(m.pid))}</span><code>${esc(m.mid)}</code><div class="rowh"><span class="badge ok">${m.emb?'Embedding':m.id===S.cfg.am?'Active':'Ready'}</span><span>${ib('editmodel',m.id,I('gear','sm'))}${ib('delmodel',m.id,'🗑','dg')}</span></div></div>`).join('')||'<p class="ps">No models yet. Tap Add model after adding a provider.</p>';
  return h+'<div style="height:40px"></div></main>'}
 function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
- if(k==='c')return`<div class="hc" data-a="cview" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(x.name[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
- if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc((x.name||'?')[0])}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
+ if(k==='c')return`<div class="hc" data-a="cview" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(first(x.name))}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
+ if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(first(x.name))}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
  return`<div class="hc" data-a="book" data-id="${x.id}">${x.cover?`<img src="${x.cover}" alt="">`:'<div class="ph">📖</div>'}<div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
 const nc=(a,l,ic='+')=>`<div class="hc nc" data-a="${a}"><i>${ic}</i><b>${l}</b></div>`;
 function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening',pn=S.persona?P().name:'',g=S.cfg;
- const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">‹</button><h1 style="font-size:22px">${t}</h1>`;
+ const back=t=>`<header><button class="ib big" data-a="home" aria-label="Back">${I('back')}</button><h1 style="font-size:22px">${t}</h1>`;
  if(T==='prev')return V.prev?charView(V.prev.c,V.prev):(V.tab='home',listHtml());if(T==='char')return charHtml();if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
  const tab=({settings:'me',pers:'me'})[T]||T;
  const ub=V.updReady?`<div class="banner" data-a="applyupd">Update v${V.updReady} is ready · tap to restart ›</div>`:'';
+ const sbtn=`<button class="ib big" data-a="find" aria-label="Search">${I('search')}</button>`;
  const topbar=(t,r='')=>`<header>${t==='Hearth'?`<span class="brandmark"><img class="logo" src="icon-192.png" alt=""><span class="wm">Hearth</span></span>`:`<h1>${t}</h1>`}${r}</header>`;
  if(tab==='me'){const g=S.cfg,ap=S.persona?P():null,acct=ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||'Default';
   const row=(id,ic,t,sub)=>`<div class="srow" data-a="${PG[id]?'tab':'sh'}" data-id="${PG[id]||id}"><span class="ic" style="background:hsl(${(id.charCodeAt(0)*47)%360} 60% 55%/.18)">${ic}</span><div class="t"><b>${t}</b>${sub?`<small>${esc(sub)}</small>`:''}</div><span class="chev">›</span></div>`;
   const pcards=S.personas.map(x=>card('p',x).replace('data-a="editp"','data-a="use"').replace('class="hc"',`class="hc${x.id===S.persona?' on':''}"`)).join('');
-  return topbar('Profile')+`<main>${ub}
+  return topbar('Profile',sbtn)+`<main>${ub}
  <div class="pcard" data-a="${ap?'editp':'newp'}" data-id="${ap?ap.id:''}">${av(ap||{name:'?'},'big')}<div class="t"><b>${esc(ap?ap.name:'Create your persona')}</b><small>${ap?'Active persona · tap to edit':'This is who you are in chats'}</small></div><span class="chev">›</span></div>
  <div class="card2"><div class="srow" data-a="tab" data-id="accounts"><span class="ic" style="background:hsl(200 60% 55%/.18)">👤</span><div class="t"><b>${esc(acct)}</b><small>Account · ${ACCOUNTS.length>1?'tap to switch or manage':'tap to add another'}</small></div><span class="chev">›</span></div></div>
  <div class="sh2"><h2>Personas<span>${S.personas.length}</span></h2>${pill('newp','New')}</div>
@@ -955,26 +1006,37 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  <h2 class="h3">Data</h2><div class="card2">${row('imp','📥','Import &amp; backup','Cards, lorebooks, backups')}</div>
  <p class="ps" style="text-align:center;font-size:13px;margin-top:6px">Hearth v${PUB} · build ${VER}</p></main>`}
  if(tab==='chars'){const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
-  return topbar('Characters',`<button class="ib" data-a="imp">Import</button>`)+`<main>${rc.length>4?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc('newc','New character')}${nc('browse','Discover','🔍')}${rc.map(x=>card('c',x)).join('')}</div></main>`}
- if(tab==='lore')return topbar('Lorebooks',`<button class="ib" data-a="imp">Import</button>`)+`<main>${S.books.length?'':'<p class="ps">Lorebooks add world details to a chat whenever their keywords come up.</p>'}<div class="grid">${nc('newl','New lorebook')}${S.books.map(x=>card('l',x)).join('')}</div></main>`;
+  return topbar('Characters',sbtn+`<button class="ib" data-a="imp">Import</button>`)+`<main>${rc.length>4?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc('newc','New character')}${nc('browse','Discover','🔍')}${rc.map(x=>card('c',x)).join('')}</div></main>`}
+ if(tab==='lore')return topbar('Lorebooks',sbtn+`<button class="ib" data-a="imp">Import</button>`)+`<main>${S.books.length?'':'<p class="ps">Lorebooks add world details to a chat whenever their keywords come up.</p>'}<div class="grid">${nc('newl','New lorebook')}${S.books.map(x=>card('l',x)).join('')}</div></main>`;
  const ago=ts=>{if(!ts)return'';const m=(Date.now()-ts)/6e4;return m<1?'now':m<60?Math.floor(m)+'m':m<1440?Math.floor(m/60)+'h':m<10080?Math.floor(m/1440)+'d':new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})};
  const chats=S.chars.filter(c=>(S.chats[c.id]||[]).some(x=>x.r==='u')).sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
  const rows=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="row" data-a="open" data-id="${c.id}">${av(c)}<div class="t"><b>${esc(c.name)}</b><small>${l?.r==='u'?'You: ':''}${esc(strip(String(l?.t||'')))}</small></div><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
  const empty=`<div class="empty" style="padding:28px 20px;text-align:center"><b style="font-size:18px">No conversations yet</b><p class="ps" style="margin:8px 0 16px">Pick a character to start chatting.</p><div class="acts" style="justify-content:center"><button class="btn" data-a="tab" data-id="chars">Choose a character</button><button class="btn s" data-a="browse">Discover</button></div></div>`;
- return topbar('Hearth',`<button class="ib big" data-a="find" aria-label="Search">⌕</button><button class="ib big" data-a="tab" data-id="chars" aria-label="New chat">✎</button><button class="ib" data-a="tab" data-id="me" aria-label="Profile" style="padding:0">${av(S.persona?P():{name:'H'},'sm')}</button>`)+`<main>
+ return topbar('Hearth',`<button class="ib big" data-a="find" aria-label="Search">${I('search')}</button><button class="ib big" data-a="tab" data-id="chars" aria-label="New chat">${I('pen')}</button><button class="ib" data-a="tab" data-id="me" aria-label="Profile" style="padding:0">${av(S.persona?P():{name:'H'},'sm')}</button>`)+`<main>
  <p class="ps" style="margin:2px 2px 12px">${gr}${pn?', '+esc(pn):''}</p>
  ${ub}${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
  ${rows||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
 const NAVI=[['home','Chats','<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-4.6A8 8 0 1 1 21 12z"/></svg>'],['chars','Characters','<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.3 3.5 5.2"/></svg>'],['lore','Lorebooks','<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/></svg>'],['me','Profile','<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></svg>']];
 const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">${NAVI.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
-function render(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();return}
+let RERR=0;
+function recoverUI(e){
+ try{console.error('Hearth render error',e)}catch(_){}
+ V.busy=false;V.ctl=null;V.sheet=null;V.picker=false;
+ if(++RERR<=2){setTimeout(()=>{try{render()}catch(_){}},30);return}
+ const a=$('#app');if(!a)return;
+ a.innerHTML='<div style="padding:46px 22px;text-align:center"><h2 style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:26px;margin:0 0 8px">Something went wrong</h2><p class="ps">The screen could not be drawn. Your chats and settings are saved.</p><div class="acts" style="justify-content:center"><button class="btn" onclick="location.reload()">Reload Hearth</button></div></div>';
+}
+/* Every draw goes through here, so a bad record cannot leave half a screen
+   with controls missing. */
+function render(s){try{renderRaw(s);RERR=0}catch(e){recoverUI(e)}}
+function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();return}
  if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div><div id="sh2"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(!same&&v.dataset.k&&/^l(home|chars|lore|pers|browse)$/.test(v.dataset.k))(V.sy=V.sy||{})[v.dataset.k]=st||0;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
-  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">‹</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">⋯</button></header>`,
+  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">${I('more')}</button></header>`,
    body=m.map((x,i)=>msgHtml(x,i,m,c)).join(''),
-   cb=V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">■</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">✎</button><button class="ib big" data-a="regen" aria-label="Retry">↻</button><button class="btn send" data-a="send" aria-label="Send">↑</button>';
+   cb=V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>';
   if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
    const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
   else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
@@ -1164,6 +1226,13 @@ function goBack(){if(V.loading)return false;if(V.picker)return false;
  V.form=null;V.tab=t==='char'?(V.charBack||'home'):t==='book'?'lore':['providers','import','memory','appr','instr','lim','upd','sec','accounts'].includes(t)?'settings':'home';render();return true}
 (()=>{const A=window.Capacitor?.Plugins?.App;if(!A?.addListener)return;A.addListener('backButton',()=>{if(goBack())return;exitHearth()})})();
 addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab==='prev'){V.prev=null;V.pq=null;V.tab=V.prevBack||'home'}else if(V.tab!=='home')V.tab='home';render()});
+/* A broken image is drawn by the browser as a small square; hide it instead
+   so a missing avatar or cover never shows up as a stray box. */
+document.addEventListener('error',e=>{const t=e.target;if(!t||t.tagName!=='IMG'||t.dataset.fb)return;t.dataset.fb='1';t.style.visibility='hidden'},true);
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+/* If a reply stalls without producing anything, release the composer so the
+   write-my-line and retry buttons come back instead of leaving only Stop. */
+setInterval(()=>{if(!V.busy)return;if(Date.now()-(V.lastTok||Date.now())<180000)return;
+ try{V.ctl?.abort()}catch(e){}V.busy=false;V.ctl=null;toast('That reply stalled. Tap send to try again.');render()},20000);
 render();
 </script></body></html>

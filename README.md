@@ -35,6 +35,26 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
+**Profile → Updates** also prints the running build (`v0.1 · build 35`).
+Check that line after an update: if the build number did not change, the
+update was not applied yet.
+
+Downloads are validated before they are stored (complete document, build
+number, size) and the boot loader refuses to apply a truncated file, so a
+bad download cannot leave a half-drawn screen. If a build ever fails to
+start, the app marks it bad and waits for a newer one instead of looping.
+
+## If a screen looks wrong
+
+- Reload from **Profile → Updates → Restart**, or force-stop the app. State is
+  saved after every message, so nothing is lost.
+- Icons are inline SVG rather than font glyphs, so a device font cannot turn
+  a button into an empty square.
+- Broken avatar or cover images are hidden instead of being drawn as a
+  placeholder box.
+- If drawing fails, the app shows a **Reload Hearth** screen instead of a
+  half-rendered one.
+
 ## Steering the model
 
 - **View prompt** (chat → ⋯ → View prompt) shows the exact system prompt,
