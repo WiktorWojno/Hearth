@@ -14,6 +14,18 @@ keys stay on your device.
 The workflow builds a debug APK with versionName **0.1** and the Sakura Night
 icon/theme.
 
+## Signing
+
+CI used to generate a fresh debug key on every run, so each new APK had a
+different signature and refused to install over the previous one — which wiped
+chats. Builds are now signed with `native/hearth.p12` (alias `hearth`), so they
+upgrade in place. The key is committed on purpose: it is a sideload app, and a
+stable identity is what makes in-place updates possible.
+
+The first build made with this key still needs one uninstall of the old app,
+because the old APKs were signed with a throwaway key. Save a backup first
+(**Profile → Import & backup → Save backup**).
+
 ## Updates
 
 The app checks the GitHub copy of `www/index.html` for a newer build (once

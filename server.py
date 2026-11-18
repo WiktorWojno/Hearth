@@ -33,8 +33,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def _send(self, code, body=b'', ctype='text/plain; charset=utf-8'):
         self.send_response(code)
         self._cors()
-        self.send_header('Content-Type', ctype)
-        self.send_header('Content-Length', str(len(body)))
+        if code != 204:
+            self.send_header('Content-Type', ctype)
+            self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         if body:
             self.wfile.write(body)

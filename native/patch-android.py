@@ -132,6 +132,35 @@ if STYLES.exists():
 gradle = read(GRADLE)
 gradle = re.sub(r"versionCode\s+\d+", "versionCode 1", gradle)
 gradle = re.sub(r'versionName\s+"[^"]*"', 'versionName "0.1"', gradle)
+
+# 6. Stable signing. CI generates a brand new debug key on every run, which
+# makes each APK refuse to install over the previous one (signature mismatch)
+# and forces an uninstall that wipes chats. Sign with the committed key
+# instead so later builds upgrade in place.
+KEYSTORE = ROOT / "native" / "hearth.p12"
+if KEYSTORE.exists():
+    if "signingConfigs" not in gradle:
+        gradle = gradle.replace(
+            "android {",
+            'android {\n'
+            '    signingConfigs {\n'
+            '        hearth {\n'
+            '            storeFile file("../../native/hearth.p12")\n'
+            '            storePassword "hearth-signing-2026"\n'
+            '            keyAlias "hearth"\n'
+            '            keyPassword "hearth-signing-2026"\n'
+            '            storeType "PKCS12"\n'
+            '        }\n'
+            '    }\n',
+            1,
+        )
+    if "signingConfig signingConfigs.hearth" not in gradle:
+        gradle = re.sub(
+            r"buildTypes\s*\{\n",
+            "buildTypes {\n        debug {\n            signingConfig signingConfigs.hearth\n        }\n",
+            gradle,
+            count=1,
+        )
 write(GRADLE, gradle)
 
 print(f"Patched Android: package {APP_ID}, Termux backup plugin, version 0.1")

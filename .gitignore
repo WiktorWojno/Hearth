@@ -2,3 +2,5 @@
 /android/
 *.apk
 .gradle/
+__pycache__/
+*.pyc
