@@ -35,6 +35,23 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
+## Steering the model
+
+- **View prompt** (chat → ⋯ → View prompt) shows the exact system prompt,
+  world info, memories and messages that will be sent, plus a token count.
+  The thin bar under the chat header opens it too.
+- **Context budget** (Profile → Limits) caps the request size in tokens;
+  older messages are dropped to fit instead of the request failing. `0`
+  keeps the old message-count behaviour.
+- **Stop sequences** (Profile → Limits) end a reply as soon as the model
+  produces a line such as `{{user}}:`.
+- **Author's note** (Profile → Instructions) injects steering a few messages
+  back rather than at the top, where models ignore it.
+- **Write my line** (the ✎ button beside send) drafts your next message in
+  your persona's voice, then leaves it in the composer to edit or discard.
+- **Search** (⌕ on the home screen) searches every chat, character and
+  lorebook entry, not just the open chat.
+
 ## Optional: automatic Termux backup server
 
 The Android app can save backups directly to `Documents/Hearth`. If that is not
