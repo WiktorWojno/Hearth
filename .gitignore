@@ -1,4 +1,4 @@
-out/
-android/
+/out/
+/android/
 *.apk
 .gradle/
