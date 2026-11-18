@@ -1,1 +1,4 @@
 out/
+android/
+*.apk
+.gradle/

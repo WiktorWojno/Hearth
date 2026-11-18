@@ -14,12 +14,15 @@ jobs:
         with: { distribution: temurin, java-version: 17 }
       - run: npm install
       - run: npx cap add android
+      - name: Patch Android (Termux backup + version 0.1)
+        run: python3 native/patch-android.py
       - name: App icon
         run: |
           for d in android/app/src/main/res/mipmap-*dpi; do
-            for f in ic_launcher ic_launcher_round ic_launcher_foreground; do
-              cp resources/icon.png "$d/$f.png"
-            done
+            n=$(basename "$d")
+            cp "resources/android/$n/ic_launcher.png" "$d/ic_launcher.png"
+            cp "resources/android/$n/ic_launcher_round.png" "$d/ic_launcher_round.png"
+            cp "resources/android/$n/ic_launcher_foreground.png" "$d/ic_launcher_foreground.png"
           done
       - run: npx cap sync android
       - run: cd android && ./gradlew assembleDebug
