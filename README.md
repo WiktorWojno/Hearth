@@ -55,6 +55,34 @@ start, the app marks it bad and waits for a newer one instead of looping.
 - If drawing fails, the app shows a **Reload Hearth** screen instead of a
   half-rendered one.
 
+## Appearance
+
+Everything visual lives under **Profile → Appearance**, and every change is
+saved per account the moment you tap it.
+
+- **Theme** — six built-in colour themes (Sakura Night, Sakura Day, Onyx,
+  Midnight, AMOLED, Paper) plus **Create theme**. A custom theme controls the
+  background (solid or gradient), panel and border colours, accent (solid or
+  gradient) and accent text, both bubble colours and their text, and primary
+  and muted text. The editor previews every change live; saved themes can be
+  edited or deleted from the same screen.
+- **Text** — separate application and chat sizes, per-format weights for bold,
+  italic, code and links, plus text and bubble colour overrides. Fonts include
+  six built-ins, a searchable online catalog (loaded from BunnyFonts on demand
+  and cached by the device), and a local font file import (.woff2, .woff, .ttf,
+  .otf). Imported fonts stay on the device in IndexedDB and are never uploaded.
+- **Avatars** — circle, squircle 8, squircle 16, square, or a custom radius.
+- **Chat** — the options button can sit in the header or in the composer; chat
+  window width; avatar placement; message alignment; sender name weight and
+  visibility; streaming speed; whether Stop keeps or deletes the partial reply;
+  typewriter or instant writing; composer shape; and the persona picker layout
+  (compact, comfortable, dense or gallery).
+- **Home** — conversations as full-width rails or a two-column grid.
+
+Themes are plain objects in the account's saved state (`look` and `themes`), so
+a backup carries the appearance with it. Upgrading from an older build maps the
+old theme, text size and serif/sans choice into the new model automatically.
+
 ## Steering the model
 
 - **View prompt** (chat → ⋯ → View prompt) shows the exact system prompt,

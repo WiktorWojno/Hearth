@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,400;7..72,600&family=Outfit:wght@400;600;700&display=swap">
 <style>
 /* ── Hearth 0.1 — Sakura Night ─────────────────────────────── */
 :root{
@@ -218,6 +218,7 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
 .srow .t{flex:1;min-width:0}
 .srow b{display:block}
 .srow small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ic .i{width:20px;height:20px;color:var(--ac)}
 .ic{width:46px;height:46px;border-radius:15px;background:var(--sf2);display:grid;place-items:center;font-size:20px;flex:none;border:1px solid color-mix(in srgb,var(--ln) 65%,transparent);font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",system-ui,sans-serif;line-height:1}
 .chev{color:var(--mut);font-size:22px;flex:none}
 /* themed select: a real <select> stays hidden so every existing
@@ -351,6 +352,91 @@ nav.tb button.on svg{fill:color-mix(in srgb,var(--ac) 18%,transparent);filter:dr
 .md img{max-width:100%;height:auto;border-radius:12px}
 .md a{color:var(--ac)}
 .md pre{background:var(--bg);padding:10px;border-radius:12px;overflow-x:auto}
+/* ── Appearance controls ───────────────────────────────────── */
+body{font-family:var(--ff,Inter,system-ui,sans-serif);font-size:var(--appfs,16px);transition:font-size .15s ease}
+.row b,.srow b,.card2>b,.rowh b{font-size:var(--appfs,16px)}
+.row small,.srow small{font-size:calc(var(--appfs,16px) * .76)}
+.ps,.ap-note,.note{font-size:calc(var(--appfs,16px) * .94)}
+.btn,.lnk{font-size:calc(var(--appfs,16px) * .94)}
+input,textarea,select,.srch{font-size:var(--appfs,16px)}
+.h2,.h3{font-size:calc(var(--appfs,16px) * 1.1)}
+.hc b{font-size:calc(var(--appfs,16px) * .9)}
+.chip,.tags span{font-size:calc(var(--appfs,16px) * .8)}
+.bub{font-size:var(--fs,16px);font-family:var(--cff,Literata,Georgia,serif);color:var(--botT,var(--ink));background:var(--bot)}
+.u .bub{background:linear-gradient(135deg,var(--me,var(--g1)),var(--me2,var(--g2)));color:var(--meT,#fff)}
+.md b,.md strong,.bub b,.bub strong{font-weight:var(--wB,700)}
+.md em,.md i,.bub em,.bub i{font-weight:var(--wI,400)}
+.md code,.bub code{font-weight:var(--wC,500)}
+.md a,.bub a{font-weight:var(--wL,600)}
+.av,.pav,.ph,.sw{border-radius:var(--avr,50%)}
+.comp textarea{border-radius:var(--compR,24px)}
+#v[data-k^="c"] main{width:100%;max-width:var(--cwidth,600px);margin:0 auto}
+.who{font-size:12px;font-weight:var(--whoW,650);opacity:var(--whoOp,1);color:var(--mut);margin:0 7px 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.u .who{align-self:flex-end}
+html.bgGrad body{background:radial-gradient(120% 62% at 50% -16%,var(--glow),transparent 62%),linear-gradient(168deg,var(--bg),var(--bg2) 62%,var(--bg))}
+html.alignL .u .mw{align-items:flex-start}
+html.alignL .u .bub{border-radius:22px 22px 22px 8px}
+html.alignL .u .who{align-self:flex-start}
+html.avTop .msg{align-items:flex-start}
+html.avTop .msg .av{margin-top:2px}
+html.avMid .msg{align-items:center}
+html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
+/* pickers */
+.plist.compact .prow{padding:7px 10px}
+.plist.compact .pav{width:34px;height:34px}
+.plist.dense .prow{padding:4px 8px;gap:9px}
+.plist.dense .pav{width:28px;height:28px;border-radius:calc(var(--avr,50%) * .8)}
+.plist.gallery{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.plist.gallery .prow{flex-direction:column;align-items:center;text-align:center;padding:12px 8px;gap:7px}
+.plist.gallery .pt small{white-space:normal}
+/* appearance pages */
+.ap-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.ap-card{border:1px solid var(--ln);border-radius:18px;background:var(--sf);padding:10px;text-align:left;display:flex;flex-direction:column;gap:8px;color:var(--ink);font:inherit}
+.ap-card.on{border-color:var(--ac);box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 32%,transparent)}
+.ap-card b{font-size:14px;font-weight:700}
+.ap-card small{color:var(--mut);font-size:12px;line-height:1.2}
+.ap-art{height:64px;border-radius:12px;border:1px solid var(--ln);overflow:hidden;display:flex}
+.ap-art i{display:block;flex:1}
+.ap-add{align-items:center;justify-content:center;min-height:112px;border-style:dashed;color:var(--mut)}
+.ap-add .i{width:26px;height:26px;margin-bottom:2px}
+.ap-sec{margin:24px 2px 9px;font:700 12px/1 Inter,system-ui,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+.ap-note{color:var(--mut);font-size:13px;line-height:1.45;margin:6px 0 0}
+.ap-opts{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+.ap-opts.three{grid-template-columns:1fr 1fr 1fr}
+.ap-opts.four{grid-template-columns:repeat(4,1fr)}
+.ap-opts.five{grid-template-columns:repeat(5,1fr)}
+.ap-opt{border:1px solid var(--ln);background:var(--sf);border-radius:14px;padding:11px 8px;text-align:center;color:var(--ink);font-size:14px;font-weight:600;line-height:1.25;font-family:inherit}
+.ap-opt small{display:block;font-weight:400;color:var(--mut);font-size:11px;margin-top:2px}
+.ap-opt.on{border-color:var(--ac);box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 30%,transparent);background:color-mix(in srgb,var(--ac) 10%,var(--sf))}
+.ap-sw{height:44px;border-radius:12px;border:1px solid var(--ln);display:flex;overflow:hidden;margin-bottom:6px}
+.ap-sw i{flex:1}
+.ap-tile{padding:8px;text-align:center}
+.ap-tile .aa{display:block;font-size:24px;line-height:1.1;margin-bottom:6px}
+.ap-tile .aa.big{font-size:30px}
+.ap-tile .aa.small{font-size:19px}
+.cpick{display:flex;align-items:center;gap:10px;border:1px solid var(--ln);border-radius:99px;padding:5px 12px 5px 5px;background:var(--sf);margin-top:6px}
+.cpick input[type=color]{width:38px;height:38px;border:0;padding:0;background:none;border-radius:50%;overflow:hidden;flex:none}
+.cpick input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.cpick input[type=color]::-webkit-color-swatch{border:1px solid var(--ln);border-radius:50%}
+.cpick .hx{flex:1;min-width:0;background:none;border:0;padding:0;font:600 14px ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.02em}
+.ap-live{border:1px solid var(--ln);border-radius:18px;padding:12px;background:var(--bg);margin:6px 0 2px}
+.ap-live .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 8px}
+.ap-live .lr{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.ap-live .lm{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:10px}
+.ap-live .b{max-width:88%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.4}
+.ap-live .b.u{background:linear-gradient(135deg,var(--me,var(--g1)),var(--me2,var(--g2)));color:var(--meT,#fff);border-radius:16px 16px 5px 16px}
+.ap-live .b.c{background:var(--bot);color:var(--botT,var(--ink));border:1px solid var(--ln);border-radius:16px 16px 16px 5px}
+.ap-live .row{display:flex;align-items:center;gap:10px;margin-top:10px}
+.ap-live .abtn{background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--acT,#fff);border-radius:11px;padding:8px 14px;font-size:13px;font-weight:700}
+.ap-live .mut{color:var(--mut);font-size:12px}
+.ap-actions{display:flex;gap:10px;margin:22px 0 4px}
+.ap-actions .btn{flex:1}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.hcard{border:1px solid var(--ln);border-radius:18px;background:var(--sf);padding:12px;display:flex;flex-direction:column;gap:9px;color:var(--ink);text-align:left}
+.hcard .av{width:44px;height:44px}
+.hcard b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hcard small{color:var(--mut);font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hcard time{color:var(--mut);font-size:11px}
 .pg{animation:pg .26s ease-out}
 @keyframes pg{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){
@@ -358,7 +444,7 @@ nav.tb button.on svg{fill:color-mix(in srgb,var(--ac) 18%,transparent);filter:dr
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=35,PUB='0.1';try{
+<script>var VER=36,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -399,7 +485,16 @@ const IP={
  gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3.2v2.2M12 18.6v2.2M4.8 12H2.6M21.4 12h-2.2M6.9 6.9 5.3 5.3M18.7 18.7l-1.6-1.6M17.1 6.9l1.6-1.6M5.3 18.7l1.6-1.6"/>',
  trash:'<path d="M4 7h16"/><path d="M9 7V4.8h6V7"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v5M14 11v5"/>',
  plus:'<path d="M12 5v14M5 12h14"/>',
- check:'<path d="M4.5 12.5 9.5 17.5 19.5 6.5"/>'
+ check:'<path d="M4.5 12.5 9.5 17.5 19.5 6.5"/>',
+ key:'<circle cx="8" cy="8" r="4.2"/><path d="M11 11l8.4 8.4"/><path d="M16.6 16.6l2-2M14.3 14.3l2-2"/>',
+ book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/>',
+ brain:'<path d="M12 5.5a3 3 0 0 0-5.6-1.2A3 3 0 0 0 4.6 9a3 3 0 0 0 .9 5.2A3 3 0 0 0 12 18.5z"/><path d="M12 5.5a3 3 0 0 1 5.6-1.2A3 3 0 0 1 19.4 9a3 3 0 0 1-.9 5.2A3 3 0 0 1 12 18.5z"/><path d="M12 5.5v13"/>',
+ clock:'<circle cx="12" cy="12" r="8.4"/><path d="M12 7.4V12l3.1 2"/>',
+ palette:'<path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.4 0 2-.9 2-1.8 0-1.4-1.2-1.7-1.2-2.7 0-.8.6-1.3 1.5-1.3h1.4a5.3 5.3 0 0 0 5.3-5.3c0-3.3-3.6-5.9-9-5.9z"/><circle cx="7.6" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.1" cy="6.9" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.6" cy="6.9" r="1.1" fill="currentColor" stroke="none"/>',
+ lock:'<rect x="5" y="10.4" width="14" height="9.6" rx="2.6"/><path d="M8.6 10.4V8a3.4 3.4 0 0 1 6.8 0v2.4"/>',
+ refresh:'<path d="M20 11.5A8 8 0 1 0 17.7 17"/><path d="M20 4.8v6.7h-6.6"/>',
+ inbox:'<path d="M6.4 4.5h11.2L20 13v5.4a2.1 2.1 0 0 1-2.1 2.1H6.1A2.1 2.1 0 0 1 4 18.4V13z"/><path d="M4 13h4.2l1.5 2.6h4.6L15.8 13H20"/>',
+ user:'<circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.4c.7-3.7 3.4-5.6 7.2-5.6s6.5 1.9 7.2 5.6"/>'
 };
 const I=(n,cls='')=>`<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${IP[n]||''}</svg>`;
 /* First visible character, safe for names that start with an emoji: a lone
@@ -418,8 +513,45 @@ let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false}catch(e){saveErr=true}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false}).catch(()=>{saveErr=true}),250)};
 let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false};
 const CFG0={repo:'WiktorWojno/Hearth',gh:'',auto:true,autoc:true,html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40,ctx:0,stop:'',anote:'',andepth:4,mem:{on:false,every:10,per:10,keep:100,model:''},termux:true};S.cfg=Object.assign({},CFG0,S.cfg);
+/* ---------- appearance ---------- */
+const THEMES=[
+ {id:'sakura',name:'Sakura Night',mode:'dark',bgMode:'grad',bg:'#12051f',bg2:'#1b0930',panel:'#1d0b31',border:'#3a1d52',accent:'#ff8fd8',accent2:'#c77dff',accentText:'#260520',text:'#fbeaff',textMut:'#b99ac9',ubg:'#ef6fc4',ubg2:'#9b6cff',utex:'#ffffff',abg:'#221035',atext:'#fbeaff'},
+ {id:'day',name:'Sakura Day',mode:'light',bgMode:'solid',bg:'#fdf3fb',bg2:'#f9e8f6',panel:'#ffffff',border:'#f0d9ec',accent:'#c2449e',accent2:'#7d4fd3',accentText:'#ffffff',text:'#2b1433',textMut:'#7d648c',ubg:'#c2449e',ubg2:'#7d4fd3',utex:'#ffffff',abg:'#ffffff',atext:'#2b1433'},
+ {id:'onyx',name:'Onyx',mode:'dark',bgMode:'solid',bg:'#0b0b0c',bg2:'#111113',panel:'#151517',border:'#2a2a2e',accent:'#f2f2f4',accent2:'#c9c9d0',accentText:'#0b0b0c',text:'#f4f4f6',textMut:'#9a9aa4',ubg:'#ededf0',ubg2:'#cfcfd6',utex:'#0b0b0c',abg:'#1a1a1e',atext:'#f4f4f6'},
+ {id:'midnight',name:'Midnight',mode:'dark',bgMode:'grad',bg:'#050914',bg2:'#0a1730',panel:'#0d1a33',border:'#1f3257',accent:'#7aa2f7',accent2:'#4f7cf7',accentText:'#04101f',text:'#e6ecff',textMut:'#93a4c9',ubg:'#3b6ff5',ubg2:'#5b8cff',utex:'#ffffff',abg:'#122243',atext:'#e6ecff'},
+ {id:'amoled',name:'AMOLED',mode:'dark',bgMode:'solid',bg:'#000000',bg2:'#000000',panel:'#0a0a0a',border:'#1e1e1e',accent:'#c9c9d0',accent2:'#8f8f99',accentText:'#000000',text:'#ffffff',textMut:'#8e8e96',ubg:'#1b1b1b',ubg2:'#2a2a2a',utex:'#ffffff',abg:'#0a0a0a',atext:'#ffffff'},
+ {id:'paper',name:'Paper',mode:'light',bgMode:'solid',bg:'#f7f1e6',bg2:'#efe6d6',panel:'#fffaf1',border:'#e2d5bf',accent:'#a4552b',accent2:'#7d6a3f',accentText:'#fffaf1',text:'#2d2317',textMut:'#7b6a54',ubg:'#a4552b',ubg2:'#c07a45',utex:'#fff8ef',abg:'#fffaf1',atext:'#2d2317'}
+];
+const FONTS=[
+ ['inter','Inter','Readable Sans','Inter,system-ui,sans-serif'],
+ ['literata','Literata','Book serif','Literata,Georgia,serif'],
+ ['cormorant','Cormorant','Display serif','"Cormorant Garamond",Georgia,serif'],
+ ['outfit','Outfit','Geometric Sans','Outfit,system-ui,sans-serif'],
+ ['firacode','Fira Code','Monospace','"Fira Code",ui-monospace,monospace'],
+ ['system','Device','System default','system-ui,-apple-system,sans-serif']
+];
+const LOOK0={theme:'sakura',appfs:16,chatfs:18,font:'inter',chatfont:'literata',fontStack:'Inter,system-ui,sans-serif',chatStack:'Literata,Georgia,serif',fmt:{b:700,i:400,c:500,l:600},msgUser:'',msgBot:'',bubUser:'',bubBot:'',av:'circle',avr:22,opt:'top',width:'standard',align:'lr',avplace:'bottom',whoW:650,whoOp:1,speed:'normal',stopKeep:true,effect:'classic',comp:'pill',picker:'comfortable',home:'rails',customFont:null};
+S.look=Object.assign({},LOOK0,S.look||{});S.look.fmt=Object.assign({},LOOK0.fmt,(S.look&&S.look.fmt)||{});S.themes=Array.isArray(S.themes)?S.themes:[];
+const hexRGB=h=>{let x=String(h||'#000000').replace('#','');if(x.length===3)x=x.split('').map(c=>c+c).join('');const n=parseInt(x,16);return Number.isFinite(n)?[(n>>16)&255,(n>>8)&255,n&255]:[0,0,0]};
+const rgbHex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const mixc=(a,b,t)=>{const A=hexRGB(a),B=hexRGB(b);return rgbHex(A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t,A[2]+(B[2]-A[2])*t)};
+const rgbaC=(h,a)=>{const[r,g,b]=hexRGB(h);return`rgba(${r},${g},${b},${a})`};
+const allThemes=()=>[...THEMES,...(S.themes||[])];
+const activeTheme=()=>allThemes().find(t=>t.id===S.look?.theme)||THEMES[0];
 S.old=S.old||{};
-const fix=()=>{S.cfg=Object.assign({},CFG0,S.cfg);if(!S.cfg.mig1){if(S.cfg.max===600)S.cfg.max=1500;S.cfg.mig1=1}S.old=S.old||{};S.provs=S.provs||[];S.models=S.models||[];
+const fix=hadLook=>{S.cfg=Object.assign({},CFG0,S.cfg);if(!S.cfg.mig1){if(S.cfg.max===600)S.cfg.max=1500;S.cfg.mig1=1}
+ /* Older builds kept appearance in cfg.theme / cfg.fs / cfg.ff. */
+ S.themes=Array.isArray(S.themes)?S.themes:[];
+ const before=S.look||{};
+ S.look=Object.assign({},LOOK0,before);
+ S.look.fmt=Object.assign({},LOOK0.fmt,before.fmt||{});
+ if(!hadLook){
+  const t=S.cfg.theme;
+  S.look.theme=t==='light'?'day':t==='dark'?'sakura':(matchMedia?.('(prefers-color-scheme: dark)').matches?'sakura':'day');
+  if(S.cfg.fs)S.look.chatfs=Math.max(13,Math.min(24,+S.cfg.fs||16));
+  if(S.cfg.ff==='sans'){S.look.chatfont='inter';S.look.chatStack='Inter,system-ui,sans-serif'}
+ }
+ S.old=S.old||{};S.provs=S.provs||[];S.models=S.models||[];
  if(!S.provs.length&&S.cfg.url&&S.cfg.model){const p={id:uid(),name:S.cfg.prov==='anthropic'?'Anthropic':S.cfg.prov==='openai'?'OpenAI':'Provider',url:S.cfg.url,key:S.cfg.key,fmt:S.cfg.prov==='anthropic'?'anthropic':'openai'},m={id:uid(),pid:p.id,mid:S.cfg.model,name:S.cfg.model};S.provs.push(p);S.models.push(m);S.cfg.am=m.id}};fix();
 const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
 let M=[],hd=0,pop=false;
@@ -429,8 +561,57 @@ const pg=v=>{v.classList.remove('pg');void v.offsetWidth;v.classList.add('pg')};
 const tmo=ms=>{const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal};
 const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
 const strip=t=>t.replace(/<[^>]*>/g,'').replace(/[*`]/g,'');
-const applyTheme=()=>{const t=S.cfg.theme;if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;const st=document.documentElement.style;st.setProperty('--fs',(S.cfg.fs||16)+'px');st.setProperty('--ff',S.cfg.ff==='sans'?'Inter,system-ui,sans-serif':'Literata,Georgia,serif');
- const dark=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.querySelector('#themecolor')?.setAttribute('content',dark?'#12051f':'#fdf3fb')};
+function applyLook(){
+ const L=S.look||LOOK0,T=activeTheme(),st=document.documentElement.style,root=document.documentElement,dark=T.mode==='dark';
+ root.dataset.theme=dark?'dark':'light';root.dataset.scheme=T.mode;
+ const panel2=mixc(T.panel,dark?'#ffffff':'#000000',.075);
+ const set=(k,v)=>{try{st.setProperty(k,v)}catch(e){}};
+ set('--bg',T.bg);set('--bg2',T.bg2||T.bg);set('--sf',T.panel);set('--sf2',panel2);
+ set('--ln',T.border);set('--ink',T.text);set('--mut',T.textMut);
+ set('--ac',T.accent);set('--ac2',T.accent2||T.accent);set('--acT',T.accentText||(dark?'#12051f':'#ffffff'));
+ const solid=T.accentMode==='solid';
+ set('--g1',T.accent);set('--g2',solid?T.accent:(T.accent2||T.accent));
+ set('--me',L.bubUser||T.ubg||T.accent);set('--me2',L.bubUser||T.ubg2||T.accent2||T.accent);set('--meT',L.msgUser||T.utex||'#ffffff');
+ set('--bot',L.bubBot||T.abg||T.panel);set('--botT',L.msgBot||T.atext||T.text);
+ set('--glow',rgbaC(T.accent,dark?.22:.16));
+ set('--sh',dark?'0 18px 50px rgba(0,0,0,.5)':'0 18px 50px rgba(70,40,60,.14)');
+ set('--sh2',dark?'0 6px 22px rgba(0,0,0,.35)':'0 6px 22px rgba(70,40,60,.10)');
+ set('--dg',dark?'#ff758c':'#c62828');set('--ok',dark?'#63e6b0':'#178a5e');
+ set('--fs',(L.chatfs||18)+'px');set('--cfs',(L.chatfs||18)+'px');set('--appfs',(L.appfs||16)+'px');
+ set('--ff',L.fontStack||LOOK0.fontStack);set('--cff',L.chatStack||LOOK0.chatStack);
+ set('--avr',L.av==='circle'?'50%':L.av==='square'?'7%':L.av==='custom'?Math.max(0,Math.min(50,+L.avr||0))+'%':L.av==='squircle8'?'24%':'38%');
+ set('--compR',L.comp==='pill'?'24px':L.comp==='squircle'?'18px':L.comp==='boxy'?'11px':'4px');
+ set('--cwidth',({compact:'460px',standard:'600px',wide:'760px',full:'100%'})[L.width]||'600px');
+ set('--wB',String((L.fmt||{}).b||700));set('--wI',String((L.fmt||{}).i||400));set('--wC',String((L.fmt||{}).c||500));set('--wL',String((L.fmt||{}).l||600));
+ set('--whoW',String(L.whoW||650));set('--whoOp',String(L.whoOp==null?1:L.whoOp));
+ root.classList.toggle('alignL',L.align==='ll');
+ root.classList.toggle('bgGrad',T.bgMode==='grad');
+ root.classList.toggle('avTop',L.avplace==='top');root.classList.toggle('avMid',L.avplace==='center');root.classList.toggle('avHide',L.avplace==='hidden');
+ document.querySelector('#themecolor')?.setAttribute('content',T.bg);
+}
+const applyTheme=()=>applyLook();
+const lookSave=()=>{save();applyLook()};
+const liveThemePreview=()=>{const el=document.getElementById('aptp');if(el&&V.tmpTheme)el.outerHTML=apPreview(V.tmpTheme)};
+function loadOnlineFont(name,target){
+ const fam=name.replace(/\s+/g,'+');
+ if(!document.getElementById('gf-'+fam)){const lk=document.createElement('link');lk.id='gf-'+fam;lk.rel='stylesheet';lk.href='https://fonts.bunny.net/css?family='+fam+':400,600,700';document.head.append(lk)}
+ const stack=`"${name}",system-ui,sans-serif`;
+ if(target==='chat'){S.look.chatfont='online';S.look.chatStack=stack}else{S.look.font='online';S.look.fontStack=stack}
+ lookSave();render();toast(name+' applied')}
+async function importFont(file){
+ if(!/\.(woff2?|ttf|otf)$/i.test(file.name))return toast('Use a .woff2, .woff, .ttf or .otf file');
+ try{
+  const buf=await file.arrayBuffer(),family='Hearth_'+Date.now().toString(36),face=new FontFace(family,buf);
+  await face.load();document.fonts.add(face);
+  S.look.customFont={family,name:file.name};S.look.font='custom';S.look.fontStack=`"${family}",system-ui,sans-serif`;
+  try{await idbRaw('hearth_font',{family,buf})}catch(e){toast('Font applied, but it could not be stored')}
+  save();applyLook();render();toast('Font applied')}
+ catch(e){toast('That font file could not be loaded')}}
+async function loadCustomFont(){
+ const f=S.look?.customFont;if(!f?.family)return;
+ try{const rec=await idbRaw('hearth_font');if(!rec||rec.family!==f.family||typeof FontFace==='undefined')return;
+  const face=new FontFace(f.family,rec.buf);await face.load();document.fonts.add(face);applyLook()}
+ catch(e){}}
 function syncHist(){const w=(V.chat?1:0)+(V.sheet?1:0)+(V.pick?1:0)+(V.tab!=='home'?1:0);if(w>hd){while(hd<w){history.pushState({},'');hd++}}else if(w<hd){pop=true;history.go(w-hd);hd=w}}
 async function dl(n,t,mime='application/json'){
  const C=window.Capacitor,FS=C?.Plugins?.Filesystem,native=!!C?.isNativePlatform?.();
@@ -833,9 +1014,18 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  else if(mode==='swipe'){m=h[h.length-1];m.s=m.s||[m.t];m.s.push('');m.i=m.s.length-1;m.t='';hist=h.slice(0,-1)}
  else{m=h[h.length-1];base=m.t;hist=h}
  V.busy=true;V.lastTok=Date.now();V.stick=true;V.ctl=new AbortController();render(true);
- const set=t=>{m.t=base+(t.startsWith(c.name+':')?t.slice(c.name.length+1).trimStart():t);m.s&&(m.s[m.i||0]=m.t)};
- let cut='';try{V.sem=await sem(c,hist).catch(()=>null);const{sys,msgs}=build(c,hist,mode==='cont');m.fl=LF.slice();await llm(sys,msgs,t=>{V.lastTok=Date.now();set(t);upd()},V.ctl.signal,g);cut=LLM_END.fin==='length'?'length':(m.t&&!LLM_END.fin&&!LLM_END.done&&!/[.!?…"'”’*)\]»~]\s*$/.test(m.t.trim())?'early':'')}
- catch(e){if(e.name!=='AbortError')V.sheet={t:'info',m:'Request failed: '+e.message+(/Failed to fetch|Load failed/.test(e.message)?'\nCheck the URL and key, and that the server allows browser (CORS) requests.':'')}}
+ const LK=S.look||LOOK0,typed=LK.effect!=='instant'&&LK.speed!=='instant',step={slow:1,normal:4,fast:10}[LK.speed]||4,stepMs=step<4?26:step<10?16:10;
+ let target='',shown='',timer=null,aborted=false;
+ V.shown=typed?'':null;
+ const set=t=>{m.t=base+(t.startsWith(c.name+':')?t.slice(c.name.length+1).trimStart():t);m.s&&(m.s[m.i||0]=m.t);target=m.t};
+ if(typed)timer=setInterval(()=>{if(shown.length>=target.length)return;shown=target.slice(0,Math.min(target.length,shown.length+step));V.shown=shown;upd()},stepMs);
+ let cut='';try{V.sem=await sem(c,hist).catch(()=>null);const{sys,msgs}=build(c,hist,mode==='cont');m.fl=LF.slice();await llm(sys,msgs,t=>{V.lastTok=Date.now();set(t);if(!typed)upd()},V.ctl.signal,g);cut=LLM_END.fin==='length'?'length':(m.t&&!LLM_END.fin&&!LLM_END.done&&!/[.!?…"'”’*)\]»~]\s*$/.test(m.t.trim())?'early':'')}
+ catch(e){if(e.name==='AbortError')aborted=true;else V.sheet={t:'info',m:'Request failed: '+e.message+(/Failed to fetch|Load failed/.test(e.message)?'\nCheck the URL and key, and that the server allows browser (CORS) requests.':'')}}
+ clearInterval(timer);V.shown=null;
+ if(aborted&&(S.look||LOOK0).stopKeep===false){
+  if(mode==='new'){const k=h.indexOf(m);if(k>=0)h.splice(k,1)}
+  else if(mode==='cont'){m.t=base;m.s&&(m.s[m.i||0]=m.t)}
+  else if(mode==='swipe'&&m.s&&m.s.length>1){m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]||''}}
  if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
  V.busy=false;V.ctl=null;save();render(V.stick);summarize(c);
  if(cut==='length'&&S.cfg.autoc!==false&&depth<2)return gen('cont',depth+1);
@@ -844,12 +1034,124 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
 function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
  if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
 const swb=x=>`<div class="tools"><button data-a="sl">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">${I('right','sm')}</button><button data-a="cont">Continue</button></div>`;
-function upd(){const b=document.querySelector('.msg:last-child .bub');if(b){b.innerHTML=rich(S.chats[V.chat].slice(-1)[0].t);const m=$('main');if(V.stick)m.scrollTop=m.scrollHeight}}
+function upd(){const b=document.querySelector('.msg:last-child .bub');if(!b)return;
+ const t=V.shown!=null?V.shown:S.chats[V.chat].slice(-1)[0].t;if(!t)return;b.innerHTML=rich(t);
+ const m=$('main');if(V.stick)m.scrollTop=m.scrollHeight}
 function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t});(S.act=S.act||{})[V.chat]=Date.now();i.value='';i.style.height='auto';save();gen()}
 
 /* ---------- views ---------- */
 const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc(first(c.name))}</div>`;
+/* ---------- appearance pages ---------- */
+const GFONTS=['42dot Sans','ABeeZee','Abel','Alegreya','Anton','Archivo','Arimo','Asap','Barlow','Bebas Neue','Bitter','Cabin','Cardo','Catamaran','Caveat','Chivo','Comfortaa','Cormorant','Crimson Pro','DM Sans','DM Serif Display','Domine','EB Garamond','Exo 2','Figtree','Fira Sans','Fraunces','Gelasio','Heebo','IBM Plex Sans','IBM Plex Serif','Inconsolata','Inter','Josefin Sans','Jost','Karla','Lato','Lexend','Libre Baskerville','Libre Franklin','Literata','Lora','Manrope','Merriweather','Montserrat','Mulish','Nunito','Open Sans','Oswald','Outfit','Playfair Display','Plus Jakarta Sans','Poppins','PT Serif','Quicksand','Raleway','Roboto','Roboto Mono','Rubik','Source Serif 4','Space Grotesk','Spectral','Spline Sans','Syne','Tinos','Ubuntu','Work Sans','Zilla Slab'];
+const apOpt=(k,v,label,sub,cur)=>`<button class="ap-opt${String(cur)===String(v)?' on':''}" data-a="look" data-k="${k}" data-v="${esc(String(v))}">${label}${sub?`<small>${sub}</small>`:''}</button>`;
+const apRow=(k,items,cur,cls='')=>`<div class="ap-opts ${cls}">${items.map(x=>apOpt(k,x[0],x[1],x[2],cur)).join('')}</div>`;
+const famc=x=>String(x||'').replace(/"/g,"'");
+const apSec=(t,note)=>`<h2 class="ap-sec">${t}</h2>${note?`<p class="ap-note">${note}</p>`:''}`;
+const gradOf=(a,b,mode)=>mode==='grad'?`linear-gradient(135deg,${a},${b||a})`:a;
+const apSwatch=t=>`<span class="ap-art"><i style="background:${t.bgMode==='grad'?`linear-gradient(160deg,${t.bg},${t.bg2})`:t.bg}"></i><i style="background:${t.panel}"></i><i style="background:${gradOf(t.accent,t.accent2,t.accentMode)}"></i></span>`;
+const apThemeCard=t=>`<button class="ap-card${S.look.theme===t.id?' on':''}" data-a="aptheme" data-id="${t.id}">${apSwatch(t)}<b>${esc(t.name)}</b><small>${t.mode==='dark'?'Dark':'Light'}${t.custom?' · custom':''}</small></button>`;
+function apPreview(d){
+ return`<div class="ap-live" id="aptp" style="background:${d.bgMode==='grad'?`linear-gradient(160deg,${d.bg},${d.bg2})`:d.bg};border-color:${d.border}">
+ <p class="lbl" style="color:${d.textMut}">Live preview</p>
+ <div class="lr"><div class="b u" style="background:${gradOf(d.ubg,d.ubg2,'grad')};color:${d.utex}">Looks perfect on my end</div></div>
+ <div class="lm"><div class="b c" style="background:${d.abg};color:${d.atext};border-color:${d.border}">Glad to hear it — the accent matches too</div></div>
+ <div class="row"><span class="abtn" style="background:${gradOf(d.accent,d.accent2,d.accentMode)};color:${d.accentText}">Accent button</span><span class="mut" style="color:${d.textMut}">Muted caption</span></div></div>`}
+function apColor(k,label,d){
+ const v=(d[k]||'#000000');
+ return`<label>${label}</label><div class="cpick"><input type="color" data-tk="${k}" value="${v}" aria-label="${label}"><input class="hx" data-tk="${k}" value="${v.toUpperCase()}" maxlength="7" spellcheck="false" autocapitalize="characters" aria-label="${label} hex"></div>`}
+function apNewPage(){
+ const d=V.tmpTheme;
+ if(!d)return['Create custom theme','<p class="ap-note">Start from the theme picker.</p>'];
+ const seg=(k,items)=>`<div class="ap-opts">${items.map(([v,l])=>`<button class="ap-opt${d[k]===v?' on':''}" data-a="apfield" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
+ let h=apPreview(d);
+ h+=apSec('Name')+`<input id="ap_name" value="${esc(d.name||'')}" placeholder="My Theme" maxlength="32" autocomplete="off">`;
+ h+=apSec('Classification')+seg('mode',[['dark','Dark theme'],['light','Light theme']]);
+ h+=apSec('Background')+seg('bgMode',[['solid','Solid colour'],['grad','Gradient']])+apColor('bg','Background colour',d)+(d.bgMode==='grad'?apColor('bg2','Gradient end',d):'');
+ h+=apSec('Panels')+apColor('panel','Panel colour',d)+apColor('border','Border colour',d);
+ h+=apSec('Accent')+seg('accentMode',[['solid','Solid colour'],['grad','Gradient accent']])+apColor('accent','Accent colour',d)+(d.accentMode==='grad'?apColor('accent2','Gradient end',d):'')+apColor('accentText','Accent text colour',d);
+ h+=apSec('Chat bubbles')+`<div class="ap-grid">${apColor('ubg','Your bubble',d)}${apColor('utex','Your bubble text',d)}${apColor('abg','Character bubble',d)}${apColor('atext','Character bubble text',d)}</div>`+(d.ubg2?apColor('ubg2','Your bubble gradient end',d):'');
+ h+=apSec('Text')+`<div class="ap-grid">${apColor('text','Primary text',d)}${apColor('textMut','Muted text',d)}</div>`;
+ h+=`<div class="ap-sec">Swatch preview</div><div class="ap-sw"><i style="background:${d.bg}"></i><i style="background:${d.panel}"></i><i style="background:${gradOf(d.accent,d.accent2,d.accentMode)}"></i><i style="background:${d.ubg}"></i><i style="background:${d.abg}"></i></div>`;
+ h+=`<div class="ap-actions"><button class="btn s" data-a="apcancel">Cancel</button><button class="btn" data-a="apsave">${I('check','sm')} Save theme</button></div>`;
+ return[d.id?'Edit theme':'Create custom theme',h]}
+function apBody(T){
+ const L=S.look,live=activeTheme();
+ if(T==='appr'){
+  const card=(id,t,s)=>`<button class="ap-card" data-a="tab" data-id="${id}" style="flex-direction:row;align-items:center;gap:12px;margin-bottom:11px;padding:14px"><span style="flex:1;min-width:0"><b style="font-size:15.5px">${t}</b><small style="display:block;margin-top:2px">${s}</small></span>${I('next','sm')}</button>`;
+  return['Appearance',
+   card('apTheme','Theme','Built-in and custom colour themes for the whole app')+
+   card('apText','Text','Sizes, fonts and formatting for app and chat text')+
+   card('apAv','Avatars','Shape and rounding of profile pictures')+
+   card('apChat','Chat','Options button, layout, streaming and composer')+
+   card('apHome','Home','Sections layout on the mobile home screen')+
+   `<p class="ap-note" style="margin-top:16px">Every change saves immediately and applies to this screen as you set it. Colours are stored per account; themes can be edited or deleted at any time.</p>`]}
+ if(T==='apTheme'){
+  const custom=(S.themes||[]);
+  return['Visual theme',
+   `<div class="ap-grid">${allThemes().map(apThemeCard).join('')}<button class="ap-card ap-add" data-a="apnew">${I('plus')}<b>Create theme</b><small>Your own colours</small></button></div>`+
+   (live.custom?`<div class="ap-actions"><button class="btn s" data-a="apedit" data-id="${live.id}">Edit this theme</button><button class="btn d" data-a="apdel" data-id="${live.id}">Delete</button></div>`:'')+
+   `<p class="ap-note">Tap a theme to apply it instantly. Light themes also switch the status bar and form controls.</p>`]}
+ if(T==='apText'){
+  const sizes=[[14,'Small','14'],[16,'Normal','16'],[18,'Large','18'],[20,'Larger','20'],[22,'Huge','22']];
+  const sizeBox=(k,cur)=>`<div class="ap-opts five">${sizes.map(([v,l])=>`<button class="ap-tile ap-opt${cur===v?' on':''}" data-a="look" data-k="${k}" data-v="${v}"><span class="aa${v<16?' small':v>19?' big':''}">Aa</span>${l}<small>${v} px</small></button>`).join('')}</div>`;
+  const wRow=(k,label)=>apSec(label)+`<div class="ap-opts four">${[[400,'Light'],[500,'Normal'],[600,'Medium'],[700,'Bold']].map(([v,l])=>`<button class="ap-tile ap-opt${+L.fmt[k]===v?' on':''}" data-a="lookw" data-k="${k}" data-v="${v}"><span class="aa" style="font-weight:${v}">Aa</span>${l}</button>`).join('')}</div>`;
+  const fontGrid=(k,cur,stackKey)=>`<div class="ap-grid">${FONTS.map(f=>`<button class="ap-card${(k==='font'?L.font:L.chatfont)===f[0]?' on':''}" data-a="lookfont" data-k="${k}" data-v="${f[0]}"><span style="height:48px;display:grid;place-items:center;border:1px solid var(--ln);border-radius:11px;font-family:${famc(f[3])};font-size:23px">Aa</span><b>${f[1]}</b><small>${f[2]}</small></button>`).join('')}</div>`;
+  const cat=(V.gfQ||'').toLowerCase();
+  const list=GFONTS.filter(n=>n.toLowerCase().includes(cat));
+  return['Text',
+   apSec('Application text','Buttons, forms and navigation across the whole app.')+sizeBox('appfs',L.appfs)+
+   apSec('Chat text','Messages in conversation view.')+sizeBox('chatfs',L.chatfs)+
+   apSec('Message text colours','Leave on theme default unless you want overrides.')+
+   `<div class="ap-grid"><button class="ap-card" data-a="lookcolor" data-k="msgUser"><b>Your messages</b><small style="display:flex;align-items:center;gap:8px;margin-top:6px"><i style="width:26px;height:26px;border-radius:50%;border:1px solid var(--ln);background:${L.msgUser||live.utex||'#fff'}"></i>${L.msgUser||'Theme default'}</small></button><button class="ap-card" data-a="lookcolor" data-k="msgBot"><b>Character messages</b><small style="display:flex;align-items:center;gap:8px;margin-top:6px"><i style="width:26px;height:26px;border-radius:50%;border:1px solid var(--ln);background:${L.msgBot||live.atext||'#fff'}"></i>${L.msgBot||'Theme default'}</small></button></div>`+
+   apSec('Chat bubble colours','The background behind each side of the conversation.')+
+   `<div class="ap-grid"><button class="ap-card" data-a="lookcolor" data-k="bubUser"><b>Your bubbles</b><small style="display:flex;align-items:center;gap:8px;margin-top:6px"><i style="width:26px;height:26px;border-radius:8px;border:1px solid var(--ln);background:${L.bubUser||live.ubg}"></i>${L.bubUser||'Theme default'}</small></button><button class="ap-card" data-a="lookcolor" data-k="bubBot"><b>Character bubbles</b><small style="display:flex;align-items:center;gap:8px;margin-top:6px"><i style="width:26px;height:26px;border-radius:8px;border:1px solid var(--ln);background:${L.bubBot||live.abg}"></i>${L.bubBot||'Theme default'}</small></button></div>`+
+   `<div class="acts" style="margin-top:10px"><button class="btn s" data-a="lookreset">Reset colours to theme</button></div>`+
+   apSec('Formatting','How bold, italic, code and links read inside messages.')+
+   wRow('b','Bold')+wRow('i','Italic')+wRow('c','Code')+wRow('l','Links')+
+   apSec('Fonts','Built-in choices load instantly. Online fonts download once and are cached by the device.')+
+   `<p class="ap-note" style="margin:0 0 9px">Application font</p>`+fontGrid('font',L.font)+
+   `<p class="ap-note" style="margin:14px 0 9px">Chat font</p>`+fontGrid('chatfont',L.chatfont)+
+   `<div class="ap-live" style="margin-top:14px"><p class="lbl">Typography sandbox</p><div style="font-family:${famc(L.fontStack)};font-size:${L.appfs}px">The quick brown fox jumps over the lazy dog.</div><div style="font-family:${famc(L.chatStack)};font-size:${L.chatfs}px;margin-top:8px;color:var(--mut)">The lanterns were already lit when she arrived. 123456</div></div>`+
+   apSec('Online font catalog','Fonts are fetched from BunnyFonts on demand, then cached. '+list.length+' of '+GFONTS.length+' shown.')+
+   `<input id="gfq" class="srch" placeholder="Filter ${GFONTS.length} fonts by name…" value="${esc(V.gfQ||'')}" autocomplete="off" autocapitalize="none">`+
+   `<div class="card2" style="margin-top:10px;max-height:290px;overflow-y:auto">${list.map(n=>`<div class="srow" data-a="lookgfont" data-v="${esc(n)}"><span style="flex:1;font-family:'${esc(n)}',sans-serif">${esc(n)}</span>${I('next','sm')}</div>`).join('')||'<p class="pempty">No font matches that.</p>'}</div>`+
+   apSec('Custom font file','Import a .woff2, .woff, .ttf or .otf from this device. It is stored locally and never uploaded.')+
+   `<label class="chk"><input type="checkbox" id="fontlic"> <span>I have the licence to use this font file.</span></label>`+
+   `<button class="btn s" data-a="fontpick" style="width:100%;margin-top:8px">Select font file</button><input id="fontfile" type="file" accept=".woff2,.woff,.ttf,.otf" style="display:none">`+
+   (L.customFont?`<p class="ap-note">Using <b>${esc(L.customFont.name)}</b> · <button class="lnk" data-a="fontclear">Remove</button></p>`:'')]}
+ if(T==='apAv'){
+  const shapes=[['circle','Circle','Fluid design'],['squircle8','Squircle 8','Modern round'],['squircle16','Squircle 16','Playful'],['square','Square','Sharp corners'],['custom','Custom','Your own radius']];
+  const rad=L.av==='circle'?'50%':L.av==='square'?'7%':L.av==='custom'?(L.avr||22)+'%':L.av==='squircle8'?'24%':'38%';
+  const rr=id=>id==='circle'?'50%':id==='square'?'7%':id==='custom'?(L.avr||22)+'%':id==='squircle8'?'24%':'38%';
+  return['Avatar shape','Profile pictures across the whole app. Cards and chat bubbles keep their own shape.'+
+   `<div class="ap-grid">${shapes.map(([sid,t,s])=>`<button class="ap-card${L.av===sid?' on':''}" data-a="look" data-k="av" data-v="${sid}"><span style="height:74px;display:grid;place-items:center"><span style="width:52px;height:52px;display:grid;place-items:center;background:var(--sf2);border:1px solid var(--ln);font-weight:700;color:var(--ac);border-radius:${rr(sid)}">A</span></span><b>${t}</b><small>${s}</small></button>`).join('')}</div>`+
+   (L.av==='custom'?apSec('Custom radius')+`<div class="rowh"><span class="note" style="margin:0" data-avrval>${L.avr||22}%</span></div><input id="avr" type="range" min="0" max="50" step="1" value="${L.avr||22}" style="width:100%">`:'' )+
+   `<div class="ap-live" style="margin-top:16px"><p class="lbl">Preview</p><div style="display:flex;align-items:center;gap:12px"><div class="av" style="width:48px;height:48px;font-size:18px">A</div><div class="av" style="width:32px;height:32px;font-size:13px">M</div><div class="pav" style="width:42px;height:42px;font-size:15px">J</div><div><b style="font-size:14px">Aria</b><div class="note" style="margin:0">Character · 3 minutes ago</div></div></div></div>`]}
+ if(T==='apChat'){
+  return['Chat',
+   apSec('Options button','Where the chat options button lives in conversation view.')+
+   `<div class="ap-opts">${[['top','Top right','Floating over the thread'],['composer','Composer','Inside the message row']].map(([v,t,s])=>`<button class="ap-opt${L.opt===v?' on':''}" data-a="look" data-k="opt" data-v="${v}">${t}<small>${s}</small></button>`).join('')}</div>`+
+   apSec('Chat window width','How wide the message column runs.')+apRow('width',[['compact','Compact','Narrow'],['standard','Standard','Comfortable'],['wide','Wide','Roomy'],['full','Full','Edge to edge']],L.width,'four')+
+   apSec('Avatar placement')+apRow('avplace',[['top','Top'],['center','Center'],['bottom','Bottom'],['hidden','Hidden']],L.avplace,'four')+
+   apSec('Message alignment')+apRow('align',[['lr','Left / right','Character left, you right'],['ll','All left','Both sides on the left']],L.align)+
+   apSec('Sender names','The name above each message.')+
+   `<div class="ap-opts four">${[[400,'Light'],[500,'Normal'],[650,'Medium'],[800,'Bold']].map(([v,l])=>`<button class="ap-opt${+L.whoW===v?' on':''}" data-a="look" data-k="whoW" data-v="${v}">${l}</button>`).join('')}</div>`+
+   `<p class="ap-note" style="margin:10px 0 6px">Visibility</p><div class="ap-opts four">${[[1,'Always'],[0.75,'High'],[0.45,'Muted'],[0,'Hidden']].map(([v,l])=>`<button class="ap-opt${+L.whoOp===v?' on':''}" data-a="look" data-k="whoOp" data-v="${v}">${l}</button>`).join('')}</div>`+
+   apSec('Streaming speed','How fast incoming replies are drawn.')+apRow('speed',[['slow','Slow','1 char'],['normal','Normal','3 chars'],['fast','Fast','8 chars'],['instant','Instant','No delay']],L.speed,'four')+
+   apSec('Stop button','What happens to the part of a reply that already streamed.')+apRow('stopKeep',[[true,'Keep partial','Default'],[false,'Delete on stop','Discard']],L.stopKeep)+
+   apSec('Writing effect')+apRow('effect',[['classic','Classic','Typewriter'],['instant','Instant','No animation']],L.effect)+
+   apSec('Composer shape')+apRow('comp',[['pill','Pill / Capsule','Rounded'],['squircle','Squircle','Soft corners'],['boxy','Boxy','Small corners'],['sharp','Sharp','Square']],L.comp,'four')+
+   apSec('Persona picker layout','How the persona list is drawn when you pick one.')+apRow('picker',[['compact','Compact','2 lines'],['comfortable','Comfortable','4 lines'],['dense','Dense','6 lines'],['gallery','Gallery','Grid of cards']],L.picker,'four')]}
+ if(T==='apHome'){
+  const art=(g)=>`<span style="height:66px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--ln);border-radius:11px">${g}</span>`;
+  return['Home layout','How your conversations are arranged on the home screen.'+
+   `<div class="ap-opts">${[['rails','Rails','Full width rows'],['grid','Grid','Two columns of cards']].map(([v,t,s])=>`<button class="ap-opt${L.home===v?' on':''}" data-a="look" data-k="home" data-v="${v}">${t}<small>${s}</small></button>`).join('')}</div>`+
+   `<div style="margin-top:14px">${L.home==='rails'?`<div class="card2 pad"><div class="row"><div class="av sm">A</div><div class="t"><b>Aria</b><small>The lanterns are lit</small></div></div><div class="row" style="margin-top:8px"><div class="av sm">M</div><div class="t"><b>Mira</b><small>See you tomorrow</small></div></div></div>`:`<div class="hgrid"><div class="hcard"><div class="av">A</div><b>Aria</b><small>The lanterns are lit</small></div><div class="hcard"><div class="av">M</div><b>Mira</b><small>See you tomorrow</small></div></div>`}</div>`+
+   `<p class="ap-note">Rails list one conversation per row with a preview. Grid shows two columns of compact cards, which fits more names on a tall phone.</p>`]}
+ return null}
 function cfgForm(t){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id="g_${i}" value="${esc(v)}" ${x}>`,sel=(i,l,o,v)=>selBox('g_'+i,l,o,v,l);
+  if(t==='apNew')return apNewPage();
+  const AP=apBody(t);if(AP)return AP;
   const T={appr:['Appearance',sel('theme','Theme',[['auto','Match system'],['light','Light'],['dark','Dark']],g.theme)+sel('fs','Text size',[[14,'14 px'],[16,'16 px'],[18,'18 px'],[20,'20 px']],g.fs)+sel('ff','Font',[['serif','Serif'],['sans','Sans']],g.ff)+`<label class="chk"><input type="checkbox" id="g_html" ${g.html!==false?'checked':''}>Render HTML and images in messages</label>`],
    prov:['Providers',selBox('prov','Provider',[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']],g.prov,'Provider')+f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('top','Top P',g.top,'type="number" step="0.05"')+`<p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>`],
    instr:['Instructions',`<label>System prompt</label><textarea id="g_sys" rows="9" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea>`+`<label>Author’s note</label><textarea id="g_anote" rows="3" placeholder="Steering that applies to the next reply, e.g. keep it tense and short. {{char}} and {{user}} work.">${esc(g.anote||'')}</textarea>`+`<label>Note depth</label><input id="g_andepth" type="number" min="0" max="40" value="${g.andepth??4}"><p class="note">How many messages back the note is inserted. 0 puts it right before the newest message.</p>`],
@@ -858,7 +1160,7 @@ function cfgForm(t){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id=
    data:['Backup',`<p class="note">Backups include avatars, chats, and your API key.</p><div class="acts"><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button></div>`]}[t];
  return T}
 function pickHtml(){const s=V.pick;if(!s)return'';const many=s.rows.length>7;
- return`<div class="sheet" data-a="pickbg"><div><i class="grab"></i><h2>${esc(s.title)}</h2>`+(many?`<input id="pq" class="srch" placeholder="Search ${esc(s.title.toLowerCase())}" autocomplete="off">`:'')+`<div class="plist" id="plist">`+s.rows.map((r,ix)=>`<button type="button" class="prow${String(r.v)===String(s.cur)?' on':''}" data-a="pickv" data-i="${ix}" data-q="${esc((r.t+' '+(r.sub||'')).toLowerCase())}">`+(r.img?`<img class="pav" src="${r.img}" alt="">`:`<span class="pav"${r.dot?` style="background:${r.dot}"`:''}>${r.dot?'':esc((r.t||'?')[0])}</span>`)+`<span class="pt"><b>${esc(r.t)}</b>${r.sub?`<small>${esc(r.sub)}</small>`:''}</span>${String(r.v)===String(s.cur)?'<span class="pchk">✓</span>':''}</button>`).join('')+`</div><div class="acts"><button class="btn s" data-a="pickx">Cancel</button></div></div></div>`}
+ return`<div class="sheet" data-a="pickbg"><div><i class="grab"></i><h2>${esc(s.title)}</h2>`+(many?`<input id="pq" class="srch" placeholder="Search ${esc(s.title.toLowerCase())}" autocomplete="off">`:'')+`<div class="plist ${S.look?.picker||'comfortable'}" id="plist">`+s.rows.map((r,ix)=>`<button type="button" class="prow${String(r.v)===String(s.cur)?' on':''}" data-a="pickv" data-i="${ix}" data-q="${esc((r.t+' '+(r.sub||'')).toLowerCase())}">`+(r.img?`<img class="pav" src="${r.img}" alt="">`:`<span class="pav"${r.dot?` style="background:${r.dot}"`:''}>${r.dot?'':esc((r.t||'?')[0])}</span>`)+`<span class="pt"><b>${esc(r.t)}</b>${r.sub?`<small>${esc(r.sub)}</small>`:''}</span>${String(r.v)===String(s.cur)?'<span class="pchk">✓</span>':''}</button>`).join('')+`</div><div class="acts"><button class="btn s" data-a="pickx">Cancel</button></div></div></div>`}
 function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
  if(s.t==='info')h=`<p style="white-space:pre-wrap;margin:0 0 4px">${esc(s.m)}</p><div class="acts"><button class="btn" data-a="close">OK</button></div>`;
  if(s.t==='edit')h=`<h2>Edit message</h2><textarea id="em" rows="8">${esc(S.chats[V.chat][s.i].t)}</textarea><div class="acts"><button class="btn" data-a="savem">Save</button><button class="btn s" data-a="close">Cancel</button></div>`;
@@ -896,7 +1198,8 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';let h='';
 function ctxBar(c,h){const e=ctxEst(c,h);if(!e)return'';
  return`<div class="ctxbar" data-a="prompt" title="See what gets sent"><i style="width:${e.pct}%;${e.pct>85?'background:var(--dg)':''}"></i></div>`}
 const msgHtml=(x,i,m,c)=>{const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
- const gp=i>0&&m[i-1].r===x.r;return `<div class="msg ${x.r}${gp?' gp':''}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw"><div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div></div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
+ const gp=i>0&&m[i-1].r===x.r,nm=x.r==='u'?P().name:c.name,who=(+S.look.whoOp>0&&!gp)?`<div class="who">${esc(nm)}</div>`:'';
+ return `<div class="msg ${x.r}${gp?' gp':''}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw">${who}<div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div></div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
 async function img2(file,w,h){const an=file.size<1.5e6&&(/gif|webp/.test(file.type)||(file.type==='image/png'&&new TextDecoder('latin1').decode(new Uint8Array(await file.arrayBuffer())).includes('acTL')));if(an)return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});return new Promise(r=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/i.width,h/i.height),dw=i.width*k,dh=i.height*k;x.drawImage(i,(w-dw)/2,(h-dh)/2,dw,dh);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.8))};i.onerror=()=>r('');i.src=u})}
 function syncEd(){if(!V.ed)return;const o=V.ed.o;document.querySelectorAll('[id^="f_"]').forEach(e=>{const k=e.id.slice(2);o[k]=e.type==='checkbox'?e.checked:e.type==='number'?(+e.value||0):e.value});
  const g=[...document.querySelectorAll('[id^="gr_"]')];if(g.length)o.greets=g.map(e=>e.value)}
@@ -927,7 +1230,7 @@ function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook
  return h+`<div class="foot"><button class="lnk big" data-a="edback">Cancel</button><button class="btn wide" data-a="edsave">${isNew?'Create':'Save'} ${N}</button></div>${isNew?'':'<button class="btn d" style="width:100%;margin-top:12px" data-a="eddel">Delete</button>'}<div style="height:40px"></div></main>`}
 function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab='lore';return listHtml()}
  return `<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">${I('back')}</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings">${I('gear')}</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">${I('pen','sm')} Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">${I('dn','sm')}</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
-const PG2=['providers','import','memory','appr','instr','lim','upd','sec','accounts'];
+const PG2=['providers','import','memory','appr','apTheme','apText','apAv','apChat','apHome','apNew','instr','lim','upd','sec','accounts'];
 const WL='apple anchor arrow atlas autumn badge bamboo basket beach berry bridge brook cabin candle canyon castle cedar cherry circle cliff cloud clover coast comet coral cotton crane crystal dawn delta desert diamond dragon dream eagle ember falcon feather field flame forest fossil garden garnet glacier grove harbor hazel heron honey island ivory jade jungle kettle lagoon lantern lemon lily lotus lunar maple marble meadow mirror moss mountain nectar ocean olive onyx orchid otter oyster panda pearl pebble pepper pine planet plum prairie quartz quill rabbit raven reef river robin saffron sage sand shadow silver sketch spruce stone storm summer sunset swan thistle thunder tiger timber topaz tulip valley velvet violet walnut willow winter wolf zephyr acorn alder amber aspen aurora basil beacon birch blossom boulder breeze cactus canoe cascade cinder citrus compass copper cove cricket cypress dune dusk echo elm fern fjord flint fog frost galaxy ginger granite gust harvest haven horizon hollow iris juniper kayak lark lavender ledge lichen lilac lynx magnet mango mesa mint mist monsoon nebula nutmeg oak oasis opal orbit pasture petal pier pollen poppy quail rapids ridge ripple rose rowan rune salmon sequoia shore skylark slate sparrow spring sterling stream sundial tundra turtle twilight vine vista wander warbler wheat whisper wren yarrow yew zenith almond bronze cobalt dahlia ebony fable glen hickory indigo jasmine laurel linen magnolia marigold mulberry nimbus orchard paddle peony pewter quince reed sable sienna tamarind teal thyme umber vanilla wisp wisteria zinnia ash bay bluff brisk cairn clay dell drift ferry gale gorge heath inlet knoll loam'.split(' '),normPh=t=>String(t||'').toLowerCase().trim().split(/\s+/).join(' ');
 async function verifyAuth(lk,inp){if(!lk?.hash)return true;inp=String(inp||'');if(await hsh(inp,lk.salt)===lk.hash)return true;if(lk.rhash){const n=normPh(inp);if(n.split(' ').length>=12&&await hsh(n,lk.rsalt)===lk.rhash)return true}return false}
 async function mkPhrase(){const a=crypto.getRandomValues(new Uint8Array(12)),ph=[...a].map(x=>WL[x]).join(' '),salt=uid()+uid();S.lock.rsalt=salt;S.lock.rhash=await hsh(ph,salt);save();V.rphrase=ph;V.sheet={t:'rphrase'}}
@@ -957,8 +1260,8 @@ function pickRows(id){
  if(id==='emb_m'||id==='mem_m')rows.forEach(r=>{const m=S.models.find(x=>x.id===r.v);if(m)r.sub=[S.provs.find(p=>p.id===m.pid)?.name,m.emb?'Embedding':''].filter(Boolean).join(' · ')});
  if(id==='bgs')rows.forEach(r=>{if(BG[r.v])r.dot=BG[r.v]+',var(--bg)'});
  return rows}
-const SUB={appr:'Theme, text size and font. Changes save automatically.',instr:'How the AI is told to roleplay.',lim:'History length and reply size.',upd:'Check for a new release from the update source.'};
-function pageHtml(T){const F=V.form,hd=`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="settings" aria-label="Back">${I('back')}</button></header><main>`,
+const SUB={appr:'Themes, text, avatars, chat layout and home layout.',apTheme:'Built-in and custom colour themes for the whole app.',apText:'Sizes, fonts and formatting for app and chat text.',apAv:'Profile pictures across the whole app.',apChat:'Options button, layout, streaming and composer.',apHome:'How conversations are arranged on the home screen.',apNew:'Build a theme from scratch. The preview updates as you edit.',instr:'How the AI is told to roleplay.',lim:'History length and reply size.',upd:'Check for a new release from the update source.'};
+function pageHtml(T){const F=V.form,backTo=/^ap/.test(T)&&T!=='appr'?'appr':'settings',hd=`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="${backTo}" aria-label="Back">${I('back')}</button></header><main>`,
  title=(t,d)=>`<h1 class="pt">${t}</h1><p class="ps">${d}</p>`;
  if(SUB[T]){const f=cfgForm(T);return hd+title(f[0],SUB[T])+f[1]+'</main>'}
  if(T==='import'){const ic=(t,d,a,l)=>`<div class="card2 pad"><div class="rowh" style="align-items:flex-start;gap:14px"><div><b>${t}</b><p class="ps" style="margin:6px 0 0;font-size:15px">${d}</p></div><button class="btn s" data-a="${a}" style="flex:none">${l}</button></div></div>`;
@@ -997,25 +1300,26 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
   const pcards=S.personas.map(x=>card('p',x).replace('data-a="editp"','data-a="use"').replace('class="hc"',`class="hc${x.id===S.persona?' on':''}"`)).join('');
   return topbar('Profile',sbtn)+`<main>${ub}
  <div class="pcard" data-a="${ap?'editp':'newp'}" data-id="${ap?ap.id:''}">${av(ap||{name:'?'},'big')}<div class="t"><b>${esc(ap?ap.name:'Create your persona')}</b><small>${ap?'Active persona · tap to edit':'This is who you are in chats'}</small></div><span class="chev">›</span></div>
- <div class="card2"><div class="srow" data-a="tab" data-id="accounts"><span class="ic" style="background:hsl(200 60% 55%/.18)">👤</span><div class="t"><b>${esc(acct)}</b><small>Account · ${ACCOUNTS.length>1?'tap to switch or manage':'tap to add another'}</small></div><span class="chev">›</span></div></div>
+ <div class="card2"><div class="srow" data-a="tab" data-id="accounts"><span class="ic" style="background:hsl(200 60% 55%/.18)">${I('user')}</span><div class="t"><b>${esc(acct)}</b><small>Account · ${ACCOUNTS.length>1?'tap to switch or manage':'tap to add another'}</small></div><span class="chev">›</span></div></div>
  <div class="sh2"><h2>Personas<span>${S.personas.length}</span></h2>${pill('newp','New')}</div>
  ${pcards?`<div class="hs">${pcards}</div><p class="ps" style="margin:8px 0 0;font-size:13px">Tap a persona to switch to it.</p>`:''}
- <h2 class="h3">Models</h2><div class="card2">${row('prov','🔑','Providers',S.models.length+' model'+(S.models.length!==1?'s':''))}</div>
- <h2 class="h3">Chat</h2><div class="card2">${row('instr','📜','Instructions',g.sys?'Custom':'Default')}${row('mem','🧠','Memory',g.mem.on?'On':'Off')}${row('lim','⏱','Limits',g.hist+' history · '+g.max+' tokens')}</div>
- <h2 class="h3">App</h2><div class="card2">${row('appr','🎨','Appearance',g.theme+' · '+g.fs+'px')}${row('sec','🔒','Security',S.lock?.hash?'Password on':'Off')}${row('upd','🔄','Updates','v'+PUB+' · build '+VER+(V.updReady?' · update ready':''))}</div>
- <h2 class="h3">Data</h2><div class="card2">${row('imp','📥','Import &amp; backup','Cards, lorebooks, backups')}</div>
+ <h2 class="h3">Models</h2><div class="card2">${row('prov',I('key'),'Providers',S.models.length+' model'+(S.models.length!==1?'s':''))}</div>
+ <h2 class="h3">Chat</h2><div class="card2">${row('instr',I('book'),'Instructions',g.sys?'Custom':'Default')}${row('mem',I('brain'),'Memory',g.mem.on?'On':'Off')}${row('lim',I('clock'),'Limits',g.hist+' history · '+g.max+' tokens')}</div>
+ <h2 class="h3">App</h2><div class="card2">${row('appr',I('palette'),'Appearance',(activeTheme().name)+' · '+(S.look.chatfs||18)+'px')}${row('sec',I('lock'),'Security',S.lock?.hash?'Password on':'Off')}${row('upd',I('refresh'),'Updates','v'+PUB+' · build '+VER+(V.updReady?' · update ready':''))}</div>
+ <h2 class="h3">Data</h2><div class="card2">${row('imp',I('inbox'),'Import &amp; backup','Cards, lorebooks, backups')}</div>
  <p class="ps" style="text-align:center;font-size:13px;margin-top:6px">Hearth v${PUB} · build ${VER}</p></main>`}
  if(tab==='chars'){const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
-  return topbar('Characters',sbtn+`<button class="ib" data-a="imp">Import</button>`)+`<main>${rc.length>4?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc('newc','New character')}${nc('browse','Discover','🔍')}${rc.map(x=>card('c',x)).join('')}</div></main>`}
+  return topbar('Characters',sbtn+`<button class="ib" data-a="imp">Import</button>`)+`<main>${rc.length>4?'<input id="q" class="srch" placeholder="Search characters" autocomplete="off">':''}<div class="grid">${nc('newc','New character')}${nc('browse','Discover',I('search'))}${rc.map(x=>card('c',x)).join('')}</div></main>`}
  if(tab==='lore')return topbar('Lorebooks',sbtn+`<button class="ib" data-a="imp">Import</button>`)+`<main>${S.books.length?'':'<p class="ps">Lorebooks add world details to a chat whenever their keywords come up.</p>'}<div class="grid">${nc('newl','New lorebook')}${S.books.map(x=>card('l',x)).join('')}</div></main>`;
  const ago=ts=>{if(!ts)return'';const m=(Date.now()-ts)/6e4;return m<1?'now':m<60?Math.floor(m)+'m':m<1440?Math.floor(m/60)+'h':m<10080?Math.floor(m/1440)+'d':new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})};
  const chats=S.chars.filter(c=>(S.chats[c.id]||[]).some(x=>x.r==='u')).sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
  const rows=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="row" data-a="open" data-id="${c.id}">${av(c)}<div class="t"><b>${esc(c.name)}</b><small>${l?.r==='u'?'You: ':''}${esc(strip(String(l?.t||'')))}</small></div><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
+ const cards=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="hcard" data-a="open" data-id="${c.id}">${av(c)}<b>${esc(c.name)}</b><small>${l?.r==='u'?'You: ':''}${esc(strip(String(l?.t||'')))}</small><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
  const empty=`<div class="empty" style="padding:28px 20px;text-align:center"><b style="font-size:18px">No conversations yet</b><p class="ps" style="margin:8px 0 16px">Pick a character to start chatting.</p><div class="acts" style="justify-content:center"><button class="btn" data-a="tab" data-id="chars">Choose a character</button><button class="btn s" data-a="browse">Discover</button></div></div>`;
  return topbar('Hearth',`<button class="ib big" data-a="find" aria-label="Search">${I('search')}</button><button class="ib big" data-a="tab" data-id="chars" aria-label="New chat">${I('pen')}</button><button class="ib" data-a="tab" data-id="me" aria-label="Profile" style="padding:0">${av(S.persona?P():{name:'H'},'sm')}</button>`)+`<main>
  <p class="ps" style="margin:2px 2px 12px">${gr}${pn?', '+esc(pn):''}</p>
  ${ub}${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
- ${rows||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
+ ${(S.look.home==='grid'&&chats.length?`<div class="hgrid">${cards}</div>`:rows)||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
 const NAVI=[['home','Chats','<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-4.6A8 8 0 1 1 21 12z"/></svg>'],['chars','Characters','<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.3 3.5 5.2"/></svg>'],['lore','Lorebooks','<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/></svg>'],['me','Profile','<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></svg>']];
 const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">${NAVI.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
 let RERR=0;
@@ -1034,9 +1338,10 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(!same&&v.dataset.k&&/^l(home|chars|lore|pers|browse)$/.test(v.dataset.k))(V.sy=V.sy||{})[v.dataset.k]=st||0;
  if(V.chat){const c=C(),m=S.chats[c.id]||[];
-  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div><button class="ib big" data-a="set" aria-label="Options">${I('more')}</button></header>`,
+  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm')}<div class="ttl"><h1>${esc(c.name)}</h1><small>${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
    body=m.map((x,i)=>msgHtml(x,i,m,c)).join(''),
-   cb=V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>';
+   optBtn=S.look.opt==='composer'?'<button class="ib" data-a="set" aria-label="Options">'+I('more')+'</button>':'',
+   cb=optBtn+(V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>');
   if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
    const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
   else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
@@ -1142,6 +1447,36 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id]});S.chats[c.id]=it.msgs;if(it.pid)(S.cp=S.cp||{})[c.id]=it.pid;else delete S.cp?.[c.id];V.sheet=null;save();render(true)},
   delold:()=>{S.old[c.id]=(S.old[c.id]||[]).filter(x=>x.id!==id);save();V.sheet={t:'chats'};render()},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},fm:fetchModels,sr:()=>swp(1),cont:()=>gen('cont'),api:()=>{V.tab='settings';render()},
   savecfg:()=>{readCfg();save();applyTheme();V.sheet=null;render()},
+  look:()=>{const k=t.dataset.k;let v=t.dataset.v;
+   if(['appfs','chatfs','avr','whoW','whoOp'].includes(k))v=+v;else if(v==='true')v=true;else if(v==='false')v=false;
+   S.look[k]=v;lookSave();render()},
+  lookw:()=>{S.look.fmt=Object.assign({},S.look.fmt,{[t.dataset.k]:+t.dataset.v});lookSave();render()},
+  lookfont:()=>{const f=FONTS.find(x=>x[0]===t.dataset.v);if(!f)return;
+   if(t.dataset.k==='chatfont'){S.look.chatfont=f[0];S.look.chatStack=f[3]}else{S.look.font=f[0];S.look.fontStack=f[3]}
+   lookSave();render()},
+  lookgfont:()=>loadOnlineFont(t.dataset.v,'font'),
+  lookcolor:()=>{const k=t.dataset.k,th=activeTheme(),
+   dflt=k==='msgUser'?th.utex:k==='msgBot'?th.atext:k==='bubUser'?th.ubg:k==='bubBot'?th.abg:'#ffffff';
+   const inp=document.createElement('input');inp.type='color';
+   inp.value=/^#[0-9a-f]{6}$/i.test(S.look[k]||'')?S.look[k]:dflt;
+   inp.style.cssText='position:fixed;left:-120px;top:0;opacity:0;pointer-events:none';
+   document.body.append(inp);
+   inp.addEventListener('input',()=>{S.look[k]=inp.value;lookSave();render()});
+   inp.addEventListener('change',()=>setTimeout(()=>inp.remove(),400));
+   inp.click()},
+  lookreset:()=>{for(const k of ['msgUser','msgBot','bubUser','bubBot'])S.look[k]='';lookSave();render();toast('Colours reset to theme')},
+  aptheme:()=>{if(!allThemes().some(x=>x.id===id))return;S.look.theme=id;lookSave();render()},
+  apnew:()=>{V.tmpTheme=Object.assign({},activeTheme(),{id:'',name:'My Theme',custom:true});V.tab='apNew';render()},
+  apedit:()=>{const th=(S.themes||[]).find(x=>x.id===id);if(!th)return;V.tmpTheme=Object.assign({},th);V.tab='apNew';render()},
+  apdel:()=>{S.themes=(S.themes||[]).filter(x=>x.id!==id);if(S.look.theme===id)S.look.theme='sakura';lookSave();render();toast('Theme deleted')},
+  apsave:()=>{const d=V.tmpTheme;if(!d)return;const name=(d.name||'').trim();if(!name)return toast('Give the theme a name');
+   const thId=d.id||('th'+Date.now().toString(36)),th=Object.assign({},d,{id:thId,name,custom:true});
+   S.themes=(S.themes||[]).filter(x=>x.id!==thId).concat([th]);
+   S.look.theme=thId;V.tmpTheme=null;V.tab='apTheme';lookSave();render();toast('Theme saved')},
+  apcancel:()=>{V.tmpTheme=null;V.tab='apTheme';render()},
+  apfield:()=>{if(!V.tmpTheme)return;V.tmpTheme[t.dataset.k]=t.dataset.v;render()},
+  fontpick:()=>{if(!document.getElementById('fontlic')?.checked)return toast('Tick the licence box first');document.getElementById('fontfile')?.click()},
+  fontclear:()=>{S.look.customFont=null;S.look.font='inter';S.look.fontStack=LOOK0.fontStack;idbRaw('hearth_font',null,true).catch(()=>{});lookSave();render()},
   savec:()=>{for(const k of['name','desc','pers','scen','first','ex','sys'])c[k]=$('#c_'+k).value;save();V.sheet=null;render()},
   exp:()=>dl(c.name+' chat.txt',S.chats[c.id].map(m=>(m.r==='u'?P().name:c.name)+': '+m.t).join('\n\n')),
   bak:backupNow,rest:pick,
@@ -1165,7 +1500,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    if(F.mode==='ren'){const a=ACCOUNTS.find(x=>x.id===F.id);if(a){a.name=n;await saveAccounts()}V.form=null;render();return}
    try{V.ctl?.abort()}catch(e){}await new Promise(r=>setTimeout(r,60));await flushSave();
    const id=uid(),cur=S.cfg;ACCOUNTS.push({id,name:n});await saveAccounts();
-   const nu=fresh();nu.cfg=Object.assign({},CFG0,{theme:cur.theme,fs:cur.fs,ff:cur.ff});ACCT_ID=id;await idbSet(nu);await loadAcct(id,'accounts');toast('Created “'+n+'”')},
+   const nu=fresh();nu.cfg=Object.assign({},CFG0,{theme:cur.theme,fs:cur.fs,ff:cur.ff});
+   nu.look=JSON.parse(JSON.stringify(S.look||LOOK0));nu.themes=JSON.parse(JSON.stringify(S.themes||[]));ACCT_ID=id;await idbSet(nu);await loadAcct(id,'accounts');toast('Created “'+n+'”')},
   acctdelok:async()=>{const F=V.form;if(!F||ACCOUNTS.length<2||!idbOK)return;const id=F.id,was=id===ACCT_ID;if(F.lk?.hash&&!(await verifyAuth(F.lk,$('#a_pw')?.value||'')))return toast('Wrong password or recovery phrase');clearTimeout(tm);
    ACCOUNTS=ACCOUNTS.filter(x=>x.id!==id);await saveAccounts();await idbRaw(kS(id),undefined,true);
    if(was){await loadAcct(ACCOUNTS[0].id,'accounts')}else{V.form=null;render()}toast('Account deleted')},
@@ -1195,7 +1531,7 @@ document.addEventListener('change',e=>{const t=e.target;
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
 async function flushSave(){clearTimeout(tm);if(!idbOK)return;S.ts=Date.now();await idbSet(S)}
 async function loadAcct(id,tab){try{V.ctl?.abort()}catch(e){}await new Promise(r=>setTimeout(r,60));ACCT_ID=id;try{localStorage.setItem('hearth_acct',id)}catch(e){}
- const d=await idbGet().catch(()=>null);S=Object.assign(fresh(),d||{});fix();applyTheme();idbOK=true;{const A0=ACCOUNTS.find(a=>a.id===id);if(A0&&!!S.lock?.hash!==!!A0.locked){A0.locked=!!S.lock?.hash;saveAccounts()}}
+ const d=await idbGet().catch(()=>null);S=Object.assign(fresh(),d||{});fix(!!d?.look);applyTheme();idbOK=true;loadCustomFont();{const A0=ACCOUNTS.find(a=>a.id===id);if(A0&&!!S.lock?.hash!==!!A0.locked){A0.locked=!!S.lock?.hash;saveAccounts()}}
  Object.assign(V,{chat:null,sheet:null,form:null,edit:null,ed:null,prev:null,busy:false,ctl:null,forgot:false,picker:false,tab:tab||'home'});V.locked=!!S.lock?.hash;render()}
 idbRaw('accounts').then(async accs=>{
  if(!accs||!accs.length){accs=[{id:'default',name:'Default'}];await saveAccountsTo(accs)}
@@ -1204,17 +1540,29 @@ idbRaw('accounts').then(async accs=>{
  if(accs.length>1){V.loading=false;V.picker=true;render();return}
  let d=await idbGet();
  if(!d&&ACCT_ID==='default'){const r=await idbRaw('S_default');if(r){d=r;await idbRaw('S',r)}}
- if(d&&(ACCT_ID!=='default'||(d.ts||0)>=(S.ts||0))){S=Object.assign(fresh(),d);fix();applyTheme()}
+ if(d&&(ACCT_ID!=='default'||(d.ts||0)>=(S.ts||0))){S=Object.assign(fresh(),d);fix(!!d.look);applyTheme()}
  else if(ACCT_ID!=='default'){S=fresh();fix();applyTheme()}
  idbOK=true;V.loading=false;V.locked=!!S.lock?.hash;idbSet(S).then(()=>{try{localStorage.removeItem('hearth')}catch(e){}}).catch(()=>{});render();}).catch(()=>{V.loading=false;V.locked=!!S.lock?.hash;render();});
 setTimeout(()=>{if(V.loading){V.loading=false;V.locked=!!S.lock?.hash;render();}},3000);
 document.addEventListener('visibilitychange',()=>{if(!S.lock?.hash||V.loading)return;if(document.hidden){V.hid=Date.now();return}
  if(Date.now()<(V.skipUntil||0))return;const m=S.lock.after??5;if(m>=0&&Date.now()-(V.hid||0)>=m*60000){V.locked=true;render()}});
 document.addEventListener('click',e=>{if(e.target?.type==='file')V.skipUntil=Date.now()+180000},true);
+document.addEventListener('input',e=>{const t=e.target;
+ if(t.id==='gfq'){const q=t.value.toLowerCase().trim();document.querySelectorAll('[data-a="lookgfont"]').forEach(r=>{r.style.display=!q||r.textContent.toLowerCase().includes(q)?'':'none'});return}
+ if(t.dataset.tk&&V.tmpTheme){const k=t.dataset.tk;let v=(t.value||'').trim();
+  if(t.classList.contains('hx')){if(v&&v[0]!=='#')v='#'+v;if(!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v))return;v=v.toLowerCase()}
+  V.tmpTheme[k]=v;
+  document.querySelectorAll('[data-tk="'+k+'"]').forEach(el=>{if(el!==t)el.value=t.classList.contains('hx')?v.toUpperCase():v});
+  liveThemePreview();return}
+ if(t.id==='ap_name'&&V.tmpTheme){V.tmpTheme.name=t.value;return}
+ if(t.id==='avr'){S.look.avr=+t.value;applyLook();const l=document.querySelector('[data-avrval]');if(l)l.textContent=t.value+'%';return}});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.id==='fontfile'&&t.files&&t.files[0])importFont(t.files[0]);
+ if(t.id==='avr')render()});
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;const q=e.target.value.toLowerCase().trim(),c=C();
  $('#fr').innerHTML=q.length<2?'':S.chats[c.id].map((m,i)=>[m,i]).filter(([m])=>strip(m.t).toLowerCase().includes(q)).slice(0,30).map(([m,i])=>`<div class="row" data-a="goto" data-i="${i}"><div class="t"><b>${m.r==='u'?esc(P().name):esc(c.name)}</b><small>${esc(strip(m.t).slice(0,90))}</small></div></div>`).join('')||'<p class="note">No matches.</p>'});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
-applyTheme();setTimeout(autoUpd,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoUpd()});document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
+applyTheme();setTimeout(loadCustomFont,700);setTimeout(autoUpd,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoUpd()});document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
 function goBack(){if(V.loading)return false;if(V.picker)return false;
  if(V.pick){V.pick=null;render();return true}
  if(V.locked){if(V.forgot){V.forgot=false;render();return true}if(ACCOUNTS.length>1){(async()=>{try{V.ctl?.abort()}catch(e){}if(idbOK)await flushSave();V.locked=false;V.forgot=false;V.chat=null;V.sheet=null;V.picker=true;render()})();return true}return false}
@@ -1223,6 +1571,7 @@ function goBack(){if(V.loading)return false;if(V.picker)return false;
  const t=V.tab;if(t==='home')return false;
  if(t==='editor'){const b=V.ed?.back||{tab:'home'};V.ed=null;V.tab=b.tab;b.chat?openChat(b.chat):render();return true}
  if(t==='prev'){if(V.pq?.length){V.pq.shift();nextPrev();return true}V.prev=null;V.pq=null;V.tab=V.prevBack||'home';render();return true}
+ if(/^ap/.test(t)&&t!=='appr'){V.tmpTheme=null;V.tab='appr';render();return true}
  V.form=null;V.tab=t==='char'?(V.charBack||'home'):t==='book'?'lore':['providers','import','memory','appr','instr','lim','upd','sec','accounts'].includes(t)?'settings':'home';render();return true}
 (()=>{const A=window.Capacitor?.Plugins?.App;if(!A?.addListener)return;A.addListener('backButton',()=>{if(goBack())return;exitHearth()})})();
 addEventListener('popstate',()=>{if(pop){pop=false;return}hd=Math.max(0,hd-1);if(V.sheet)V.sheet=null;else if(V.chat){V.ctl?.abort();V.chat=null;V.edit=null}else if(V.tab==='prev'){V.prev=null;V.pq=null;V.tab=V.prevBack||'home'}else if(V.tab!=='home')V.tab='home';render()});
