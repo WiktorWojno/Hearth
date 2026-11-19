@@ -106,6 +106,18 @@ old theme, text size and serif/sans choice into the new model automatically.
 - **Search** (⌕ on the home screen) searches every chat, character and
   lorebook entry, not just the open chat.
 
+## Personas
+
+Tap a persona on **Profile** to make it the default for every chat. A chat that
+had its own persona picked in **chat options → Persona** keeps that choice;
+switch a chat back to *Default* there to follow the profile again. An opening
+message is rewritten with the new name in any chat where you have not sent a
+message yet, so a fresh chat always starts in the right voice. Renaming a
+persona updates those openings too.
+
+**Search** from inside a chat opens the character or lorebook you pick, even
+though the chat stays in the back stack.
+
 ## Optional: automatic Termux backup server
 
 The Android app can save backups directly to `Documents/Hearth`. If that is not

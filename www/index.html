@@ -444,7 +444,7 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=37,PUB='0.1';try{
+<script>var VER=38,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -830,7 +830,40 @@ $('#fa').onchange=async e=>{const c=C(),f=e.target.files[0];if(c&&f){c.img=await
 /* ---------- chat ---------- */
 const P=()=>{const id=(V.chat&&S.cp?.[V.chat])||S.persona;return S.personas.find(p=>p.id===id)||{name:'You',desc:''}};
 const C=()=>S.chars.find(c=>c.id===V.chat);
-const rep=(s,c)=>(s||'').replace(/{{char}}/gi,c.name).replace(/{{user}}/gi,P().name);
+const rep=(s,c,u)=>(s||'').replace(/{{char}}/gi,c.name).replace(/{{user}}/gi,u||P().name);
+const personaName=id=>S.personas.find(p=>p.id===id)?.name||'You';
+/* The opening message is generated text, so it follows the persona. Only chats
+   with no user message yet are rebuilt; a real conversation is never touched. */
+function regenOpener(id,uname){
+ const c=S.chars.find(x=>x.id===id),h=S.chats?.[id];
+ if(!c||!h?.length||h.some(m=>m.r==='u'))return false;
+ const first=h[0];
+ if(!Array.isArray(first.s)||!first.s.length)return false;
+ const gs=[c.first,...(c.alts||[])].filter(Boolean);
+ if(!gs.length)return false;
+ first.s=gs.map(x=>rep(x,c,uname));
+ first.i=Math.max(0,Math.min(first.i||0,first.s.length-1));
+ first.t=first.s[first.i];
+ return true;
+}
+function regenAllOpeners(){
+ for(const k in S.chats||{})regenOpener(k,personaName(S.cp?.[k]||S.persona));
+}
+function setPersona(id,chat){
+ if(chat){
+  if(id)(S.cp=S.cp||{})[chat]=id;else delete S.cp?.[chat];
+  regenOpener(chat,personaName(id||S.persona));
+ }else{
+  const prev=S.persona;S.persona=id||null;
+  if(S.cp)for(const k in S.cp){
+   /* An override that merely mirrored the old default was not a deliberate
+      choice, so it follows the new one. A third persona is left alone. */
+   if(!S.cp[k]||!S.personas.some(p=>p.id===S.cp[k])||(prev&&S.cp[k]===prev))delete S.cp[k];
+  }
+  regenAllOpeners();
+ }
+ save();render();
+}
 let LF=[];
 function lore(c,msgs){LF=[];const out=[],turns=i=>msgs.slice(i+1).filter(x=>x.r==='u').length;
  const hitIn=(e,ms)=>{const tx=ms.map(m=>m.t.toLowerCase()).join('\n');return e.keys.some(k=>{try{const m=/^\/(.+)\/([a-z]*)$/.exec(k);return m?new RegExp(m[1],m[2]||'i').test(tx):tx.includes(k.toLowerCase())}catch(x){return false}})};
@@ -891,7 +924,7 @@ function importLLAI(d,o){const R={c:0,p:0,l:0,ch:0,m:0},dt=t=>t?Date.parse(t)||D
  if(o.instr&&d.user?.ai_instructions&&!S.cfg.sys)S.cfg.sys=d.user.ai_instructions;
  save();return R}
 function startWith(id,i){const c=S.chars.find(x=>x.id===id),cur=S.chats[id];if(cur?.some(m=>m.r==='u'))(S.old[id]=S.old[id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[id]});delete S.cp?.[id];
- const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[i]||g[0],s:g,i:Math.min(i,g.length-1)}]:[];(S.act=S.act||{})[id]=Date.now();save();openChat(id)}
+ const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c,personaName(S.persona)));S.chats[id]=g.length?[{r:'c',t:g[i]||g[0],s:g,i:Math.min(i,g.length-1)}]:[];(S.act=S.act||{})[id]=Date.now();save();openChat(id)}
 function charHtml(){const c=S.chars.find(x=>x.id===V.cd);if(!c){V.tab='home';return listHtml()}return charView(c,null)}
 function charView(c,pv){
  const cur=S.chats[c.id]||[],olds=S.old[c.id]||[],has=cur.some(m=>m.r==='u'),chats=olds.length+(has?1:0),msgs=olds.reduce((a,o)=>a+o.msgs.length,0)+cur.length,
@@ -900,7 +933,7 @@ function charView(c,pv){
   gs=[c.first,...(c.alts||[])].filter(Boolean),gi=Math.min(V.gi||0,Math.max(gs.length-1,0)),img=c.banner||c.img,
   sec=(t,x)=>x?`<h2 class="h2">${t}</h2><div class="body md">${rich(x)}</div>`:'';
  const meta=((c.tags||[]).length?`<div class="tags" style="margin-top:14px">${c.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+`<p class="ps" style="margin-top:18px">Created ${dt(c.created)} · Updated ${dt(c.updated)}<br>Origin ${c.src||'Unknown'}</p>`;
- const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">${I('left')}</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">${I('right')}</button></div>${pv?`<button class="btn full" data-a="pimp" data-s="1" data-i="${gi}" style="margin-top:8px">💬 Import &amp; start with this opening</button>`:`<button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`}`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
+ const story=`<h2 class="h2">Choose how the story begins</h2>`+(gs.length?`<div class="card2 pad gtext">${rich(rep(gs[gi],c,personaName(S.persona)))}</div><div class="rowh"><button class="ib big" data-a="gnav" data-d="-1">${I('left')}</button><span class="note">${gi+1} / ${gs.length}</span><button class="ib big" data-a="gnav" data-d="1">${I('right')}</button></div>${pv?`<button class="btn full" data-a="pimp" data-s="1" data-i="${gi}" style="margin-top:8px">💬 Import &amp; start with this opening</button>`:`<button class="btn full" data-a="start" data-id="${c.id}" data-i="${gi}" style="margin-top:8px">💬 Start with this opening</button>`}`:'<p class="ps">This character has no greeting. Open a chat and write the first message.</p>')
   +sec('About',c.about)+(c.about?(c.id?`<button class="lnk" style="color:var(--ac);margin-top:6px" data-a="cfind" data-id="${c.id}">${I('retry','sm')} Refresh About from the hub</button>`:''):`<h2 class="h2">About</h2><p class="ps">No About yet.${c.id?` <button class="lnk" style="color:var(--ac)" data-a="cfind" data-id="${c.id}">Find it on the hub</button>`:''}</p>`)+meta;
  const card=sec('Description',c.desc)+sec('Personality',c.pers)+sec('Scenario',c.scen)+sec('Definition',c.ex)+((S.links[c.id]||[]).length?`<h2 class="h2">Lorebooks</h2><div class="tags">${S.links[c.id].map(i=>S.books.find(b=>b.id===i)).filter(Boolean).map(b=>`<span class="chip">📖 ${esc(b.name)}</span>`).join('')}</div>`:'')
   ;
@@ -1417,12 +1450,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    if(k==='c'){if(!o.name.trim())return toast('Name is required');let c=S.chars.find(x=>x.id===id);if(!c){c={id:uid()};S.chars.push(c)}
     Object.assign(c,{name:o.name.trim(),about:o.about||'',desc:o.desc,pers:o.pers,scen:o.scen,ex:o.ex,sys:o.sys,rag:o.rag,tags:o.tags,img:o.img,banner:o.banner,bgimg:o.bgimg,first:o.greets[0]||'',alts:o.greets.slice(1).filter(Boolean),updated:Date.now()});if(!c.created){c.created=Date.now();c.src='Created'}if(o.bgimg&&!c.bg)c.bg='img';S.links[c.id]=o.links;save();return go()}
    if(k==='p'){if(!o.name.trim())return toast('Name is required');let p=S.personas.find(x=>x.id===id);if(!p){p={id:uid()};S.personas.push(p)}Object.assign(p,{name:o.name.trim(),desc:o.desc,lore:o.lore,rag:o.rag,img:o.img,banner:o.banner});
-    if(o.active)S.persona=p.id;else if(S.persona===p.id)S.persona=null;if(!S.persona&&V.ed.isNew)S.persona=p.id;save();return go()}
+    if(o.active)S.persona=p.id;else if(S.persona===p.id)S.persona=null;if(!S.persona&&V.ed.isNew)S.persona=p.id;regenAllOpeners();save();return go()}
    if(k==='l'){if(!o.name.trim())return toast('Name is required');let l=S.books.find(x=>x.id===id);if(!l){l={id:uid(),entries:[]};S.books.push(l)}Object.assign(l,{name:o.name.trim(),desc:o.desc,tags:o.tags,cover:o.cover});save();V.bk=l.id;V.ed=null;V.tab='book';return render()}
    const bk=S.books.find(x=>x.id===V.bk),e={name:o.name,keys:o.keys,content:o.content,constant:!!o.constant,delay:o.delay,cooldown:o.cooldown,sticky:o.sticky,on:o.on!==false};if(id==null)bk.entries.push(e);else bk.entries[id]=e;save();go()},
   eddel:()=>{const{k,id}=V.ed,b=V.ed.back;
    if(k==='c'){S.chars=S.chars.filter(x=>x.id!==id);delete S.chats[id];delete S.links[id];delete S.old[id];delete S.cp?.[id]}
-   if(k==='p'){S.personas=S.personas.filter(x=>x.id!==id);if(S.persona===id)S.persona=null}
+   if(k==='p'){S.personas=S.personas.filter(x=>x.id!==id);if(S.persona===id)S.persona=null;if(S.cp)for(const q in S.cp)if(S.cp[q]===id)delete S.cp[q];regenAllOpeners()}
    if(k==='l'){S.books=S.books.filter(x=>x.id!==id);for(const q in S.links)S.links[q]=S.links[q].filter(x=>x!==id);V.ed=null;V.tab='lore';save();return render()}
    if(k==='e')S.books.find(x=>x.id===V.bk).entries.splice(id,1);
    save();V.ed=null;V.tab=b.tab;render()},
@@ -1438,12 +1471,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    if(m.id)Object.assign(S.models.find(x=>x.id===m.id),m);else{m.id=uid();S.models.push(m);if(!S.cfg.am)S.cfg.am=m.id}V.form=null;save();render()},
   delmodel:()=>{S.models=S.models.filter(x=>x.id!==id);if(S.cfg.am===id)S.cfg.am=S.models[0]?.id;save();render()},
   usem:()=>{if(S.models.find(x=>x.id===id)?.emb)return toast('Embedding models can’t be used for chat');S.cfg.am=id;save();render()},
-  st:()=>{const k=t.dataset.k,m=S.cfg.mem;m[k]=Math.max(k==='keep'?0:1,m[k]+(+t.dataset.d)*(k==='keep'?10:1));save();render()},home:()=>{V.tab='home';V.ed=null;render()},sh:()=>{V.sheet={t:id};render()},usep:()=>{S.persona=V.sheet.p.id;V.sheet=null;save();render()},addm:()=>{V.sheet={t:'add'};render()},imp2:()=>{V.sheet=null;render();pick()},avp:()=>$('#fa').click(),
+  st:()=>{const k=t.dataset.k,m=S.cfg.mem;m[k]=Math.max(k==='keep'?0:1,m[k]+(+t.dataset.d)*(k==='keep'?10:1));save();render()},home:()=>{V.tab='home';V.ed=null;render()},sh:()=>{V.sheet={t:id};render()},usep:()=>{const id=V.sheet.p.id;V.sheet=null;setPersona(id)},addm:()=>{V.sheet={t:'add'};render()},imp2:()=>{V.sheet=null;render();pick()},avp:()=>$('#fa').click(),
   
   find:()=>{V.sheet={t:'gsearch',q:'',res:[]};render();setTimeout(()=>$('#gq')?.focus(),80)},
   gres:()=>{const r=(V.sheet?.res||[])[i];if(!r)return;V.sheet=null;const g=r.go||{};
-   if(g.book){V.bk=g.book;V.tab='book';return render()}
-   if(g.char){V.charBack=V.tab;V.cd=g.char;V.cdt='story';V.gi=0;V.tab='char';return render()}
+   if(g.book){V.chat=null;V.bk=g.book;V.tab='book';return render()}
+   if(g.char){V.chat=null;V.charBack=V.tab;V.cd=g.char;V.cdt='story';V.gi=0;V.tab='char';return render()}
    if(g.chat){openChat(g.chat);return setTimeout(()=>{const e=document.querySelectorAll('main .msg')[g.msg];e?.scrollIntoView({block:'center'});e?.classList.add('hl');setTimeout(()=>e?.classList.remove('hl'),2000)},120)}
    render()},
   goto:()=>{V.sheet=null;render();const e=document.querySelectorAll('main .msg')[i];e?.scrollIntoView({block:'center'});e?.classList.add('hl')},
@@ -1516,8 +1549,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   prompt:promptPreview,
   pcopy:()=>{const s=V.sheet;if(!s)return;const t=s.sys+'\n\n'+s.msgs.map(m=>m.role.toUpperCase()+':\n'+m.content).join('\n\n');navigator.clipboard?.writeText(t).then(()=>toast('Copied the whole request')).catch(()=>toast('Copy failed'))},
   mine:()=>{if(V.busy)return;impersonate()},
-  use:()=>{S.persona=id;save();render()},
-  savep:()=>{const p=V.sheet.p,n=$('#pn').value.trim();if(!n)return;p.name=n;p.desc=$('#pd').value;if(!p.id){p.id=uid();S.personas.push(p);if(!S.persona)S.persona=p.id}V.sheet=null;save();render()},
+  use:()=>setPersona(id),
+  savep:()=>{const p=V.sheet.p,n=$('#pn').value.trim();if(!n)return;p.name=n;p.desc=$('#pd').value;if(!p.id){p.id=uid();S.personas.push(p);if(!S.persona)S.persona=p.id}V.sheet=null;regenAllOpeners();save();render()},
   delp:()=>{const p=V.sheet.p;S.personas=S.personas.filter(x=>x!==p);if(S.persona===p.id)S.persona=null;V.sheet=null;save();render()}
  })[a]?.()});
 document.addEventListener('change',e=>{const t=e.target;
@@ -1527,7 +1560,7 @@ document.addEventListener('change',e=>{const t=e.target;
  if(/^g_/.test(t.id)){readCfg();save();applyTheme()}
  if(t.dataset.tag&&t.value.trim())addTag(t);
  if(t.dataset.lk&&V.ed){const l=V.ed.o.links;if(t.checked){if(!l.includes(t.dataset.lk))l.push(t.dataset.lk)}else V.ed.o.links=l.filter(x=>x!==t.dataset.lk)}
- if(t.id==='ps'){const c=C();if(t.value)(S.cp=S.cp||{})[c.id]=t.value;else delete S.cp?.[c.id];save();render()}
+ if(t.id==='ps'){const c=C();if(c)setPersona(t.value||null,c.id)}
  if(t.id==='bgs'){C().bg=t.value;save();render()}
  if(t.id==='rm'){C().model=t.value;save();render()}
  if(t.id==='emb_m'){S.cfg.emb=t.value;save()}
