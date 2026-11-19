@@ -4,9 +4,11 @@
 Run from the repo root after `npx cap add android` and before
 `npx cap sync android`. It is idempotent.
 """
+import os
 import pathlib
 import re
 import shutil
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -21,6 +23,11 @@ STYLES = MAIN / "res" / "values" / "styles.xml"
 
 if not ANDROID.exists():
     sys.exit("android/ not found — run `npx cap add android` first")
+
+# CI gates the APK on the headless smoke test. Keeping the call here means the
+# existing build workflow runs it without needing a separate workflow step.
+if os.environ.get("CI"):
+    subprocess.run(["npm", "test"], cwd=ROOT, check=True)
 
 
 def read(path):

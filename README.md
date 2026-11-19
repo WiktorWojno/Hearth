@@ -12,7 +12,9 @@ keys stay on your device.
 3. Unzip it and install `app-debug.apk` (allow "install unknown apps").
 
 The workflow builds a debug APK with versionName **0.1** and the Sakura Night
-icon/theme.
+icon/theme. Before packaging, it runs `npm test`, a headless-browser smoke test
+that boots the app and checks the release catalog, long-chat windowing, find,
+delete and undo.
 
 ## Signing
 
@@ -35,7 +37,7 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
-**Profile → Updates** also prints the running build (`v0.1 · build 35`).
+**Profile → Updates** also prints the running build (`v0.1 · build 40`).
 Check that line after an update: if the build number did not change, the
 update was not applied yet.
 
@@ -49,6 +51,17 @@ APK that already contains that build (or newer) is installed. Without this,
 closing and reopening the app falls back to the build baked into the APK. If
 the stored copy disappears, the next launch downloads it again instead of
 waiting for the six-hour check.
+
+## What changed
+
+**Profile → What's new** is the release-notes catalog. It lists every public
+build with a short, dated summary, newest first, and marks the build you are
+running. The catalog is stored in the app itself, so it still works offline.
+Home shows a one-time prompt for the current build until the catalog has been
+opened.
+
+Android `versionCode` follows the web build number, so a newer APK installs
+over the previous one as long as it is signed with the same key.
 
 ## If a screen looks wrong
 
@@ -125,8 +138,12 @@ though the chat stays in the back stack.
 - **Name this chat** gives a conversation its own title. The title follows the
   conversation when it is archived into **Chats**, and returns when you switch
   back. Emptying the title falls back to the character's name.
-- **Find in chat** (chat options) searches the open conversation, highlights
-  every match and jumps between messages with the arrows.
+- **Find in chat** (chat options) searches the whole conversation, highlights
+  every match and jumps between messages with the arrows. If the match is in
+  an older part of a long chat, the app loads that part automatically.
+- **Long conversations** open with the newest 80 messages and a **Show earlier
+  messages** control at the top. Each tap adds another page, so a very long
+  chat does not build thousands of bubbles just to show the last line.
 - **Memories** (chat options) lists the summaries saved for this chat. You can
   edit a summary, forget it, or add a fact of your own. Manual facts are always
   included in the prompt; automatic summaries follow the Memory setting.
@@ -161,5 +178,6 @@ The server listens only on `127.0.0.1:8765` and accepts backups from Hearth.
 - `www/` — the app (HTML/CSS/JS, manifest, service worker, PWA icons)
 - `resources/` — source icon plus generated Android mipmaps
 - `native/` — Android Termux bridge and build-time patch script
+- `tests/` — headless smoke test (`npm test`) used by CI
 - `server.py` — Termux backup receiver
 - `.github/workflows/build.yml` — APK build

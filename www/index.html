@@ -169,6 +169,7 @@ button .i{pointer-events:none}
 #cb{display:flex;gap:8px;align-items:flex-end;flex:none}
 textarea,input,select{width:100%;font:16px inherit;font-family:inherit;color:var(--ink);background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:12px 13px;outline:0;transition:border-color .15s,box-shadow .15s}
 textarea:focus,input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 18%,transparent)}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 textarea{resize:none}
 .sheet{position:fixed;inset:0;background:rgba(7,2,14,.72);display:flex;align-items:flex-end;z-index:20;animation:fade .2s}
 #sh2 .sheet{z-index:30;background:rgba(7,2,14,.5)}
@@ -192,6 +193,16 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
 .pinmark svg{width:15px;height:15px}
 mark.fhit{background:color-mix(in srgb,var(--ac) 40%,transparent);color:inherit;border-radius:4px;padding:0 1px}
 .msg.cur .bub{outline:2px solid color-mix(in srgb,var(--ac) 55%,transparent);outline-offset:2px}
+.morebar{display:flex;justify-content:center;padding:8px 0 16px}
+.rel{background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:15px 16px;margin-bottom:12px;box-shadow:var(--sh2)}
+.rel.cur{border-color:color-mix(in srgb,var(--ac) 55%,var(--ln))}
+.relh{display:flex;align-items:center;gap:12px}
+.relv{flex:none;min-width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--acT);font-weight:800;font-size:15px}
+.relh h2{display:block;font-size:16px;line-height:1.25;margin:0}
+.relh small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px}
+.rell{margin:12px 0 0;padding-left:20px;color:var(--ink);font-size:14.5px;line-height:1.55}
+.rell li{margin:0 0 7px}
+.rell li:last-child{margin-bottom:0}
 .srch{margin-bottom:14px;border-radius:16px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 14px}
 .card{display:flex;flex-direction:column;gap:2px;min-width:0;transition:transform .12s}
@@ -454,7 +465,7 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=39,PUB='0.1';try{
+<script>var VER=40,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -508,7 +519,8 @@ const IP={
  refresh:'<path d="M20 11.5A8 8 0 1 0 17.7 17"/><path d="M20 4.8v6.7h-6.6"/>',
  inbox:'<path d="M6.4 4.5h11.2L20 13v5.4a2.1 2.1 0 0 1-2.1 2.1H6.1A2.1 2.1 0 0 1 4 18.4V13z"/><path d="M4 13h4.2l1.5 2.6h4.6L15.8 13H20"/>',
  user:'<circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.4c.7-3.7 3.4-5.6 7.2-5.6s6.5 1.9 7.2 5.6"/>',
- pin:'<path d="M9 3.5h6"/><path d="M10 3.5v6.2L7.4 13.5h9.2L14 9.7V3.5"/><path d="M12 13.5v7"/>'
+ pin:'<path d="M9 3.5h6"/><path d="M10 3.5v6.2L7.4 13.5h9.2L14 9.7V3.5"/><path d="M12 13.5v7"/>',
+ spark:'<path d="M11 3.8 12.8 9l5.2 1.8-5.2 1.8L11 17.8l-1.8-5.2L4 10.8 9.2 9z"/><path d="M18.4 15.6l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>'
 };
 const I=(n,cls='')=>`<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${IP[n]||''}</svg>`;
 /* First visible character, safe for names that start with an emoji: a lone
@@ -525,7 +537,9 @@ const kS=id=>id==='default'?'S':'S_'+id,fresh=()=>({chars:[],books:[],personas:[
 const idbGet=()=>idbRaw(kS(ACCT_ID)),idbSet=v=>idbRaw(kS(ACCT_ID),v),saveAccountsTo=a=>idbRaw('accounts',a),saveAccounts=()=>saveAccountsTo(ACCOUNTS);
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false;clearSaveWarn()}catch(e){saveErr=true;saveWarn()}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false;clearSaveWarn()}).catch(()=>{saveErr=true;saveWarn()}),250)};
-let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,undo:null};
+let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,undo:null,limit:0};
+const CHATWIN=80;
+let lastUpd=0;
 const CFG0={repo:'WiktorWojno/Hearth',gh:'',auto:true,autoc:true,html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40,ctx:0,stop:'',anote:'',andepth:4,mem:{on:false,every:10,per:10,keep:100,model:''},termux:true};S.cfg=Object.assign({},CFG0,S.cfg);
 /* ---------- appearance ---------- */
 const THEMES=[
@@ -535,6 +549,60 @@ const THEMES=[
  {id:'midnight',name:'Midnight',mode:'dark',bgMode:'grad',bg:'#050914',bg2:'#0a1730',panel:'#0d1a33',border:'#1f3257',accent:'#7aa2f7',accent2:'#4f7cf7',accentText:'#04101f',text:'#e6ecff',textMut:'#93a4c9',ubg:'#3b6ff5',ubg2:'#5b8cff',utex:'#ffffff',abg:'#122243',atext:'#e6ecff'},
  {id:'amoled',name:'AMOLED',mode:'dark',bgMode:'solid',bg:'#000000',bg2:'#000000',panel:'#0a0a0a',border:'#1e1e1e',accent:'#c9c9d0',accent2:'#8f8f99',accentText:'#000000',text:'#ffffff',textMut:'#8e8e96',ubg:'#1b1b1b',ubg2:'#2a2a2a',utex:'#ffffff',abg:'#0a0a0a',atext:'#ffffff'},
  {id:'paper',name:'Paper',mode:'light',bgMode:'solid',bg:'#f7f1e6',bg2:'#efe6d6',panel:'#fffaf1',border:'#e2d5bf',accent:'#a4552b',accent2:'#7d6a3f',accentText:'#fffaf1',text:'#2d2317',textMut:'#7b6a54',ubg:'#a4552b',ubg2:'#c07a45',utex:'#fff8ef',abg:'#fffaf1',atext:'#2d2317'}
+];
+/* Release notes under Profile → What's new. Newest first; items are plain
+   text and are escaped when the catalog renders them. */
+const CHANGELOG=[
+ {v:40,when:'19 November 2026',title:'Faster long chats, and a changelog',items:[
+  "New: this catalog. Profile → What's new lists every public build and what changed.",
+  "Long conversations open with the latest messages and load older ones on demand, so a very long chat no longer builds thousands of bubbles at once.",
+  "Streaming replies update only the last message and redraw less often in instant mode, keeping the rest of the chat still.",
+  "The APK workflow now boots the app in a headless browser and checks the catalog and long-chat behavior before packaging.",
+  "Keyboard focus rings are clearer, and undo, save warnings and search counts are announced to screen readers.",
+  "A What's new prompt appears on Home once per build until you open this page."
+ ]},
+ {v:39,when:'19 November 2026',title:'Chat tools',items:[
+  "Undo a deleted message, character, lorebook, persona, entry or archived chat from the snackbar.",
+  "Pin a conversation to the top of Home and give it a title. Titles follow the chat into Chats and come back when you switch.",
+  "Find in chat highlights every match and jumps between messages with the arrows.",
+  "Memories can be viewed, edited, forgotten, or added by hand for each chat.",
+  "Android persistent storage is reported under Import & backup, and a failed save now offers a backup.",
+  "Android versionCode now follows the build number so later APKs install in place."
+ ]},
+ {v:38,when:'19 November 2026',title:'Personas that stay put',items:[
+  "Switching the default persona updates chats that were following it, including generated opening messages.",
+  "A chat with its own persona keeps it; a chat that only mirrored the old default follows the new one.",
+  "Renaming a persona updates empty chats, and the character preview uses the active persona.",
+  "Search results for characters and lorebooks open cleanly from inside a chat."
+ ]},
+ {v:37,when:'19 November 2026',title:'Updates that survive a restart',items:[
+  "A downloaded update is kept and applied again on every cold start until an APK with that build or newer is installed.",
+  "Truncated, oversized or invalid downloads are rejected before they can replace the running app.",
+  "A deleted update copy is downloaded again instead of waiting for the next six-hour check.",
+  "Automatic checks recover from an empty or failed response."
+ ]},
+ {v:36,when:'18 November 2026',title:'Appearance',items:[
+  "A five-section Appearance hub: Theme, Text, Avatars, Chat and Home.",
+  "Six built-in themes plus a custom theme editor with a live preview; themes are saved per account.",
+  "Separate app and chat text sizes, formatting weights, a searchable font catalog and local font import.",
+  "Avatar shapes, chat width and alignment, sender labels, streaming options, and home rails or a grid."
+ ]},
+ {v:35,when:'18 November 2026',title:'Stability pass',items:[
+  "Inline SVG icons replace font glyphs, removing empty squares on devices with limited emoji fonts.",
+  "A reload screen, render watchdog and safer image handling replace half-drawn or blank screens.",
+  "The interface recovers after a broken record or a failed redraw instead of leaving half a UI.",
+  "Search, the model picker and the composer keep working after an error."
+ ]},
+ {v:34,when:'18 November 2026',title:'Control over the prompt',items:[
+  "View prompt shows the exact system prompt, messages, memories and token estimate for the next reply.",
+  "Context budget, reply limits, stop sequences and an author's note.",
+  "Write my line drafts your next message in your persona's voice without sending it.",
+  "Search everything across chats, characters and lorebooks."
+ ]},
+ {v:33,when:'18 November 2026',title:'A warmer picker',items:[
+  "A custom scrolling picker with avatar images for personas and other choices.",
+  "Styled scrollbars and consistent selection controls across the app."
+ ]}
 ];
 const FONTS=[
  ['inter','Inter','Readable Sans','Inter,system-ui,sans-serif'],
@@ -566,7 +634,7 @@ const fix=hadLook=>{S.cfg=Object.assign({},CFG0,S.cfg);if(!S.cfg.mig1){if(S.cfg.
   if(S.cfg.ff==='sans'){S.look.chatfont='inter';S.look.chatStack='Inter,system-ui,sans-serif'}
  }
  S.old=S.old||{};S.provs=S.provs||[];S.models=S.models||[];
- S.pin=S.pin||{};S.title=S.title||{};S.memo=S.memo||{};
+ S.pin=S.pin||{};S.title=S.title||{};S.memo=S.memo||{};S.seen=+S.seen||0;
  if(!S.provs.length&&S.cfg.url&&S.cfg.model){const p={id:uid(),name:S.cfg.prov==='anthropic'?'Anthropic':S.cfg.prov==='openai'?'OpenAI':'Provider',url:S.cfg.url,key:S.cfg.key,fmt:S.cfg.prov==='anthropic'?'anthropic':'openai'},m={id:uid(),pid:p.id,mid:S.cfg.model,name:S.cfg.model};S.provs.push(p);S.models.push(m);S.cfg.am=m.id}};fix();
 const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
 let M=[],hd=0,pop=false;
@@ -574,10 +642,10 @@ const BG={dusk:'linear-gradient(160deg,rgba(90,80,220,.2),rgba(220,80,160,.15))'
 const bgOf=c=>(c.bg==='avatar'&&c.img||c.bg==='img'&&c.bgimg)?`linear-gradient(color-mix(in srgb,var(--bg) 86%,transparent),color-mix(in srgb,var(--bg) 86%,transparent)),url(${c.bg==='img'?c.bgimg:c.img}) center/cover`:BG[c.bg]?BG[c.bg]+',var(--bg)':'';
 const pg=v=>{v.classList.remove('pg');void v.offsetWidth;v.classList.add('pg')};
 const tmo=ms=>{const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal};
-const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
+const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.setAttribute('aria-live','polite');d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
 const clone=x=>JSON.parse(JSON.stringify(x));
 let undoT=0,persistState=null;
-function snackHost(){let h=document.getElementById('sn');if(!h){h=document.createElement('div');h.id='sn';document.body.append(h)}return h}
+function snackHost(){let h=document.getElementById('sn');if(!h){h=document.createElement('div');h.id='sn';h.setAttribute('role','status');h.setAttribute('aria-live','polite');document.body.append(h)}return h}
 function snack(msg,opt){
  const h=snackHost(),d=document.createElement('div');d.className='snack'+(opt?.cls?' '+opt.cls:'');
  d.innerHTML=`<span>${esc(msg)}</span>${opt?.undo?'<button class="btn s" data-a="undo">Undo</button>':''}`;
@@ -1095,7 +1163,7 @@ function ctxEst(c,h){const lim=ctxLim();if(!lim)return null;
  const recent=h.filter(y=>!y.mm).slice(-(S.cfg.hist||40));
  const used=recent.reduce((a,x)=>a+tkn(x.t),0)+360+maxOut;
  return{pct:Math.min(100,Math.round(used/lim*100)),used,lim}}
-function openChat(id){V.chat=id;V.fq='';V.fcur=0;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0}]:[];save()}render(true)}
+function openChat(id){V.chat=id;V.fq='';V.fcur=0;V.limit=CHATWIN;V.edit=null;V.stick=true;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0}]:[];save()}render(true)}
 async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(!g){toast('Add a provider and a model first');V.chat=null;V.tab='providers';return render()}
  let m,base='',hist;
@@ -1123,8 +1191,9 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
 function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
  if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
 const swb=x=>`<div class="tools"><button data-a="sl">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">${I('right','sm')}</button><button data-a="cont">Continue</button></div>`;
-function upd(){const b=document.querySelector('.msg:last-child .bub');if(!b)return;
- const t=V.shown!=null?V.shown:S.chats[V.chat].slice(-1)[0].t;if(!t)return;b.innerHTML=rich(t);
+function upd(){const h=S.chats[V.chat]||[],idx=h.length-1,b=document.querySelector(`.msg[data-i="${idx}"] .bub`);if(!b)return;
+ if(V.shown==null){const now=performance.now();if(now-lastUpd<40)return;lastUpd=now}
+ const t=V.shown!=null?V.shown:(h[idx]?.t||'');if(!t)return;b.innerHTML=rich(t);
  const m=$('main');if(V.stick)m.scrollTop=m.scrollHeight}
 function findHits(){
  const q=(V.fq||'').trim().toLowerCase();
@@ -1168,9 +1237,16 @@ function applyFind(){
  const e=main.querySelector(`.msg[data-i="${cur}"]`);
  if(e&&e.scrollIntoView)e.scrollIntoView({block:'center',behavior:'smooth'});
 }
+function ensureHit(idx){
+ const m=S.chats[V.chat]||[];if(idx==null||idx<0)return false;
+ const lim=V.limit||CHATWIN,start=Math.max(0,m.length-lim);
+ if(idx>=start)return false;
+ V.limit=Math.min(m.length,Math.max(lim,m.length-idx+2));return true;
+}
 function findStep(d){
  const hits=findHits();if(!hits.length)return;
  V.fcur=((V.fcur||0)+d+hits.length)%hits.length;
+ if(ensureHit(hits[V.fcur])){render();const n=$('#fq');if(n){n.focus();try{n.setSelectionRange(n.value.length,n.value.length)}catch(e){}}}
  applyFind();
  const c=$('#fcount');if(c)c.textContent=findLabel();
 }
@@ -1293,7 +1369,7 @@ function cfgForm(t){const g=S.cfg,f=(i,l,v,x='')=>`<label>${l}</label><input id=
    prov:['Providers',selBox('prov','Provider',[['openai','OpenAI'],['openrouter','OpenRouter'],['anthropic','Anthropic'],['local','Local (KoboldCpp, Ollama, LM Studio)'],['custom','Other OpenAI-compatible']],g.prov,'Provider')+f('url','Base URL',g.url)+f('key','API key',g.key,'type="password" autocomplete="off"')+f('model','Model',g.model,'list="mods" placeholder="e.g. gpt-4o-mini"')+`<datalist id="mods">${M.map(m=>`<option value="${esc(m)}">`).join('')}</datalist><button class="btn s" data-a="fm" style="margin-top:8px">Fetch models</button>`+f('temp','Temperature',g.temp,'type="number" step="0.05"')+f('top','Top P',g.top,'type="number" step="0.05"')+`<p class="note">Ollama: http://localhost:11434/v1. LM Studio: http://localhost:1234/v1. Your key stays on this device and goes only to the URL above.</p>`],
    instr:['Instructions',`<label>System prompt</label><textarea id="g_sys" rows="9" placeholder="Empty uses the default roleplay instructions. {{char}} and {{user}} work.">${esc(g.sys)}</textarea>`+`<label>Author’s note</label><textarea id="g_anote" rows="3" placeholder="Steering that applies to the next reply, e.g. keep it tense and short. {{char}} and {{user}} work.">${esc(g.anote||'')}</textarea>`+`<label>Note depth</label><input id="g_andepth" type="number" min="0" max="40" value="${g.andepth??4}"><p class="note">How many messages back the note is inserted. 0 puts it right before the newest message.</p>`],
    lim:['Limits',f('hist','Messages sent as history',g.hist,'type="number"')+f('ctx','Context budget in tokens (0 = off)',g.ctx??0,'type="number"')+f('max','Max reply tokens',g.max,'type="number"')+`<p class="note">With a context budget set, older messages are dropped so the request fits. Leave it at 0 to send the message count above. Thinking models spend tokens on reasoning first, so use 2000 or more with them.</p><label class="chk"><input type="checkbox" id="g_autoc" ${g.autoc!==false?'checked':''}>Auto-continue when a reply hits the limit</label><label>Stop sequences</label><textarea id="g_stop" rows="4" placeholder="One per line, e.g.&#10;{{user}}:&#10;[END]">${esc(g.stop||'')}</textarea><p class="note">The model stops as soon as it produces one of these. Useful for keeping it out of your lines.</p>`],
-   upd:['Updates',f('repo','GitHub owner/repo',g.repo)+f('gh','GitHub token (private repos only)',g.gh,'type="password"')+`<label class="chk"><input type="checkbox" id="g_auto" ${g.auto!==false?'checked':''}>Check for updates automatically</label><p class="note">${updStatus()}</p><button class="btn s" data-a="upd" style="margin-top:8px">Check for updates · v${PUB} (build ${VER})</button>${V.updReady?`<button class="btn full" data-a="applyupd" style="margin-top:10px">Restart to apply build ${V.updReady}</button>`:''}`],
+   upd:['Updates',f('repo','GitHub owner/repo',g.repo)+f('gh','GitHub token (private repos only)',g.gh,'type="password"')+`<label class="chk"><input type="checkbox" id="g_auto" ${g.auto!==false?'checked':''}>Check for updates automatically</label><p class="note">${updStatus()}</p><button class="btn s" data-a="upd" style="margin-top:8px">Check for updates · v${PUB} (build ${VER})</button><button class="btn s" data-a="tab" data-id="news" style="margin-top:8px">What’s new</button>${V.updReady?`<button class="btn full" data-a="applyupd" style="margin-top:10px">Restart to apply build ${V.updReady}</button>`:''}`],
    data:['Backup',`<p class="note">Backups include avatars, chats, and your API key.</p><div class="acts"><button class="btn s" data-a="bak">Backup</button><button class="btn s" data-a="rest">Restore</button></div>`]}[t];
  return T}
 function pickHtml(){const s=V.pick;if(!s)return'';const many=s.rows.length>7;
@@ -1308,7 +1384,7 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';
  if(s.t==='char'){const c=C(),f=(k,l,r)=>`<label>${l}</label><textarea id="c_${k}" rows="${r}">${esc(c[k])}</textarea>`;
   h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="avp">Avatar</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='add')h=`<h2>Add</h2><div class="acts" style="flex-direction:column;margin-top:0"><button class="btn" data-a="imp2">Import cards or lorebooks</button><button class="btn s" data-a="newc">Create a character</button></div>`;
- if(s.t==='find')h=`<h2>Find in chat</h2><input id="fq" value="${esc(V.fq||'')}" placeholder="Search this conversation" autocomplete="off"><div class="rowh" style="margin-top:10px"><span class="note" id="fcount" style="margin:0">${findLabel()}</span><div class="acts" style="margin:0"><button class="ib" data-a="fprev" aria-label="Previous match">${I('left')}</button><button class="ib" data-a="fnext" aria-label="Next match">${I('right')}</button></div></div><p class="note">Matches are highlighted in the conversation. The arrows jump between messages.</p><div class="acts"><button class="btn s" data-a="close">Close</button></div>`;
+ if(s.t==='find')h=`<h2>Find in chat</h2><input id="fq" value="${esc(V.fq||'')}" placeholder="Search this conversation" autocomplete="off"><div class="rowh" style="margin-top:10px"><span class="note" id="fcount" aria-live="polite" style="margin:0">${findLabel()}</span><div class="acts" style="margin:0"><button class="ib" data-a="fprev" aria-label="Previous match">${I('left')}</button><button class="ib" data-a="fnext" aria-label="Next match">${I('right')}</button></div></div><p class="note">Matches are highlighted in the conversation. The arrows jump between messages.</p><div class="acts"><button class="btn s" data-a="close">Close</button></div>`;
  if(s.t==='cprev'){const p=V.prev;h=`<div class="phero">${p.img?`<img src="${esc(p.img)}" alt="" referrerpolicy="no-referrer">`:`<div class="ph">${esc(first(p.name))}</div>`}</div><h2 style="text-align:center;margin:14px 0 2px;font-size:24px">${esc(p.name)}</h2>${p.creator?`<p class="note" style="text-align:center;margin:0 0 6px">By ${esc(p.creator)}</p>`:''}<h2 class="h2" style="margin-top:16px">About</h2><p class="body">${esc(p.about||'No description provided.')}</p>`+(p.tags?.length?`<div class="tags" style="margin-top:12px">${p.tags.slice(0,14).map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+(p.stats?`<p class="ps" style="margin:10px 0 0">${esc(p.stats)}</p>`:'')+`<div class="acts"><button class="btn wide" data-a="pimp" style="flex:2">Import</button><button class="btn s" data-a="pskip" style="flex:1">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`}
  if(s.t==='llai'){const d=V.llai.d,cn=d.chats||[],ids=new Set((d.characters||[]).map(x=>x.id)),have=cn.filter(x=>ids.has(x.character_id)).length,mc=cn.reduce((a,x)=>a+(x.messages||[]).length,0);
   h=`<h2>Import from LLAI</h2><p class="ps">Account export for ${esc(d.user?.display_name||d.user?.username||'your account')}.</p><div class="card2 pad"><div class="rowh"><span>Characters</span><b>${(d.characters||[]).length}</b></div><div class="rowh"><span>Personas</span><b>${(d.personas||[]).length}</b></div><div class="rowh"><span>Lorebooks</span><b>${(d.lorebooks||[]).length}</b></div><div class="rowh"><span>Chats</span><b>${cn.length} (${mc} messages)</b></div></div><label class="chk"><input type="checkbox" id="l_stub" checked>Include the ${cn.length-have} chats whose characters aren’t in the export (creates placeholder characters)</label><label class="chk"><input type="checkbox" id="l_instr" checked>Use your AI instructions as the system prompt</label><p class="note">Images aren’t part of the export, so avatars and covers are left blank. Importing the same file again skips what’s already there.</p><div class="acts"><button class="btn wide" data-a="llaigo">Import</button><button class="btn s" data-a="close">Cancel</button></div>`}
@@ -1379,7 +1455,7 @@ function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook
  return h+`<div class="foot"><button class="lnk big" data-a="edback">Cancel</button><button class="btn wide" data-a="edsave">${isNew?'Create':'Save'} ${N}</button></div>${isNew?'':'<button class="btn d" style="width:100%;margin-top:12px" data-a="eddel">Delete</button>'}<div style="height:40px"></div></main>`}
 function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab='lore';return listHtml()}
  return `<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">${I('back')}</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings">${I('gear')}</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">${I('pen','sm')} Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">${I('dn','sm')}</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
-const PG2=['providers','import','memory','appr','apTheme','apText','apAv','apChat','apHome','apNew','instr','lim','upd','sec','accounts'];
+const PG2=['providers','import','memory','appr','apTheme','apText','apAv','apChat','apHome','apNew','instr','lim','upd','sec','accounts','news'];
 const WL='apple anchor arrow atlas autumn badge bamboo basket beach berry bridge brook cabin candle canyon castle cedar cherry circle cliff cloud clover coast comet coral cotton crane crystal dawn delta desert diamond dragon dream eagle ember falcon feather field flame forest fossil garden garnet glacier grove harbor hazel heron honey island ivory jade jungle kettle lagoon lantern lemon lily lotus lunar maple marble meadow mirror moss mountain nectar ocean olive onyx orchid otter oyster panda pearl pebble pepper pine planet plum prairie quartz quill rabbit raven reef river robin saffron sage sand shadow silver sketch spruce stone storm summer sunset swan thistle thunder tiger timber topaz tulip valley velvet violet walnut willow winter wolf zephyr acorn alder amber aspen aurora basil beacon birch blossom boulder breeze cactus canoe cascade cinder citrus compass copper cove cricket cypress dune dusk echo elm fern fjord flint fog frost galaxy ginger granite gust harvest haven horizon hollow iris juniper kayak lark lavender ledge lichen lilac lynx magnet mango mesa mint mist monsoon nebula nutmeg oak oasis opal orbit pasture petal pier pollen poppy quail rapids ridge ripple rose rowan rune salmon sequoia shore skylark slate sparrow spring sterling stream sundial tundra turtle twilight vine vista wander warbler wheat whisper wren yarrow yew zenith almond bronze cobalt dahlia ebony fable glen hickory indigo jasmine laurel linen magnolia marigold mulberry nimbus orchard paddle peony pewter quince reed sable sienna tamarind teal thyme umber vanilla wisp wisteria zinnia ash bay bluff brisk cairn clay dell drift ferry gale gorge heath inlet knoll loam'.split(' '),normPh=t=>String(t||'').toLowerCase().trim().split(/\s+/).join(' ');
 async function verifyAuth(lk,inp){if(!lk?.hash)return true;inp=String(inp||'');if(await hsh(inp,lk.salt)===lk.hash)return true;if(lk.rhash){const n=normPh(inp);if(n.split(' ').length>=12&&await hsh(n,lk.rsalt)===lk.rhash)return true}return false}
 async function mkPhrase(){const a=crypto.getRandomValues(new Uint8Array(12)),ph=[...a].map(x=>WL[x]).join(' '),salt=uid()+uid();S.lock.rsalt=salt;S.lock.rhash=await hsh(ph,salt);save();V.rphrase=ph;V.sheet={t:'rphrase'}}
@@ -1389,7 +1465,7 @@ function lockHtml(){const pn=S.persona?P().name:'',ini=esc(first((ACCOUNTS.find(
  if(V.picker)return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="pick">${ACCOUNTS.map(a=>`<button class="pk" data-a="pickacct" data-id="${a.id}"><span class="av lg">${esc(first(a.name))}</span><b>${esc(a.name)}</b>${a.locked?'<small>🔒 Password</small>':''}</button>`).join('')}</div></div>`;
  if(V.forgot){const rc=!!S.lock?.rhash;return`<div class="lock">${br}<h2>Forgot password?</h2>${rc?`<p class="ps" style="text-align:center">Enter your 12-word recovery phrase and choose a new password.</p><textarea id="rp" rows="3" placeholder="word1 word2 word3 …" autocomplete="off" autocapitalize="none" style="width:100%"></textarea><div class="pw"><input id="np" type="password" placeholder="New password" autocomplete="off"><button class="eye" data-a="eye" data-t="np">👁</button></div><div class="pw"><input id="nc" type="password" placeholder="Confirm new password" autocomplete="off"><button class="eye" data-a="eye" data-t="nc">👁</button></div><button class="btn wide" data-a="recover" style="width:100%">Reset password</button>`:`<p class="ps" style="text-align:center">This account has no recovery phrase, so its password can’t be reset.</p>`}<details style="width:100%;margin-top:6px"><summary style="text-align:center;color:var(--mut)">Erase this account instead</summary><p class="ps" style="text-align:center;margin-top:10px">Deletes every chat, character, lorebook and key in this account on this device.</p><input id="er" placeholder="Type ERASE to confirm" autocomplete="off"><button class="btn wide danger" data-a="erase" style="width:100%;margin-top:10px">Erase everything</button></details><button class="lnk" data-a="unforgot">Back</button></div>`}
  return`<div class="lock">${br}<h2>Who’s opening?</h2><div class="av xl">${ini}</div>${ACCOUNTS.length>1?'<button class="ib big" data-a="backpick" aria-label="Choose a different account" style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:10px">'+I('left')+'</button>':''}<b style="font-size:20px">${esc(ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||pn||'Hearth')}</b><label style="align-self:flex-start;margin:6px 0 0">Password</label><div class="pw"><input id="lk" type="password" autocomplete="off"><button class="eye" data-a="eye" data-t="lk">👁</button></div><button class="btn wide" data-a="unlock" style="width:100%">Unlock</button><button class="lnk" data-a="forgot">Forgot password?</button>${ACCOUNTS.length>1?'<button class="lnk" data-a="backpick" style="color:var(--ac)">'+I('left','sm')+' Choose a different account</button>':''}</div>`}
-const PG={prov:'providers',imp:'import',mem:'memory',appr:'appr',instr:'instr',lim:'lim',upd:'upd',sec:'sec',acct:'accounts'};
+const PG={prov:'providers',imp:'import',mem:'memory',appr:'appr',instr:'instr',lim:'lim',upd:'upd',sec:'sec',acct:'accounts',news:'news'};
 const mask=k=>k?(k.length>9?k.slice(0,4)+'…'+k.slice(-4):'••••'):'no key';
 const pill=(a,l)=>`<button class="pill" data-a="${a}">+ ${l}</button>`;
 /* ---------- custom picker ---------- */
@@ -1413,6 +1489,9 @@ const SUB={appr:'Themes, text, avatars, chat layout and home layout.',apTheme:'B
 function pageHtml(T){const F=V.form,backTo=/^ap/.test(T)&&T!=='appr'?'appr':'settings',hd=`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="${backTo}" aria-label="Back">${I('back')}</button></header><main>`,
  title=(t,d)=>`<h1 class="pt">${t}</h1><p class="ps">${d}</p>`;
  if(SUB[T]){const f=cfgForm(T);return hd+title(f[0],SUB[T])+f[1]+'</main>'}
+ if(T==='news'){
+  const rel=CHANGELOG.map(e=>`<section class="rel${e.v===VER?' cur':''}" aria-labelledby="rel${e.v}"><div class="relh"><span class="relv" aria-hidden="true">${e.v}</span><div style="flex:1;min-width:0"><h2 id="rel${e.v}">Build ${e.v} · ${esc(e.title)}</h2><small>${esc(e.when)}${e.v===VER?' · this build':''}</small></div>${e.v===VER?'<span class="badge ok">Latest</span>':''}</div><ul class="rell">${e.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section>`).join('');
+  return hd+title('What’s new','Release notes for Hearth 0.1, newest first.')+rel+`<p class="ps" style="text-align:center;margin-top:18px">Hearth v${PUB} · build ${VER}</p></main>`}
  if(T==='import'){const ic=(t,d,a,l)=>`<div class="card2 pad"><div class="rowh" style="align-items:flex-start;gap:14px"><div><b>${t}</b><p class="ps" style="margin:6px 0 0;font-size:15px">${d}</p></div><button class="btn s" data-a="${a}" style="flex:none">${l}</button></div></div>`;
   return hd+title('Import','Bring characters and lorebooks from other apps.')+ic('Back up this account','Save everything to one file. API keys are never included.','bak','Save backup')+ic('Restore a backup','Load a file saved with Save backup. Your keys stay as they are.','rest','Choose file')+`<div class="card2 pad"><div class="rowh" style="align-items:flex-start;gap:14px"><div><b>Storage protection</b><p class="ps" style="margin:6px 0 0;font-size:15px">${persistState===true?'Android has marked this app’s storage as persistent, so it is less likely to be cleared when space runs low.':persistState===false?'Android did not grant persistent storage. Save a backup from time to time.':'Ask Android to keep this app’s data instead of clearing it when space runs low.'}</p></div><button class="btn s" data-a="persist" style="flex:none">${persistState===true?'Protected':'Protect'}</button></div></div>`+ic('Termux backup server','Optional: Hearth can start server.py in Termux automatically before a backup. This needs Termux, Python, and the RUN_COMMAND permission.','termux','Start now')+`<label class="chk" style="padding:0 4px 14px"><input type="checkbox" id="g_termux" ${S.cfg.termux!==false?'checked':''}>Start the Termux server automatically when backing up</label>`+ic('SillyTavern characters','Character cards: JSON or PNG (V2, V3). Embedded lorebooks are imported too.','imp','Choose file')+ic('SillyTavern lorebooks','World Info JSON files.','imp','Choose file')+ic('LLAI export','Your LLAI account export (.json): characters, personas, lorebooks and all chats.','imp','Choose file')+ic('Discover characters','Browse public characters and import them in one tap.','browse','Open')+'</main>'}
  if(T==='memory'){const mc=S.cfg.mem,stp=(k,t,d)=>`<h2 class="h2">${t}</h2><div class="card2 pad"><div class="rowh"><p class="ps" style="margin:0;font-size:15px;flex:1">${d}</p><div class="step"><button data-a="st" data-k="${k}" data-d="-1">−</button><b>${mc[k]}</b><button data-a="st" data-k="${k}" data-d="1">+</button></div></div></div>`;
@@ -1442,6 +1521,7 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  if(T==='prev')return V.prev?charView(V.prev.c,V.prev):(V.tab='home',listHtml());if(T==='char')return charHtml();if(T==='browse')return browseHtml();if(T==='editor')return edHtml();if(T==='book')return bookHtml();if(PG2.includes(T))return pageHtml(T);
  const tab=({settings:'me',pers:'me'})[T]||T;
  const ub=V.updReady?`<div class="banner" data-a="applyupd">Update v${V.updReady} is ready · tap to restart ›</div>`:'';
+ const nb=S.seen===VER?'':`<div class="banner" data-a="tab" data-id="news">What’s new in build ${VER} · release notes ›</div>`;
  const sbtn=`<button class="ib big" data-a="find" aria-label="Search">${I('search')}</button>`;
  const topbar=(t,r='')=>`<header>${t==='Hearth'?`<span class="brandmark"><img class="logo" src="icon-192.png" alt=""><span class="wm">Hearth</span></span>`:`<h1>${t}</h1>`}${r}</header>`;
  if(tab==='me'){const g=S.cfg,ap=S.persona?P():null,acct=ACCOUNTS.find(a=>a.id===ACCT_ID)?.name||'Default';
@@ -1454,7 +1534,7 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  ${pcards?`<div class="hs">${pcards}</div><p class="ps" style="margin:8px 0 0;font-size:13px">Tap a persona to switch to it.</p>`:''}
  <h2 class="h3">Models</h2><div class="card2">${row('prov',I('key'),'Providers',S.models.length+' model'+(S.models.length!==1?'s':''))}</div>
  <h2 class="h3">Chat</h2><div class="card2">${row('instr',I('book'),'Instructions',g.sys?'Custom':'Default')}${row('mem',I('brain'),'Memory',g.mem.on?'On':'Off')}${row('lim',I('clock'),'Limits',g.hist+' history · '+g.max+' tokens')}</div>
- <h2 class="h3">App</h2><div class="card2">${row('appr',I('palette'),'Appearance',(activeTheme().name)+' · '+(S.look.chatfs||18)+'px')}${row('sec',I('lock'),'Security',S.lock?.hash?'Password on':'Off')}${row('upd',I('refresh'),'Updates','v'+PUB+' · build '+VER+(V.updReady?' · update ready':''))}</div>
+ <h2 class="h3">App</h2><div class="card2">${row('appr',I('palette'),'Appearance',(activeTheme().name)+' · '+(S.look.chatfs||18)+'px')}${row('news',I('spark'),'What’s new','Build '+VER+(S.seen===VER?' · release notes':' · new notes'))}${row('sec',I('lock'),'Security',S.lock?.hash?'Password on':'Off')}${row('upd',I('refresh'),'Updates','v'+PUB+' · build '+VER+(V.updReady?' · update ready':''))}</div>
  <h2 class="h3">Data</h2><div class="card2">${row('imp',I('inbox'),'Import &amp; backup','Cards, lorebooks, backups')}</div>
  <p class="ps" style="text-align:center;font-size:13px;margin-top:6px">Hearth v${PUB} · build ${VER}</p></main>`}
  if(tab==='chars'){const rc=[...S.chars].sort((a,b)=>(S.act?.[b.id]||0)-(S.act?.[a.id]||0));
@@ -1470,7 +1550,7 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  const empty=`<div class="empty" style="padding:28px 20px;text-align:center"><b style="font-size:18px">No conversations yet</b><p class="ps" style="margin:8px 0 16px">Pick a character to start chatting.</p><div class="acts" style="justify-content:center"><button class="btn" data-a="tab" data-id="chars">Choose a character</button><button class="btn s" data-a="browse">Discover</button></div></div>`;
  return topbar('Hearth',`<button class="ib big" data-a="find" aria-label="Search">${I('search')}</button><button class="ib big" data-a="tab" data-id="chars" aria-label="New chat">${I('pen')}</button><button class="ib" data-a="tab" data-id="me" aria-label="Profile" style="padding:0">${av(S.persona?P():{name:'H'},'sm')}</button>`)+`<main>
  <p class="ps" style="margin:2px 2px 12px">${gr}${pn?', '+esc(pn):''}</p>
- ${ub}${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
+ ${nb}${ub}${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
  ${(S.look.home==='grid'&&chats.length?`<div class="hgrid">${cards}</div>`:rows)||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
 const NAVI=[['home','Chats','<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-4.6A8 8 0 1 1 21 12z"/></svg>'],['chars','Characters','<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.3 3.5 5.2"/></svg>'],['lore','Lorebooks','<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/></svg>'],['me','Profile','<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></svg>']];
 const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">${NAVI.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
@@ -1492,7 +1572,9 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
  if(!same&&v.dataset.k&&/^l(home|chars|lore|pers|browse)$/.test(v.dataset.k))(V.sy=V.sy||{})[v.dataset.k]=st||0;
  if(V.chat){const c=C(),m=S.chats[c.id]||[],tt=S.title?.[c.id];
   const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm')}<div class="ttl"><h1>${esc(tt||c.name)}</h1><small>${tt?esc(c.name)+' · ':''}${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
-   body=m.map((x,i)=>msgHtml(x,i,m,c)).join(''),
+   from=Math.max(0,m.length-(V.limit||CHATWIN)),
+   earlier=from>0?`<div class="morebar"><button class="btn s" data-a="earlier">${I('up','sm')} Show earlier messages <span class="note" style="margin:0">${from} older</span></button></div>`:'',
+   body=earlier+m.slice(from).map((x,j)=>msgHtml(x,from+j,m,c)).join(''),
    optBtn=S.look.opt==='composer'?'<button class="ib" data-a="set" aria-label="Options">'+I('more')+'</button>':'',
    cb=optBtn+(V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>');
   if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
@@ -1500,7 +1582,7 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
   else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
   const mn=$('main');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
   mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
-  mn.querySelectorAll('.bub').forEach((b,i)=>b.onclick=e=>{if(e.target.closest('a'))return;V.edit=V.edit===i?null:i;render()});
+  mn.querySelectorAll('.bub').forEach(b=>b.onclick=e=>{if(e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
   if(V.fq)applyFind()}
  else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
   const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
@@ -1517,7 +1599,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
  ({imp:pick,
   sel:()=>{const el=document.getElementById(id);if(!el)return;V.pick={id,title:t.dataset.title||'Choose',cur:el.value,rows:pickRows(id)};render()},
   pickv:()=>{const p=V.pick;if(!p?.rows)return;const r=p.rows[i],el=document.getElementById(p.id);V.pick=null;if(el&&r){el.value=r.v;el.dispatchEvent(new Event('change',{bubbles:true}))}render()},
-  tab:()=>{V.tab=id;V.form=null;V.ed=null;render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;V.sheet=null;V.fq='';V.fcur=0;render()},
+  tab:()=>{V.tab=id;V.form=null;V.ed=null;if(id==='news'&&S.seen!==VER){S.seen=VER;save()}render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;V.sheet=null;V.fq='';V.fcur=0;V.limit=0;render()},
+  earlier:()=>{const mn=$('main'),h=mn?.scrollHeight||0,top=mn?.scrollTop||0;V.limit=(V.limit||CHATWIN)+CHATWIN;render();const n=$('main');if(n){n.scrollTop=n.scrollHeight-h+top;V.stick=false}},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
   rgen:async()=>{if(!S.lock?.hash||await hsh($('#s_cur')?.value||'',S.lock.salt)!==S.lock.hash)return toast('Enter your current password above first');await mkPhrase();render()},
   rcopy:()=>{navigator.clipboard?.writeText(V.rphrase||'').then(()=>toast('Copied')).catch(()=>toast('Copy failed'))},
@@ -1749,7 +1832,10 @@ document.addEventListener('change',e=>{const t=e.target;
   save()}return}
  if(t.id==='avr')render()});
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;
- V.fq=e.target.value;V.fcur=0;applyFind();
+ const at=e.target.selectionStart;V.fq=e.target.value;V.fcur=0;
+ const hits=findHits();
+ if(hits.length&&ensureHit(hits[0])){render();const n=$('#fq');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}
+ applyFind();
  const c=$('#fcount');if(c)c.textContent=findLabel();});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
 applyTheme();setTimeout(loadCustomFont,700);setTimeout(autoUpd,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoUpd()});document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
