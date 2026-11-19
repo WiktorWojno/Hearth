@@ -128,10 +128,16 @@ if STYLES.exists():
     styles = styles.replace("@drawable/splash", "@color/launch_bg")
     write(STYLES, styles)
 
-# 5. Public version 0.1.
+# 5. Public version. versionCode tracks the web build number so every release
+# installs over the previous APK instead of being rejected as a downgrade.
+web = read(ROOT / "www" / "index.html")
+vm = re.search(r"var VER=(\d+)", web)
+pm = re.search(r"PUB='([^']+)'", web)
+version_code = int(vm.group(1)) if vm else 1
+version_name = pm.group(1) if pm else "0.1"
 gradle = read(GRADLE)
-gradle = re.sub(r"versionCode\s+\d+", "versionCode 1", gradle)
-gradle = re.sub(r'versionName\s+"[^"]*"', 'versionName "0.1"', gradle)
+gradle = re.sub(r"versionCode\s+\d+", f"versionCode {version_code}", gradle)
+gradle = re.sub(r'versionName\s+"[^"]*"', f'versionName "{version_name}"', gradle)
 
 # 6. Stable signing. CI generates a brand new debug key on every run, which
 # makes each APK refuse to install over the previous one (signature mismatch)

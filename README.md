@@ -118,6 +118,24 @@ persona updates those openings too.
 **Search** from inside a chat opens the character or lorebook you pick, even
 though the chat stays in the back stack.
 
+## Working with a chat
+
+- **Pin** a conversation in chat options to keep it at the top of Home. Pinned
+  chats carry a small pin marker and sort before the rest.
+- **Name this chat** gives a conversation its own title. The title follows the
+  conversation when it is archived into **Chats**, and returns when you switch
+  back. Emptying the title falls back to the character's name.
+- **Find in chat** (chat options) searches the open conversation, highlights
+  every match and jumps between messages with the arrows.
+- **Memories** (chat options) lists the summaries saved for this chat. You can
+  edit a summary, forget it, or add a fact of your own. Manual facts are always
+  included in the prompt; automatic summaries follow the Memory setting.
+- **Undo** appears after deleting a message, character, lorebook, persona,
+  entry or archived chat, and restores it with one tap.
+- **Storage protection** (Profile → Import & backup) asks Android to keep this
+  app's data instead of clearing it under storage pressure, and reports whether
+  the request was granted. If a save ever fails, a warning offers a backup.
+
 ## Optional: automatic Termux backup server
 
 The Android app can save backups directly to `Documents/Hearth`. If that is not
