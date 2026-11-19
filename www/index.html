@@ -185,7 +185,7 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:11px 18px;border-radius:22px;font-size:14px;z-index:40;max-width:90%;text-align:center;animation:up .22s ease-out;box-shadow:var(--sh)}
 #sn{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column-reverse;gap:8px;z-index:42;width:max-content;max-width:92%;pointer-events:none}
 #sn>*{pointer-events:auto}
-#sn .snack{display:flex;align-items:center;gap:10px;background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:8px 10px 8px 16px;border-radius:22px;box-shadow:var(--sh);font-size:14px;animation:up .22s ease-out;max-width:100%}
+#sn .snack{display:flex;align-items:center;gap:10px;background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:8px 10px 8px 16px;border-radius:22px;box-shadow:var(--sh);font-size:14px;animation:up .22s ease-out;max-width:100%;touch-action:pan-y;will-change:transform}
 #sn .snack span{min-width:0}
 #sn .snack .btn{padding:7px 14px;border-radius:16px;font-size:14px}
 #sn .savewarn{border-color:color-mix(in srgb,var(--dg) 55%,var(--ln))}
@@ -193,6 +193,7 @@ label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
 .pinmark svg{width:15px;height:15px}
 mark.fhit{background:color-mix(in srgb,var(--ac) 40%,transparent);color:inherit;border-radius:4px;padding:0 1px}
 .msg.cur .bub{outline:2px solid color-mix(in srgb,var(--ac) 55%,transparent);outline-offset:2px}
+.msg.c .bub{touch-action:pan-y pinch-zoom}
 .morebar{display:flex;justify-content:center;padding:8px 0 16px}
 .rel{background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:15px 16px;margin-bottom:12px;box-shadow:var(--sh2)}
 .rel.cur{border-color:color-mix(in srgb,var(--ac) 55%,var(--ln))}
@@ -465,7 +466,7 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=40,PUB='0.1';try{
+<script>var VER=41,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -537,7 +538,7 @@ const kS=id=>id==='default'?'S':'S_'+id,fresh=()=>({chars:[],books:[],personas:[
 const idbGet=()=>idbRaw(kS(ACCT_ID)),idbSet=v=>idbRaw(kS(ACCT_ID),v),saveAccountsTo=a=>idbRaw('accounts',a),saveAccounts=()=>saveAccountsTo(ACCOUNTS);
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false;clearSaveWarn()}catch(e){saveErr=true;saveWarn()}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false;clearSaveWarn()}).catch(()=>{saveErr=true;saveWarn()}),250)};
-let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,undo:null,limit:0};
+let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,limit:0};
 const CHATWIN=80;
 let lastUpd=0;
 const CFG0={repo:'WiktorWojno/Hearth',gh:'',auto:true,autoc:true,html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40,ctx:0,stop:'',anote:'',andepth:4,mem:{on:false,every:10,per:10,keep:100,model:''},termux:true};S.cfg=Object.assign({},CFG0,S.cfg);
@@ -553,6 +554,13 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:41,when:'19 November 2026',title:'Undo history and reply swipes',items:[
+  "Undo snackbars now stack, so several deletes or message edits can be undone independently while their seven-second windows are open.",
+  "Swipe an undo snackbar left or right to dismiss it without restoring.",
+  "Swipe a character reply right for the previous version and left for the next. At the end of a reply's versions, swipe left to write a new one.",
+  "Message edits now offer Undo as well as deletes.",
+  "Fixed: alternative greetings can be browsed in a Discover preview instead of only the first."
+ ]},
  {v:40,when:'19 November 2026',title:'Faster long chats, and a changelog',items:[
   "New: this catalog. Profile → What's new lists every public build and what changed.",
   "Long conversations open with the latest messages and load older ones on demand, so a very long chat no longer builds thousands of bubbles at once.",
@@ -644,18 +652,47 @@ const pg=v=>{v.classList.remove('pg');void v.offsetWidth;v.classList.add('pg')};
 const tmo=ms=>{const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal};
 const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.setAttribute('aria-live','polite');d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
 const clone=x=>JSON.parse(JSON.stringify(x));
-let undoT=0,persistState=null;
+let persistState=null,undoSeq=0,swipeClick=0;
+const UNDO=[];
 function snackHost(){let h=document.getElementById('sn');if(!h){h=document.createElement('div');h.id='sn';h.setAttribute('role','status');h.setAttribute('aria-live','polite');document.body.append(h)}return h}
+function snackSwipe(d,done){
+ let x0=0,y0=0,dx=0,dy=0,on=false;
+ d.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const t=e.touches[0];x0=t.clientX;y0=t.clientY;dx=dy=0;on=false;d.style.transition='none'},{passive:true});
+ d.addEventListener('touchmove',e=>{if(e.touches.length!==1)return;const t=e.touches[0];dx=t.clientX-x0;dy=t.clientY-y0;
+  if(!on&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2)on=true;
+  if(!on)return;if(e.cancelable)e.preventDefault();
+  d.style.transform=`translateX(${Math.max(-140,Math.min(140,dx))}px)`;
+  d.style.opacity=String(Math.max(.3,1-Math.abs(dx)/240));
+ },{passive:false});
+ const reset=()=>{d.style.transition='transform .16s ease, opacity .16s ease';d.style.transform='';d.style.opacity='1';setTimeout(()=>{d.style.transition=''},180)};
+ const end=()=>{
+  if(!on){d.style.transform='';d.style.opacity='';d.style.transition='';return}
+  on=false;
+  if(Math.abs(dx)>64){const dir=dx<0?-1:1;d.style.transition='transform .16s ease, opacity .16s ease';d.style.transform=`translateX(${dir*140}px)`;d.style.opacity='0';setTimeout(()=>d.remove(),170);done&&done()}
+  else reset();
+ };
+ d.addEventListener('touchend',end);d.addEventListener('touchcancel',end);
+}
 function snack(msg,opt){
  const h=snackHost(),d=document.createElement('div');d.className='snack'+(opt?.cls?' '+opt.cls:'');
- d.innerHTML=`<span>${esc(msg)}</span>${opt?.undo?'<button class="btn s" data-a="undo">Undo</button>':''}`;
+ d.innerHTML=`<span>${esc(msg)}</span>${opt?.undo?`<button class="btn s" data-a="undo"${opt.undoId?` data-u="${opt.undoId}"`:''}>Undo</button>`:''}`;
  h.append(d);
  if(!opt?.sticky)setTimeout(()=>d.remove(),2400);
+ if(opt?.onDismiss)snackSwipe(d,opt.onDismiss);
  return d;
 }
+function undoDismiss(id){const i=UNDO.findIndex(x=>x.id===id);if(i<0)return;clearTimeout(UNDO[i].timer);UNDO.splice(i,1)}
+function undoExpire(id){
+ const i=UNDO.findIndex(x=>x.id===id);if(i<0)return;
+ const e=UNDO.splice(i,1)[0];clearTimeout(e.timer);
+ const d=e.el;d._dx=1;d.style.transition='transform .16s ease, opacity .16s ease';d.style.transform='translateX(140px)';d.style.opacity='0';setTimeout(()=>d.remove(),170);
+}
 function undoable(msg,fn){
- V.undo={fn};const d=snack(msg,{undo:true,sticky:true});clearTimeout(undoT);
- undoT=setTimeout(()=>{V.undo=null;d.remove()},7000);
+ const id=++undoSeq;
+ const d=snack(msg,{undo:true,sticky:true,undoId:id,onDismiss:()=>undoDismiss(id)});
+ const e={id,fn,el:d,timer:0};UNDO.push(e);
+ e.timer=setTimeout(()=>undoExpire(id),7000);
+ if(UNDO.length>5)undoExpire(UNDO[0].id);
 }
 function saveWarn(){
  if(!saveErr||document.querySelector('.savewarn'))return;
@@ -1190,6 +1227,30 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(cut==='early')toast('The connection ended early. Tap Continue to finish the reply.')}
 function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
  if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
+function swipeMsg(i,d){
+ const c=V.chat&&C(),h=c&&S.chats[c.id],m=h&&h[i];if(!m||m.r!=='c'||V.busy)return;
+ m.s=m.s||[m.t];m.i=m.i||0;
+ if(d>0&&m.i===m.s.length-1){if(i===h.length-1)return gen('swipe');return}
+ const n=m.i+d;if(n<0||n>=m.s.length)return;
+ m.i=n;m.t=m.s[n];save();render();
+}
+function wireReplySwipe(b){
+ const idx=+b.closest('.msg')?.dataset.i;let x0=0,y0=0,dx=0,dy=0,on=false;
+ b.addEventListener('touchstart',e=>{if(V.busy||e.touches.length!==1||e.target.closest('a'))return;const t=e.touches[0];x0=t.clientX;y0=t.clientY;dx=dy=0;on=false;b.style.transition='none'},{passive:true});
+ b.addEventListener('touchmove',e=>{if(e.touches.length!==1)return;const t=e.touches[0];dx=t.clientX-x0;dy=t.clientY-y0;
+  if(!on&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2)on=true;
+  if(!on)return;if(e.cancelable)e.preventDefault();
+  b.style.transform=`translateX(${Math.max(-70,Math.min(70,dx))}px)`;
+  b.style.opacity=String(Math.max(.55,1-Math.abs(dx)/260));
+ },{passive:false});
+ const end=()=>{
+  if(!on){b.style.transform='';b.style.opacity='';b.style.transition='';return}
+  const move=Math.abs(dx)>52,dir=dx<0?1:-1;on=false;
+  b.style.transition='transform .16s ease, opacity .16s ease';b.style.transform='';b.style.opacity='1';setTimeout(()=>{b.style.transition=''},180);
+  if(move){swipeClick=Date.now()+350;swipeMsg(idx,dir)}
+ };
+ b.addEventListener('touchend',end);b.addEventListener('touchcancel',end);
+}
 const swb=x=>`<div class="tools"><button data-a="sl">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">${I('right','sm')}</button><button data-a="cont">Continue</button></div>`;
 function upd(){const h=S.chats[V.chat]||[],idx=h.length-1,b=document.querySelector(`.msg[data-i="${idx}"] .bub`);if(!b)return;
  if(V.shown==null){const now=performance.now();if(now-lastUpd<40)return;lastUpd=now}
@@ -1582,7 +1643,8 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
   else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
   const mn=$('main');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
   mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
-  mn.querySelectorAll('.bub').forEach(b=>b.onclick=e=>{if(e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
+  mn.querySelectorAll('.bub').forEach(b=>b.onclick=e=>{if(Date.now()<swipeClick||e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
+  mn.querySelectorAll('.msg.c .bub').forEach(wireReplySwipe);
   if(V.fq)applyFind()}
  else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
   const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
@@ -1623,7 +1685,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    const r=await hubCard(fp,site),d=r.j.data||r.j,nt=cleanNote(d.creator_notes);c.about=nt.length>15?nt:(cleanNote(nd.tagline||nd.description)||nt);c.fp=fp;c.site=site;save();toast('About updated');render()}catch(e){toast('Failed: '+e.message)}},
   
   cview:()=>{V.charBack=V.tab;V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
-  gnav:()=>{const c=S.chars.find(x=>x.id===V.cd),n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
+  gnav:()=>{const c=V.tab==='prev'?V.prev?.c:S.chars.find(x=>x.id===V.cd);if(!c)return;const n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
   start:()=>startWith(id,i),cnew:()=>startWith(id,0),
   browse:()=>{if(V.sy)delete V.sy.lbrowse;V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
   bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
@@ -1701,7 +1763,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    else{const a=S.memo[c.id],old=a.splice(x.j,1)[0];save();render();undoable('Memory forgotten',()=>{a.splice(x.j,0,old);save();render()})}},
   chfind:()=>{V.sheet={t:'find'};V.fq='';V.fcur=0;render();setTimeout(()=>$('#fq')?.focus(),80)},
   fnext:()=>findStep(1),fprev:()=>findStep(-1),
-  undo:()=>{const u=V.undo;if(!u)return;V.undo=null;clearTimeout(undoT);document.querySelectorAll('#sn .snack').forEach(x=>x.remove());try{u.fn()}catch(e){}toast('Restored')},
+  undo:()=>{const id=+t.dataset.u,i=id?UNDO.findIndex(x=>x.id===id):UNDO.length-1;if(i<0)return;const u=UNDO.splice(i,1)[0];clearTimeout(u.timer);u.el.remove();try{u.fn()}catch(e){}toast('Restored')},
   savewarnx:()=>clearSaveWarn(),
   persist:async()=>{await askPersist();render();toast(persistState?'Storage protection is on':'Android did not grant persistent storage')},
   sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.some(m=>m.r==='u'))o.unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id],title:S.title?.[c.id]});S.chats[c.id]=it.msgs;if(it.pid)(S.cp=S.cp||{})[c.id]=it.pid;else delete S.cp?.[c.id];if(it.title)S.title[c.id]=it.title;else delete S.title?.[c.id];V.sheet=null;save();render(true)},
@@ -1744,10 +1806,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   termux:async()=>{toast('Starting the Termux backup server…');const ok=await startBackupServer(true);toast(ok?'Backup server is running on 127.0.0.1:8765':'Could not start it. In Termux run: bash native/termux-setup.sh')},
   updnow:()=>checkUpdate(true),
   regen:()=>{const h=S.chats[c.id],l=h[h.length-1];gen(l&&l.r==='c'?'swipe':'new')},
-  del:()=>{const cid=c.id,idx=i,gone=S.chats[cid].splice(i,1)[0];V.edit=null;save();render();
-   undoable('Message deleted',()=>{const a=S.chats[cid];if(!a)return;a.splice(Math.min(idx,a.length),0,gone);save();render()})},
+  del:()=>{const cid=c.id,idx=i,a=S.chats[cid],prev=a[idx-1]||null,next=a[idx+1]||null,gone=a.splice(idx,1)[0];V.edit=null;save();render();
+   undoable('Message deleted',()=>{const h=S.chats[cid];if(!h)return;let at=h.length;const p=prev?h.indexOf(prev):-1;if(p>=0)at=p+1;else{const n=next?h.indexOf(next):-1;at=n>=0?n:Math.min(idx,h.length)}h.splice(at,0,gone);save();render()})},
   edit:()=>{V.sheet={t:'edit',i};V.edit=null;render()},
-  savem:()=>{const v=$('#em').value.trim();if(v){const m=S.chats[c.id][V.sheet.i];m.s=m.s||[m.t];if(v!==m.t){m.s.push(v);m.i=m.s.length-1;m.t=v}save()}V.sheet=null;render()},
+  savem:()=>{const m=S.chats[c.id][V.sheet.i],old={t:m.t,s:m.s?[...m.s]:null,i:m.i},v=$('#em').value.trim();
+   if(v&&v!==m.t){m.s=m.s||[m.t];m.s.push(v);m.i=m.s.length-1;m.t=v;save();V.sheet=null;render();undoable('Message edited',()=>{m.t=old.t;m.s=old.s;m.i=old.i;save();render()})}
+   else{V.sheet=null;render()}},
   reset:()=>{delete S.chats[c.id];V.sheet=null;save();openChat(c.id)},
   delchar:()=>{const cid=c.id,snap={char:clone(c),chat:S.chats[cid],old:S.old[cid],links:S.links[cid],cp:S.cp?.[cid],title:S.title?.[cid],act:S.act?.[cid]};
    S.chars=S.chars.filter(x=>x.id!==cid);delete S.chats[cid];delete S.links[cid];delete S.old[cid];delete S.cp?.[cid];delete S.title?.[cid];V.chat=null;V.sheet=null;save();render();
@@ -1798,7 +1862,8 @@ document.addEventListener('change',e=>{const t=e.target;
 async function flushSave(){clearTimeout(tm);if(!idbOK)return;S.ts=Date.now();await idbSet(S)}
 async function loadAcct(id,tab){try{V.ctl?.abort()}catch(e){}await new Promise(r=>setTimeout(r,60));ACCT_ID=id;try{localStorage.setItem('hearth_acct',id)}catch(e){}
  const d=await idbGet().catch(()=>null);S=Object.assign(fresh(),d||{});fix(!!d?.look);applyTheme();idbOK=true;askPersist();loadCustomFont();{const A0=ACCOUNTS.find(a=>a.id===id);if(A0&&!!S.lock?.hash!==!!A0.locked){A0.locked=!!S.lock?.hash;saveAccounts()}}
- Object.assign(V,{chat:null,sheet:null,form:null,edit:null,ed:null,prev:null,busy:false,ctl:null,forgot:false,picker:false,tab:tab||'home',fq:'',fcur:0,undo:null});
+ Object.assign(V,{chat:null,sheet:null,form:null,edit:null,ed:null,prev:null,busy:false,ctl:null,forgot:false,picker:false,tab:tab||'home',fq:'',fcur:0});
+ UNDO.splice(0).forEach(e=>clearTimeout(e.timer));
  document.querySelectorAll('#sn .snack,.toast').forEach(x=>x.remove());
  V.locked=!!S.lock?.hash;render()}
 idbRaw('accounts').then(async accs=>{

@@ -53,19 +53,20 @@ async function closeSheet(){click(d.querySelector('#sh [data-a="close"]'));await
 (async()=>{
  await wait(800);
  ok('boots clean',errors.length===0);
- ok('build is 40',/build 40/.test(d.body.textContent));
+ const VER=W.eval('VER');
+ ok('build is current',new RegExp('build '+VER).test(d.body.textContent));
  ok('catalog banner appears on Home',!!d.querySelector('main .banner[data-a="tab"][data-id="news"]'));
- ok('banner names the build',d.querySelector('main .banner[data-a="tab"][data-id="news"]')?.textContent.includes('40'));
+ ok('banner names the build',d.querySelector('main .banner[data-a="tab"][data-id="news"]')?.textContent.includes(String(VER)));
 
  // catalog
  click(d.querySelector('main .banner[data-a="tab"][data-id="news"]'));await wait(200);
  ok('catalog opens',d.querySelector('h1.pt')?.textContent==='What’s new');
- ok('catalog lists every build',d.querySelectorAll('.rel').length===8);
- ok('latest build is marked',d.querySelector('.rel.cur .relv')?.textContent==='40');
+ ok('catalog lists every build',d.querySelectorAll('.rel').length>=8);
+ ok('latest build is marked',d.querySelector('.rel.cur .relv')?.textContent===String(VER));
  ok('latest badge is shown',d.querySelector('.rel.cur .badge.ok')?.textContent==='Latest');
  ok('catalog has release items',d.querySelectorAll('.rel.cur .rell li').length>=4);
  ok('build 39 is documented',[...d.querySelectorAll('.rel .relv')].some(x=>x.textContent==='39'));
- ok('catalog marks itself seen',saved().seen===40);
+ ok('catalog marks itself seen',saved().seen===VER);
  await toHome();
  ok('catalog banner is gone after reading',!d.querySelector('main .banner[data-a="tab"][data-id="news"]'));
 
@@ -73,7 +74,7 @@ async function closeSheet(){click(d.querySelector('#sh [data-a="close"]'));await
  await tab('me');
  const newsRow=d.querySelector('[data-a="tab"][data-id="news"]');
  ok('Profile has a What’s new row',!!newsRow&&newsRow.textContent.includes('What’s new'));
- ok('Profile row reports the build',newsRow?.textContent.includes('40'));
+ ok('Profile row reports the build',newsRow?.textContent.includes(String(VER)));
  click(newsRow);await wait(180);
  ok('Profile row opens the catalog',d.querySelector('h1.pt')?.textContent==='What’s new');
  await toHome();await tab('me');

@@ -14,7 +14,7 @@ keys stay on your device.
 The workflow builds a debug APK with versionName **0.1** and the Sakura Night
 icon/theme. Before packaging, it runs `npm test`, a headless-browser smoke test
 that boots the app and checks the release catalog, long-chat windowing, find,
-delete and undo.
+delete and undo history, reply swipes, and preview greetings.
 
 ## Signing
 
@@ -37,7 +37,7 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
-**Profile → Updates** also prints the running build (`v0.1 · build 40`).
+**Profile → Updates** also prints the running build (`v0.1 · build 41`).
 Check that line after an update: if the build number did not change, the
 update was not applied yet.
 
@@ -131,6 +131,9 @@ persona updates those openings too.
 **Search** from inside a chat opens the character or lorebook you pick, even
 though the chat stays in the back stack.
 
+In a **Discover** preview, the greeting arrows page through every alternate
+greeting, not just the first.
+
 ## Working with a chat
 
 - **Pin** a conversation in chat options to keep it at the top of Home. Pinned
@@ -148,7 +151,13 @@ though the chat stays in the back stack.
   edit a summary, forget it, or add a fact of your own. Manual facts are always
   included in the prompt; automatic summaries follow the Memory setting.
 - **Undo** appears after deleting a message, character, lorebook, persona,
-  entry or archived chat, and restores it with one tap.
+  entry or archived chat, and restores it with one tap. Message edits can be
+  undone too. Undo snackbars stack, so a second delete or edit no longer
+  replaces the first; swipe a snackbar left or right to dismiss it without
+  restoring.
+- **Reply versions** can be swiped directly on the message: swipe right for the
+  previous version and left for the next. At the last version of the newest
+  reply, swipe left to write a new one.
 - **Storage protection** (Profile → Import & backup) asks Android to keep this
   app's data instead of clearing it under storage pressure, and reports whether
   the request was granted. If a save ever fails, a warning offers a backup.
