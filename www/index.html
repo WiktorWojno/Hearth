@@ -1744,9 +1744,9 @@ document.addEventListener('input',e=>{const t=e.target;
 document.addEventListener('change',e=>{const t=e.target;
  if(t.id==='fontfile'&&t.files&&t.files[0])importFont(t.files[0]);
  if(t.dataset.mj!==undefined&&V.chat){const L=memList(V.chat),x=L[+t.dataset.mj];if(x){const v=t.value.trim();
-  if(x.k==='m'){const m=S.chats[V.chat][x.i];if(v)m.mt=v;else delete m.mt}
-  else{const a=S.memo[V.chat]||[];if(v)a[x.j]=v;else a.splice(x.j,1)}
-  save();render()}return}
+  if(x.k==='m'){const m=S.chats[V.chat][x.i];if(v)m.mt=v;else{delete m.mt;save();render();return}}
+  else{const a=S.memo[V.chat]||[];if(v)a[x.j]=v;else{a.splice(x.j,1);save();render();return}}
+  save()}return}
  if(t.id==='avr')render()});
 document.addEventListener('input',e=>{if(e.target.id!=='fq')return;
  V.fq=e.target.value;V.fcur=0;applyFind();
