@@ -444,12 +444,15 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=36,PUB='0.1';try{
+<script>var VER=37,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
  const drop=()=>{['hearth_ota','hearth_ota_try','hearth_ota_etag'].forEach(k=>{try{L.removeItem(k)}catch(e){}})};
- if(o&&ov<=VER){drop();const b=+(L.getItem('hearth_ota_bad')||0);if(b&&b<=VER)L.removeItem('hearth_ota_bad')}
+ if(o&&ov<VER){drop();const b=+(L.getItem('hearth_ota_bad')||0);if(b&&b<=VER)L.removeItem('hearth_ota_bad')}
+ /* Running the stored copy over an older APK. Keep it: without this the next
+    cold start goes back to the build baked into the APK. */
+ else if(o&&ov===VER){try{L.removeItem('hearth_ota_try')}catch(e){}}
  else if(o&&ov>VER){
   const p=(L.getItem('hearth_ota_try')||'').split(':');
   const complete=/^\s*<!doctype html/i.test(o)&&/<\/html>\s*$/i.test(o)&&o.length>20000;
@@ -640,9 +643,11 @@ async function dl(n,t,mime='application/json'){
 const UPD_KEY='hearth_upd',UPD_OTA='hearth_ota',UPD_BAD='hearth_ota_bad',UPD_ETAG='hearth_ota_etag';
 function updMeta(){try{return JSON.parse(localStorage.getItem(UPD_KEY)||'{}')||{}}catch(e){return{}}}
 function setUpdMeta(p){try{localStorage.setItem(UPD_KEY,JSON.stringify(Object.assign(updMeta(),p)))}catch(e){}}
+function storedOta(){
+ try{const x=localStorage.getItem(UPD_OTA)||'',m=x.match(/var VER=(\d+)/);return m?+m[1]:0}catch(e){return 0}}
 function updStatus(){
- const m=updMeta();
- if(V.updReady)return`Build ${V.updReady} is downloaded. Restart to apply it.`;
+ const m=updMeta(),so=storedOta();
+ if(V.updReady||so>VER)return`Build ${V.updReady||so} is downloaded. Restart to apply it.`;
  if(!S.cfg.repo)return'Set a GitHub owner/repo above to enable updates.';
  let s=m.checked?`Last checked ${new Date(m.checked).toLocaleString()}.`:'Not checked yet.';
  if(m.error)s+=' Last error: '+m.error;else if(m.latest&&m.latest>VER)s+=` A newer build (${m.latest}) is available.`;
@@ -706,8 +711,10 @@ async function checkUpdate(manual=false){
 }
 function autoUpd(){
  if(!S.cfg.auto||!S.cfg.repo||V.loading)return;
- const m=updMeta();
- if(Date.now()-(m.checked||0)<6*3600*1000)return;
+ const m=updMeta(),behind=m.latest&&m.latest>VER&&!storedOta();
+ /* If a newer build is known but the stored copy is gone (the old build
+    dropped it after applying), download it again instead of waiting 6h. */
+ if(!behind&&Date.now()-(m.checked||0)<6*3600*1000)return;
  checkUpdate(false);
 }
 function exitHearth(){

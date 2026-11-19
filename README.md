@@ -44,6 +44,12 @@ number, size) and the boot loader refuses to apply a truncated file, so a
 bad download cannot leave a half-drawn screen. If a build ever fails to
 start, the app marks it bad and waits for a newer one instead of looping.
 
+The downloaded copy is **kept** and re-applied on every cold start until an
+APK that already contains that build (or newer) is installed. Without this,
+closing and reopening the app falls back to the build baked into the APK. If
+the stored copy disappears, the next launch downloads it again instead of
+waiting for the six-hour check.
+
 ## If a screen looks wrong
 
 - Reload from **Profile → Updates → Restart**, or force-stop the app. State is
