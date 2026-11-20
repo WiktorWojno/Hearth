@@ -14,7 +14,8 @@ keys stay on your device.
 The workflow builds a debug APK with versionName **0.1** and the Sakura Night
 icon/theme. Before packaging, it runs `npm test`, a headless-browser smoke test
 that boots the app and checks the release catalog, long-chat windowing, find,
-delete and undo history, reply swipes, and preview greetings.
+delete and undo history, reply swipes, message branches and regeneration,
+message times, and preview greetings.
 
 ## Signing
 
@@ -37,7 +38,7 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
-**Profile → Updates** also prints the running build (`v0.1 · build 41`).
+**Profile → Updates** also prints the running build (`v0.1 · build 42`).
 Check that line after an update: if the build number did not change, the
 update was not applied yet.
 
@@ -139,8 +140,14 @@ greeting, not just the first.
 - **Pin** a conversation in chat options to keep it at the top of Home. Pinned
   chats carry a small pin marker and sort before the rest.
 - **Name this chat** gives a conversation its own title. The title follows the
-  conversation when it is archived into **Chats**, and returns when you switch
-  back. Emptying the title falls back to the character's name.
+  conversation when it is archived into **Branches & chats**, and returns when
+  you switch back. Emptying the title falls back to the character's name.
+- **Branches** — tap a message and choose **Branch here** to copy the
+  conversation up to that point into a new chat. The original stays in
+  **Branches & chats**, where you can switch, rename or delete it without
+  losing the active conversation. **Regenerate** on a reply, or **Reply from
+  here** on one of your messages, starts a fresh branch and writes a new
+  response instead of overwriting the old one.
 - **Find in chat** (chat options) searches the whole conversation, highlights
   every match and jumps between messages with the arrows. If the match is in
   an older part of a long chat, the app loads that part automatically.
@@ -158,6 +165,9 @@ greeting, not just the first.
 - **Reply versions** can be swiped directly on the message: swipe right for the
   previous version and left for the next. At the last version of the newest
   reply, swipe left to write a new one.
+- **Message details** show the send time under each new message and add an
+  **edited** marker after a manual edit. Hide both in **Profile → Appearance →
+  Chat**.
 - **Storage protection** (Profile → Import & backup) asks Android to keep this
   app's data instead of clearing it under storage pressure, and reports whether
   the request was granted. If a save ever fails, a warning offers a backup.

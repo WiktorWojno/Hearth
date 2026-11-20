@@ -65,16 +65,19 @@ async function swipeEl(el,dx){
  await wait(800);
  ok('boots clean',errors.length===0);
  const VER=W.eval('VER');
- ok('build is 41',VER===41&&/build 41/.test(d.body.textContent));
+ ok('build is at least 41',VER>=41&&new RegExp('build '+VER).test(d.body.textContent));
 
  // release notes
  ok('catalog banner appears on Home',!!d.querySelector('main .banner[data-a="tab"][data-id="news"]'));
  click(d.querySelector('main .banner[data-a="tab"][data-id="news"]'));await wait(200);
  ok('catalog opens',d.querySelector('h1.pt')?.textContent==='What’s new');
- ok('catalog marks build 41 as current',d.querySelector('.rel.cur .relv')?.textContent==='41');
- ok('catalog documents stacked undo',[...d.querySelectorAll('.rel.cur .rell li')].some(x=>/stack/i.test(x.textContent)));
- ok('catalog documents reply swipes',[...d.querySelectorAll('.rel.cur .rell li')].some(x=>/swipe/i.test(x.textContent)));
- ok('catalog documents the preview fix',[...d.querySelectorAll('.rel.cur .rell li')].some(x=>/alternative greetings/i.test(x.textContent)));
+ ok('catalog marks the current build',d.querySelector('.rel.cur .relv')?.textContent===String(VER));
+ const rel41=[...d.querySelectorAll('.rel')].find(x=>x.querySelector('.relv')?.textContent==='41');
+ const rel41items=rel41?[...rel41.querySelectorAll('.rell li')]:[];
+ ok('catalog includes build 41',!!rel41);
+ ok('catalog documents stacked undo',rel41items.some(x=>/stack/i.test(x.textContent)));
+ ok('catalog documents reply swipes',rel41items.some(x=>/swipe/i.test(x.textContent)));
+ ok('catalog documents the preview fix',rel41items.some(x=>/alternative greetings/i.test(x.textContent)));
  await toHome();
 
  // two deletes stay independently undoable
