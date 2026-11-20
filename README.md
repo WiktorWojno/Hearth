@@ -15,7 +15,7 @@ The workflow builds a debug APK with versionName **0.1** and the Sakura Night
 icon/theme. Before packaging, it runs `npm test`, a headless-browser smoke test
 that boots the app and checks the release catalog, long-chat windowing, find,
 delete and undo history, reply swipes, message branches and regeneration,
-message times, and preview greetings.
+message times, preview greetings, and Discover search filters and tags.
 
 ## Signing
 
@@ -38,7 +38,7 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
-**Profile → Updates** also prints the running build (`v0.1 · build 42`).
+**Profile → Updates** also prints the running build (`v0.1 · build 43`).
 Check that line after an update: if the build number did not change, the
 update was not applied yet.
 
@@ -102,6 +102,28 @@ saved per account the moment you tap it.
 Themes are plain objects in the account's saved state (`look` and `themes`), so
 a backup carries the appearance with it. Upgrading from an older build maps the
 old theme, text size and serif/sans choice into the new model automatically.
+
+## Discovering characters
+
+Open **Characters → Discover** to search public character cards and import one
+with a tap.
+
+- **Sort** by relevance, downloads, stars or newest. Relevance is the default
+  for a new search; if the hub rejects that order, Hearth falls back to most
+  downloaded and says so.
+- **Tags** can be typed or picked from the results. Choose whether multiple
+  tags must all match or any one may match. Tag filters are sent to the hub and
+  also applied to results already on screen.
+- **Search options** cover exact phrase, forks, lorebooks, alternate greetings
+  and minimum card length. NSFW visibility stays next to the sort control.
+- **QOL**: recent searches are saved per account, the search field has a clear
+  button, loaded results can be narrowed further, the result count shows what
+  is loaded, and **Surprise me** opens a random matching card.
+- **More sites**: search runs on Chub, but the same query can be opened on
+  Chub, CharacterHub, JannyAI or JanitorAI. Paste a character link from those
+  sites, or a direct `.png`/`.json` card URL, into the link field. JannyAI and
+  JanitorAI do not expose a public search API, so they are link-import sites
+  rather than an in-app result list. JanitorAI character links are tried\n  through the JannyAI mirror.
 
 ## Steering the model
 

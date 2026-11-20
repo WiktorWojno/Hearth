@@ -328,6 +328,25 @@ details summary{cursor:pointer;color:var(--mut);margin-top:10px}
 .bc>div{flex:1;min-width:0}
 .bc b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bc small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--mut)}
+.bsearch{position:relative;flex:1;min-width:0}
+.bsearch input{padding-right:44px}
+.bclear{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--mut);width:38px;height:38px;display:grid;place-items:center;border-radius:12px;padding:0}
+.bclear:active{background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.bfilters{margin:10px 0 4px;border:1px solid var(--ln);border-radius:16px;padding:0 14px;background:color-mix(in srgb,var(--sf) 72%,transparent)}
+.bfilters summary{padding:12px 0;cursor:pointer;color:var(--mut);font-weight:600}
+.bfilters[open] summary{padding-bottom:6px}
+.bfilters .chk{margin:8px 0}
+.bcount{color:var(--mut);font-size:13px;margin:12px 2px 8px}
+.bcount b{color:var(--ink);font-weight:650}
+.bmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;color:var(--mut);font-size:12px}
+.bmeta span{background:var(--sf2);border-radius:10px;padding:2px 7px}
+.bctags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.bctags button.chip{padding:2px 8px;font-size:11px;border-radius:10px;line-height:1.35}
+.chip.on{border-color:var(--ac);color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,var(--sf))}
+.chip .i{width:12px;height:12px;stroke-width:2.2}
+a.chip{text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.bempty{padding:22px 12px;text-align:center;border:1.5px dashed var(--ln);border-radius:18px;color:var(--mut)}
+.bempty b{display:block;color:var(--ink);margin-bottom:5px}
 .hero{width:76%;margin:8px auto 18px;aspect-ratio:4/5;border-radius:28px;overflow:hidden;border:1px solid var(--ln);background:var(--sf);position:relative;box-shadow:var(--sh)}
 .hero img,.hero .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero .ph{display:grid;place-items:center;font-size:64px;color:var(--ac)}
@@ -468,7 +487,7 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=42,PUB='0.1';try{
+<script>var VER=43,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -556,6 +575,13 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:43,when:'20 November 2026',title:'Better discovery, tags and search options',items:[
+  "Discover can sort by relevance, filter by one or more tags, and match any or all of the tags you choose.",
+  "New search controls include exact phrase, minimum length, forks, lorebooks, alternate greetings and NSFW visibility.",
+  "Recent searches, a clear-search button, loaded-result filtering, result counts and a Surprise me shortcut make browsing faster.",
+  "Result cards show their tags as one-tap filters, and character previews can search for more by the same creator.",
+  "The same search can be opened on Chub, CharacterHub, JannyAI or JanitorAI. Hearth also accepts a card link from those sites when the page exposes a downloadable card."
+ ]},
  {v:42,when:'20 November 2026',title:'Branches, regeneration and message times',items:[
   "Branch any message into its own copy; the original conversation stays in Branches & chats.",
   "Regenerate an earlier reply on a fresh branch instead of overwriting the conversation.",
@@ -651,6 +677,8 @@ const fix=hadLook=>{S.cfg=Object.assign({},CFG0,S.cfg);if(!S.cfg.mig1){if(S.cfg.
  }
  S.old=S.old||{};S.provs=S.provs||[];S.models=S.models||[];
  S.pin=S.pin||{};S.title=S.title||{};S.memo=S.memo||{};S.seen=+S.seen||0;
+ S.disc=Object.assign({recent:[]},S.disc||{});
+ if(!Array.isArray(S.disc.recent))S.disc.recent=[];
  if(!S.provs.length&&S.cfg.url&&S.cfg.model){const p={id:uid(),name:S.cfg.prov==='anthropic'?'Anthropic':S.cfg.prov==='openai'?'OpenAI':'Provider',url:S.cfg.url,key:S.cfg.key,fmt:S.cfg.prov==='anthropic'?'anthropic':'openai'},m={id:uid(),pid:p.id,mid:S.cfg.model,name:S.cfg.model};S.provs.push(p);S.models.push(m);S.cfg.am=m.id}};fix();
 const PRE={openai:'https://api.openai.com/v1',openrouter:'https://openrouter.ai/api/v1',anthropic:'https://api.anthropic.com/v1',local:'http://localhost:5001/v1'};
 let M=[],hd=0,pop=false;
@@ -1056,12 +1084,43 @@ function nextPrev(){const q=V.pq;if(!q?.length)return closePrev();openPrev(prevF
 async function nfetch(url,o={},bin){const CH=window.Capacitor?.Plugins?.CapacitorHttp;
  try{const r=await fetch(url,o);if(!r.ok)throw Error(r.status);return bin?new Uint8Array(await r.arrayBuffer()):await r.json()}
  catch(e){if(!CH)throw e;const r=await CH.request({url,method:o.method||'GET',headers:o.headers||{},data:o.body?JSON.parse(o.body):undefined,responseType:bin?'arraybuffer':'json'});if(r.status>=400)throw Error(r.status);return bin?Uint8Array.from(atob(r.data),c=>c.charCodeAt(0)):r.data}}
-async function chubSearch(more){const B=V.br,qi=$('#bq');if(qi)B.q=qi.value;if(!more){B.page=1;B.items=[]}B.err='';B.busy=true;render();
- try{let n;{const j=await nfetch(`https://api.chub.ai/search?search=${encodeURIComponent(B.q)}&first=24&page=${B.page}&sort=${B.sort}&asc=false&nsfw=${B.nsfw}&nsfl=false&include_forks=false&venus=false&chub=true&min_tokens=50`);n=(j.data?.nodes||j.nodes||[]).map(x=>({...x,src:'chub'}))}
-  B.items=B.items.concat(n);B.more=n.length>=24;B.page++}catch(e){B.err=e.message}B.busy=false;render()}
+const B0=()=>({src:'chub',q:'',sort:'relevance',nsfw:false,items:[],page:1,more:false,done:{},err:'',note:'',tags:[],local:'',forks:false,lore:false,alt:false,exact:false,min:50,match:'all',total:0,busy:false});
+const bState=()=>{const d=B0();V.br=V.br||{};for(const k of Object.keys(d))if(V.br[k]===undefined)V.br[k]=d[k];if(!Array.isArray(V.br.tags))V.br.tags=[];if(!Array.isArray(V.br.items))V.br.items=[];if(!V.br.done||typeof V.br.done!=='object')V.br.done={};return V.br};
+const bTags=n=>{const out=[],seen=new Set();for(const v of [...(n?.topics||[]),...(n?.tags||[]),...(n?.custom_tags||[])]){const t=typeof v==='string'?v:(v?.name||v?.title||v?.tag||''),k=String(t||'').trim();if(!k||seen.has(k.toLowerCase()))continue;seen.add(k.toLowerCase());out.push(k)}return out};
+const bMatchTags=n=>{const B=V.br||{},want=(B.tags||[]).map(x=>String(x).toLowerCase()).filter(Boolean);if(!want.length)return true;const have=new Set(bTags(n).map(x=>x.toLowerCase()));return B.match==='any'?want.some(x=>have.has(x)):want.every(x=>have.has(x))};
+const browseVisible=()=>{const B=bState(),q=(B.local||'').toLowerCase().trim();return (B.items||[]).filter(n=>{if(!bMatchTags(n))return false;if(!q)return true;return [n.name,n.tagline,n.fullPath,n.creator,...bTags(n)].join(' ').toLowerCase().includes(q)})};
+const browseTagCounts=()=>{const m=new Map();(V.br?.items||[]).forEach(n=>bTags(n).forEach(t=>{const k=t.toLowerCase(),e=m.get(k)||{name:t,n:0};e.n++;m.set(k,e)}));return [...m.values()].sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name)).slice(0,18)};
+const BSITES=[['Chub','https://chub.ai/search?search='],['CharacterHub','https://characterhub.org/search?search='],['JannyAI','https://jannyai.com/characters?search='],['JanitorAI','https://janitorai.com/search?search=']];
+const bSiteUrl=(base,q)=>q?base+encodeURIComponent(q):base.replace(/\?search=$/,'');
+function rememberSearch(q){q=String(q||'').trim();if(q.length<2)return;S.disc=S.disc||{recent:[]};S.disc.recent=[q,...(S.disc.recent||[]).filter(x=>String(x).toLowerCase()!==q.toLowerCase())].slice(0,6);save()}
+function chubUrl(B){
+ const p=new URLSearchParams({first:'24',page:String(B.page||1),sort:B.sort||'relevance',asc:'false',nsfw:String(!!B.nsfw),nsfl:'false',include_forks:String(!!B.forks),venus:'false',chub:'true',min_tokens:String(B.min||50),count:'true'});
+ if(B.q){if(B.exact)p.set('exact_search',B.q);else p.set('search',B.q)}
+ if((B.tags||[]).length){p.set('tags',B.tags.join(','));p.set('inclusive_or',String(B.match==='any'))}
+ if(B.lore)p.set('require_lore','true');
+ if(B.alt)p.set('require_alternate_greetings','true');
+ return 'https://api.chub.ai/search?'+p.toString();
+}
+async function chubSearch(more,preserve,retried){const B=bState(),qi=$('#bq');if(qi)B.q=qi.value;
+ if(!more){B.page=1;if(!preserve)B.items=[]}
+ B.err='';B.busy=true;if(!retried)B.note='';
+ if(!more&&B.q.trim())rememberSearch(B.q);
+ render();
+ try{
+  const j=await nfetch(chubUrl(B));let n=(j.data?.nodes||j.nodes||[]).map(x=>({...x,src:'chub'}));
+  if(more){const seen=new Set(B.items.map(x=>x.fullPath));n=n.filter(x=>!seen.has(x.fullPath))}
+  B.items=more?B.items.concat(n):n;B.more=n.length>=24;B.page++;
+  const total=Number(j.data?.total??j.total??0);B.total=Number.isFinite(total)&&total>=0?total:B.items.length;
+ }catch(e){
+  if(B.sort==='relevance'&&!retried&&!more){B.sort='download_count';B.busy=false;B.note='Relevance is not available right now, so these are the most downloaded characters.';return chubSearch(false,preserve,true)}
+  B.err=e.message
+ }
+ B.busy=false;render()
+}
 async function chubImport(fp,about){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);IMPOPT={direct:true,about};await importFiles([new File([b],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){if(V.br)V.br.done[fp]=1;goDetail(LASTC)}else toast('That card had no character data')}catch(e){IMPOPT=null;toast('Import failed: '+e.message)}}
 async function previewFp(fp,src,node){toast('Loading preview…');try{const r=await hubCard(fp,src);openPrev(prevFrom({src:'hub',site:src,fp,bytes:r.bytes,j:r.j,node:node||{},img:node?.max_res_url||node?.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`}))}catch(e){toast('Couldn’t load preview: '+e.message)}}
 async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');
+ const jm=u.match(/janitorai\.com\/characters\/([^?#\s/]+)/i);if(jm)u='https://jannyai.com/characters/'+jm[1].split('_')[0];
  let m=u.match(/(?:chub\.ai|characterhub\.org)\/characters\/([^?#\s]+)/i);if(m)return previewFp(m[1].replace(/\/$/,''),'chub');
  
  try{toast('Downloading…');let b=await nfetch(u,{},true);if(!(b[0]===137&&b[1]===80)&&b[0]!==123)b=(await firstCard(await scrape(u))).bytes;
@@ -1119,13 +1178,38 @@ function charView(c,pv){
  ${pv?`<div class="card2 stats" style="margin-top:18px"><div><b>${fmt(tk)}</b><span>tokens</span></div><div><b>${gs.length}</b><span>greetings</span></div><div><b>${pv.lore}</b><span>lore entries</span></div></div>${c.creator?`<div class="card2 pad" style="flex-direction:row;align-items:center;gap:14px"><div class="av">${esc(c.creator[0]||'?')}</div><div><b>${esc(c.creator)}</b><div class="note" style="margin:0">${[pv.stars?'⭐ '+pv.stars:'',pv.dl?pv.dl+' downloads':''].filter(Boolean).join(' · ')||'Creator'}</div></div></div>`:''}`:`<div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div></div>`}
  <p class="note" style="text-align:center">${fmt(tk)} tokens · Updated ${dt(c.updated)}</p>
  <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card+(pv&&pv.lore?`<h2 class="h2">Lorebook</h2><p class="body">Includes ${pv.lore} lorebook entries.</p>`:''):story}<div style="height:40px"></div></main>`}
-function browseHtml(){const B=V.br;
- return`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="home" aria-label="Back">${I('back')}</button></header><main><h1 class="pt">Discover</h1><p class="ps">Browse public characters and import them in one tap. Content comes from third-party sites.</p>
- <div class="rowh" style="gap:8px"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="pill" data-a="bsearch">Search</button></div>
- <div class="rowh" style="margin:12px 0">${selBox('bs','',[['download_count','Most downloaded'],['star_count','Most starred'],['created_at','Newest']],B.sort,'Sort','sm')}<label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label></div>
- <label>Or paste a link</label><div class="rowh" style="gap:8px"><input id="bu" placeholder="chub.ai link, or direct .png / .json URL" autocomplete="off"><button class="pill" data-a="burl">Import</button></div><div style="height:18px"></div>`
- +B.items.map((n,ix)=>{const fp=n.fullPath,im=n.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`;return`<div class="bc" data-a="bview" data-i="${ix}"><img src="${esc(im)}" alt="" loading="lazy" referrerpolicy="no-referrer"><div><b>${esc(n.name)}</b><small>${esc(n.tagline||'')}</small></div><span class="${B.done[fp]?'badge ok':'chev'}">${B.done[fp]?'Added ✓':'›'}</span></div>`}).join('')
- +(B.err?`<p class="note">Couldn’t reach the hub (${esc(B.err)}). The Android app usually can; you can also paste a link above.</p>`:'')+(B.busy?'<p class="note">Loading…</p>':'')+(B.more&&!B.busy?'<button class="dash" data-a="bmore" style="width:100%">Load more</button>':'')+'<div style="height:40px"></div></main>'}
+function browseHtml(){const B=bState(),items=browseVisible(),tagCounts=browseTagCounts(),recent=S.disc?.recent||[],selected=B.tags||[];
+ const hasTag=t=>selected.some(x=>String(x).toLowerCase()===String(t).toLowerCase());
+ const tag=t=>`<button type="button" class="chip ${hasTag(t)?'on':''}" data-a="btag" data-tag="${esc(t)}">${esc(t)}${hasTag(t)?I('close','sm'):''}</button>`;
+ const filterCount=(selected.length?1:0)+(B.local?1:0)+(B.forks?1:0)+(B.lore?1:0)+(B.alt?1:0)+(B.exact?1:0)+((B.min||50)!==50?1:0)+(B.sort!=='relevance'?1:0)+(B.nsfw?1:0);
+ const num=v=>{v=+v||0;return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(1)+'K':String(v)};
+ const shown=items.length,loaded=B.items.length;
+ return`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="home" aria-label="Back">${I('back')}</button></header><main><h1 class="pt">Discover</h1><p class="ps">Search public characters on Chub, then open the same query on other sites or paste a character link.</p>
+ <div class="rowh" style="gap:8px"><div class="bsearch"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="bclear" data-a="bclear" aria-label="Clear search">${I('close','sm')}</button></div><button class="pill" data-a="bsearch">Search</button></div>
+ <div class="rowh" style="margin:12px 0;gap:8px">${selBox('bs','',[['relevance','Most relevant'],['download_count','Most downloaded'],['star_count','Most starred'],['created_at','Newest']],B.sort,'Sort','sm')}<label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label><button class="lnk" data-a="bsurprise" style="white-space:nowrap">Surprise me</button></div>
+ <details class="bfilters" ${filterCount?'open':''}><summary>Search options &amp; filters${filterCount?' ('+filterCount+')':''}</summary>
+  <label class="chk"><input type="checkbox" id="bex" ${B.exact?'checked':''}>Exact phrase</label>
+  <label class="chk"><input type="checkbox" id="bfl" ${B.forks?'checked':''}>Include forks</label>
+  <label class="chk"><input type="checkbox" id="blore" ${B.lore?'checked':''}>Has a lorebook</label>
+  <label class="chk"><input type="checkbox" id="balt" ${B.alt?'checked':''}>Has alternate greetings</label>
+  <label class="chk"><input type="checkbox" id="bmatch" ${B.match!=='any'?'checked':''}>Match all selected tags</label>
+  <label>Minimum length</label>${selBox('bmin','',[[50,'Any length'],[500,'500+ tokens'],[1000,'1k+ tokens'],[2000,'2k+ tokens']],B.min||50,'Minimum length')}
+  <div class="acts" style="margin-top:12px"><button class="btn s" data-a="breset">Reset filters</button></div>
+ </details>
+ <h2 class="h2" style="margin-top:18px">Filter by tag</h2>
+ <div class="tags">${selected.map(t=>tag(t)).join('')}${tagCounts.filter(x=>!hasTag(x.name)).map(x=>tag(x.name)).join('')}${selected.length?`<button class="lnk" data-a="btagclear">Clear tags</button>`:''}</div>
+ <div class="rowh" style="gap:8px;margin:8px 0"><input id="btag" placeholder="Add a tag, e.g. fantasy" autocomplete="off"><button class="pill" data-a="btagadd">Add tag</button></div>
+ ${recent.length?`<div class="rowh" style="margin:10px 0 2px"><span class="bcount" style="margin:0">Recent searches</span><button class="lnk" data-a="brecentclear">Clear</button></div><div class="tags">${recent.map(q=>`<button class="chip" data-a="brecent" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
+ <div class="rowh" style="margin:14px 0 0;gap:8px"><span class="bcount bresult" style="margin:0"><b>${shown}</b> ${shown===1?'character':'characters'}${shown!==loaded?' of '+loaded+' loaded':''}${B.total>loaded?' · '+B.total+' matches':''}</span>${B.busy?'<span class="note" style="margin:0">Loading…</span>':''}</div>
+ ${loaded?'<input id="bl" class="srch" style="margin:8px 0 10px" value="'+esc(B.local||'')+'" placeholder="Filter these results" autocomplete="off">':''}
+ ${B.note?`<p class="note">${esc(B.note)}</p>`:''}
+ ${B.err?`<p class="note">Couldn’t reach the hub (${esc(B.err)}). <button class="lnk" data-a="bsearch">Try again</button> — the Android app usually can reach it; you can also paste a link below.</p>`:''}
+ ${items.map(n=>{const fp=n.fullPath||n.id||n.name,ix=B.items.indexOf(n),im=n.avatar_url||(fp&&fp.includes('/')?`https://avatars.charhub.io/avatars/${fp}/avatar.webp`:'');return`<div class="bc" data-a="bview" data-i="${ix}"><img src="${esc(im)}" alt="" loading="lazy" referrerpolicy="no-referrer"><div><b>${esc(n.name)}</b><small>${esc(n.tagline||'')}</small>${bTags(n).length?`<div class="bctags">${bTags(n).slice(0,4).map(t=>tag(t)).join('')}</div>`:''}<div class="bmeta">${n.downloadCount?'<span>'+num(n.downloadCount)+' downloads</span>':''}${n.starCount?'<span>'+num(n.starCount)+' stars</span>':''}${n.nTokens?'<span>'+num(n.nTokens)+' tokens</span>':''}</div></div><span class="${B.done[fp]?'badge ok':'chev'}">${B.done[fp]?'Added ✓':'›'}</span></div>`}).join('')}
+ ${!items.length&&!B.busy&&!B.err?`<div class="bempty"><b>No characters match these filters</b><span>Try a broader search, remove a tag, or reset the filters.</span><div class="acts" style="justify-content:center;margin-top:12px"><button class="btn s" data-a="breset">Reset filters</button></div></div>`:''}
+ ${B.more&&!B.busy?'<button class="dash" data-a="bmore" style="width:100%">Load more</button>':''}
+ <label style="margin-top:22px">Or paste a link</label><div class="rowh" style="gap:8px"><input id="bu" placeholder="Chub, CharacterHub, JannyAI or JanitorAI link, or direct .png / .json" autocomplete="off"><button class="pill" data-a="burl">Import</button></div>
+ <div class="card2 pad" style="margin-top:18px"><b>More character sites</b><p class="ps" style="margin:4px 0 10px;font-size:14px">Open the same query on another site, then paste a character link above. JannyAI and JanitorAI links work when the page exposes a downloadable card.</p><div class="tags">${BSITES.map(([name,base])=>`<a class="chip" href="${esc(bSiteUrl(base,B.q))}" target="_blank" rel="noopener noreferrer">${esc(name)} ${I('next','sm')}</a>`).join('')}</div></div>
+ <div style="height:40px"></div></main>`}
 const hs=t=>{let h=0;for(let i=0;i<t.length;i++)h=(Math.imul(31,h)+t.charCodeAt(i))|0;return h};
 const cos=(a,b)=>{let d=0,x=0,y=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];x+=a[i]*a[i];y+=b[i]*b[i]}return d/Math.sqrt(x*y||1)};
 async function embed(g,texts){const r=await fetch(g.url.replace(/\/$/,'')+'/embeddings',{method:'POST',headers:{'content-type':'application/json',...(g.key?{authorization:'Bearer '+g.key}:{})},body:JSON.stringify({model:g.model,input:texts})});if(!r.ok)throw Error(r.status);return(await r.json()).data.map(d=>d.embedding)}
@@ -1468,7 +1552,7 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';
   h=`<h2>Edit character</h2>`+f('name','Name',1)+f('desc','Description',5)+f('pers','Personality',2)+f('scen','Scenario',3)+f('first','First message',4)+f('ex','Example dialogue',4)+f('sys','System prompt override',2)+`<div class="acts"><button class="btn" data-a="savec">Save</button><button class="btn s" data-a="avp">Avatar</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='add')h=`<h2>Add</h2><div class="acts" style="flex-direction:column;margin-top:0"><button class="btn" data-a="imp2">Import cards or lorebooks</button><button class="btn s" data-a="newc">Create a character</button></div>`;
  if(s.t==='find')h=`<h2>Find in chat</h2><input id="fq" value="${esc(V.fq||'')}" placeholder="Search this conversation" autocomplete="off"><div class="rowh" style="margin-top:10px"><span class="note" id="fcount" aria-live="polite" style="margin:0">${findLabel()}</span><div class="acts" style="margin:0"><button class="ib" data-a="fprev" aria-label="Previous match">${I('left')}</button><button class="ib" data-a="fnext" aria-label="Next match">${I('right')}</button></div></div><p class="note">Matches are highlighted in the conversation. The arrows jump between messages.</p><div class="acts"><button class="btn s" data-a="close">Close</button></div>`;
- if(s.t==='cprev'){const p=V.prev;h=`<div class="phero">${p.img?`<img src="${esc(p.img)}" alt="" referrerpolicy="no-referrer">`:`<div class="ph">${esc(first(p.name))}</div>`}</div><h2 style="text-align:center;margin:14px 0 2px;font-size:24px">${esc(p.name)}</h2>${p.creator?`<p class="note" style="text-align:center;margin:0 0 6px">By ${esc(p.creator)}</p>`:''}<h2 class="h2" style="margin-top:16px">About</h2><p class="body">${esc(p.about||'No description provided.')}</p>`+(p.tags?.length?`<div class="tags" style="margin-top:12px">${p.tags.slice(0,14).map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+(p.stats?`<p class="ps" style="margin:10px 0 0">${esc(p.stats)}</p>`:'')+`<div class="acts"><button class="btn wide" data-a="pimp" style="flex:2">Import</button><button class="btn s" data-a="pskip" style="flex:1">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`}
+ if(s.t==='cprev'){const p=V.prev;h=`<div class="phero">${p.img?`<img src="${esc(p.img)}" alt="" referrerpolicy="no-referrer">`:`<div class="ph">${esc(first(p.name))}</div>`}</div><h2 style="text-align:center;margin:14px 0 2px;font-size:24px">${esc(p.name)}</h2>${p.creator?`<p class="note" style="text-align:center;margin:0 0 6px">By ${esc(p.creator)}</p>`:''}<h2 class="h2" style="margin-top:16px">About</h2><p class="body">${esc(p.about||'No description provided.')}</p>`+(p.tags?.length?`<div class="tags" style="margin-top:12px">${p.tags.slice(0,14).map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'')+(p.stats?`<p class="ps" style="margin:10px 0 0">${esc(p.stats)}</p>`:'')+`<div class="acts"><button class="btn wide" data-a="pimp" style="flex:2">Import</button><button class="btn s" data-a="pskip" style="flex:1">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`+(p.creator?`<button class="btn s" data-a="bcreator" data-c="${esc(p.creator)}" style="width:100%;margin-top:8px">More by ${esc(p.creator)}</button>`:'')}
  if(s.t==='llai'){const d=V.llai.d,cn=d.chats||[],ids=new Set((d.characters||[]).map(x=>x.id)),have=cn.filter(x=>ids.has(x.character_id)).length,mc=cn.reduce((a,x)=>a+(x.messages||[]).length,0);
   h=`<h2>Import from LLAI</h2><p class="ps">Account export for ${esc(d.user?.display_name||d.user?.username||'your account')}.</p><div class="card2 pad"><div class="rowh"><span>Characters</span><b>${(d.characters||[]).length}</b></div><div class="rowh"><span>Personas</span><b>${(d.personas||[]).length}</b></div><div class="rowh"><span>Lorebooks</span><b>${(d.lorebooks||[]).length}</b></div><div class="rowh"><span>Chats</span><b>${cn.length} (${mc} messages)</b></div></div><label class="chk"><input type="checkbox" id="l_stub" checked>Include the ${cn.length-have} chats whose characters aren’t in the export (creates placeholder characters)</label><label class="chk"><input type="checkbox" id="l_instr" checked>Use your AI instructions as the system prompt</label><p class="note">Images aren’t part of the export, so avatars and covers are left blank. Importing the same file again skips what’s already there.</p><div class="acts"><button class="btn wide" data-a="llaigo">Import</button><button class="btn s" data-a="close">Cancel</button></div>`}
  if(s.t==='rphrase'){const w=(V.rphrase||'').split(' ');h=`<h2>Your recovery phrase</h2><p class="ps">Write these 12 words down, in order, and keep them somewhere safe. They are the only way back in if you forget your password. They won’t be shown again.</p><div class="words">${w.map((x,i)=>`<span><i>${i+1}</i>${x}</span>`).join('')}</div><div class="acts"><button class="btn s" data-a="rcopy">Copy</button><button class="btn wide" data-a="rdone">I’ve saved it</button></div>`}
@@ -1677,7 +1761,9 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
   mn.querySelectorAll('.msg.c .bub').forEach(wireReplySwipe);
   if(V.fq)applyFind()}
  else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
-  const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}}
+  const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}
+  const bq=$('#bq');if(bq)bq.oninput=()=>{V.br.q=bq.value};
+  const bl=$('#bl');if(bl)bl.oninput=()=>{V.br.local=bl.value;const at=bl.selectionStart;render();const n=$('#bl');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}}
  const sh=$('#sh'),hh=sheetHtml();if(sh.dataset.h!==hh){sh.innerHTML=hh;sh.dataset.h=hh;
   const gq=$('#gq');if(gq)gq.oninput=()=>{if(!V.sheet||V.sheet.t!=='gsearch')return;V.sheet.q=gq.value;V.sheet.res=gsearch(gq.value);const at=gq.selectionStart;render();const n=$('#gq');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}}
  const s2=$('#sh2');if(s2){const ph=pickHtml();if(s2.dataset.p!==ph){s2.innerHTML=ph;s2.dataset.p=ph;
@@ -1717,8 +1803,17 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   cview:()=>{V.charBack=V.tab;V.cd=id;V.cdt='story';V.gi=0;V.tab='char';render()},cdtab:()=>{V.cdt=id;render()},
   gnav:()=>{const c=V.tab==='prev'?V.prev?.c:S.chars.find(x=>x.id===V.cd);if(!c)return;const n=[c.first,...(c.alts||[])].filter(Boolean).length;V.gi=Math.max(0,Math.min(n-1,(V.gi||0)+(+t.dataset.d)));render()},
   start:()=>startWith(id,i),cnew:()=>startWith(id,0),
-  browse:()=>{if(V.sy)delete V.sy.lbrowse;V.br=V.br||{src:'chub',q:'',sort:'download_count',nsfw:false,items:[],page:1,more:false,done:{},err:''};V.tab='browse';render();if(!V.br.items.length)chubSearch()},
+  browse:()=>{if(V.sy)delete V.sy.lbrowse;bState();V.tab='browse';render();if(!V.br.items.length)chubSearch()},
   bsearch:()=>chubSearch(),bmore:()=>chubSearch(true),bimp:()=>chubImport(id),burl:()=>urlImport($('#bu').value),
+  bclear:()=>{const B=bState();B.q='';B.local='';B.items=[];B.more=false;B.total=0;B.err='';B.note='';B.page=1;B.busy=false;const i=$('#bq');if(i)i.value='';render();chubSearch()},
+  brecent:()=>{const B=bState();B.q=t.dataset.q||'';B.items=[];B.page=1;const i=$('#bq');if(i)i.value=B.q;chubSearch()},
+  brecentclear:()=>{S.disc.recent=[];save();render()},
+  btag:()=>{const B=bState(),tag=t.dataset.tag,v=String(tag||'').trim();if(!v)return;B.tags=(B.tags||[]).some(x=>String(x).toLowerCase()===v.toLowerCase())?B.tags.filter(x=>String(x).toLowerCase()!==v.toLowerCase()):[...(B.tags||[]),v];chubSearch(false,true)},
+  btagadd:()=>{const el=$('#btag'),v=(el?.value||'').trim().replace(/^#/,'');if(!v)return toast('Type a tag first');const B=bState();if(!B.tags.some(x=>String(x).toLowerCase()===v.toLowerCase()))B.tags.push(v);chubSearch(false,true)},
+  btagclear:()=>{bState().tags=[];chubSearch(false,true)},
+  breset:()=>{Object.assign(bState(),{q:'',local:'',tags:[],forks:false,lore:false,alt:false,exact:false,min:50,match:'all',sort:'relevance',nsfw:false,items:[],page:1,more:false,total:0,err:'',note:''});const i=$('#bq');if(i)i.value='';chubSearch()},
+  bsurprise:()=>{const items=browseVisible();if(!items.length)return toast('Search for characters first');const n=items[Math.floor(Math.random()*items.length)];previewFp(n.fullPath||n.id,n.src||'chub',n)},
+  bcreator:()=>{const B=bState();Object.assign(B,{q:t.dataset.c||'',sort:'relevance',items:[],page:1,total:0,err:'',note:'',tags:[],local:'',forks:false,lore:false,alt:false,exact:false,min:50,match:'all',nsfw:false});const i=$('#bq');if(i)i.value=B.q;V.sheet=null;V.prev=null;V.pq=null;V.tab='browse';render();chubSearch()},
   eye:()=>{const e=$('#'+t.dataset.t);e.type=e.type==='password'?'text':'password'},
   lockset:async()=>{const cur=$('#s_cur')?.value||'',n=$('#s_new').value,cf=$('#s_cf').value;if(S.lock?.hash&&await hsh(cur,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');if(n.length<4)return toast('Use at least 4 characters');if(n!==cf)return toast('Passwords do not match');const salt=uid()+uid();S.lock={...S.lock,salt,hash:await hsh(n,salt)};save();{const A=ACCOUNTS.find(a=>a.id===ACCT_ID);if(A){A.locked=true;saveAccounts()}}toast('Password saved');if(!S.lock.rhash)await mkPhrase();render()},
   lockrm:async()=>{if(await hsh($('#s_cur').value,S.lock.salt)!==S.lock.hash)return toast('Current password is wrong');S.lock=null;save();{const A=ACCOUNTS.find(a=>a.id===ACCT_ID);if(A){A.locked=false;saveAccounts()}}toast('Password removed');render()},
@@ -1880,6 +1975,12 @@ document.addEventListener('change',e=>{const t=e.target;
  if(t.id==='la'){S.lock.after=+t.value;save()}
  if(t.id==='bs'){V.br.sort=t.value;chubSearch()}
  if(t.id==='bn'){V.br.nsfw=t.checked;chubSearch()}
+ if(t.id==='bmin'){V.br.min=+t.value||50;chubSearch()}
+ if(t.id==='bfl'){V.br.forks=t.checked;chubSearch()}
+ if(t.id==='blore'){V.br.lore=t.checked;chubSearch()}
+ if(t.id==='balt'){V.br.alt=t.checked;chubSearch()}
+ if(t.id==='bex'){V.br.exact=t.checked;chubSearch()}
+ if(t.id==='bmatch'){V.br.match=t.checked?'all':'any';chubSearch()}
  if(/^g_/.test(t.id)){readCfg();save();applyTheme()}
  if(t.dataset.tag&&t.value.trim())addTag(t);
  if(t.dataset.lk&&V.ed){const l=V.ed.o.links;if(t.checked){if(!l.includes(t.dataset.lk))l.push(t.dataset.lk)}else V.ed.o.links=l.filter(x=>x!==t.dataset.lk)}
@@ -1935,7 +2036,7 @@ document.addEventListener('input',e=>{if(e.target.id!=='fq')return;
  if(hits.length&&ensureHit(hits[0])){render();const n=$('#fq');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}
  applyFind();
  const c=$('#fcount');if(c)c.textContent=findLabel();});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.tag){e.preventDefault();addTag(e.target)}if(e.key==='Enter'&&e.target.id==='lk')document.querySelector('[data-a=unlock]')?.click();if(e.key==='Enter'&&e.target.id==='bq')chubSearch();if(e.key==='Enter'&&e.target.id==='btag'){e.preventDefault();document.querySelector('[data-a=btagadd]')?.click()}});
 applyTheme();setTimeout(loadCustomFont,700);setTimeout(autoUpd,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoUpd()});document.addEventListener('mousedown',e=>{if(e.target.closest('.comp button'))e.preventDefault()});
 function goBack(){if(V.loading)return false;if(V.picker)return false;
  if(V.pick){V.pick=null;render();return true}
