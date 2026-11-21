@@ -299,6 +299,9 @@ details summary{cursor:pointer;color:var(--mut);margin-top:10px}
 .cov{width:100%;height:170px;object-fit:cover;border-radius:24px;border:1px solid var(--ln)}
 .lc{display:flex;justify-content:space-between}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.btagsug{margin:0 0 10px;align-items:center}
+.btagsug[hidden]{display:none}
+.btagsug .bcount{margin:0 2px 0 0}
 .chip{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:6px 12px;font-size:15px;color:var(--mut)}
 .chip b{margin-left:8px;cursor:pointer}
 .dash{background:color-mix(in srgb,var(--sf) 70%,transparent);border:1.5px dashed color-mix(in srgb,var(--ac) 30%,var(--ln));color:var(--ink);border-radius:16px;padding:13px 16px;margin-top:12px;font-size:15px}
@@ -487,7 +490,7 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 }
 </style></head><body><div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=43,PUB='0.1';try{
+<script>var VER=44,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -575,6 +578,12 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:44,when:'21 November 2026',title:'Discover fixes and tag suggestions',items:[
+  "Sort choices now reach the hub correctly: relevance omits the sort field, Newest uses creation order, and downloads and stars keep their own order.",
+  "Show NSFW now also asks the hub for NSFL results, so the toggle changes the result set.",
+  "The tag box suggests common tags and tags from loaded results as you type; tap a suggestion to add it.",
+  "Discover result counts now use the hub's total count when it is available."
+ ]},
  {v:43,when:'20 November 2026',title:'Better discovery, tags and search options',items:[
   "Discover can sort by relevance, filter by one or more tags, and match any or all of the tags you choose.",
   "New search controls include exact phrase, minimum length, forks, lorebooks, alternate greetings and NSFW visibility.",
@@ -1090,13 +1099,28 @@ const bTags=n=>{const out=[],seen=new Set();for(const v of [...(n?.topics||[]),.
 const bMatchTags=n=>{const B=V.br||{},want=(B.tags||[]).map(x=>String(x).toLowerCase()).filter(Boolean);if(!want.length)return true;const have=new Set(bTags(n).map(x=>x.toLowerCase()));return B.match==='any'?want.some(x=>have.has(x)):want.every(x=>have.has(x))};
 const browseVisible=()=>{const B=bState(),q=(B.local||'').toLowerCase().trim();return (B.items||[]).filter(n=>{if(!bMatchTags(n))return false;if(!q)return true;return [n.name,n.tagline,n.fullPath,n.creator,...bTags(n)].join(' ').toLowerCase().includes(q)})};
 const browseTagCounts=()=>{const m=new Map();(V.br?.items||[]).forEach(n=>bTags(n).forEach(t=>{const k=t.toLowerCase(),e=m.get(k)||{name:t,n:0};e.n++;m.set(k,e)}));return [...m.values()].sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name)).slice(0,18)};
+const COMMON_TAGS=['OC','Fanfic','Anime','Game','Movie','Book','Fantasy','Sci-Fi','Romance','Adventure','Drama','Comedy','Horror','Mystery','Action','Slice of Life','Supernatural','Historical','Modern','Post-Apocalyptic','Cyberpunk','Steampunk','Magic','Vampire','Werewolf','Demon','Monster','Furry','Yandere','Tsundere','Enemies to Lovers','Friends to Lovers','Slow Burn','Fluff','Angst','Hurt/Comfort','NSFW','NSFL','Dead Dove','Wholesome','Isekai','School','Office','Royalty','Medieval','Space','Dystopian','Time Travel','Detective','Superhero','Villain','Crossover','RPG','Simulation','Assistant','Male','Female','Non-binary','AnyPOV','MalePOV','FemalePOV','Multiple','D&D','LitRPG'];
+const btagPool=()=>{const m=new Map(),add=(name,weight)=>{const n=String(name||'').trim(),k=n.toLowerCase();if(!n)return;const e=m.get(k)||{name:n,n:0};e.n+=weight;m.set(k,e)};
+ (V.br?.items||[]).forEach(n=>bTags(n).forEach(t=>add(t,20)));
+ (S.chars||[]).forEach(c=>(c.tags||[]).forEach(t=>add(t,8)));
+ COMMON_TAGS.forEach(t=>add(t,1));return [...m.values()]};
+function btagSugs(q){q=String(q||'').trim().replace(/^#/,'').toLowerCase();const selected=new Set((V.br?.tags||[]).map(x=>String(x).toLowerCase()));
+ return btagPool().filter(x=>!selected.has(x.name.toLowerCase())).filter(x=>!q||x.name.toLowerCase().includes(q)).sort((a,b)=>{const as=q&&a.name.toLowerCase().startsWith(q),bs=q&&b.name.toLowerCase().startsWith(q);return (as===bs?0:as?-1:1)||(b.n-a.n)||a.name.localeCompare(b.name)}).slice(0,10)}
+function drawTagSugs(){const box=$('#btagsug');if(!box)return;const q=$('#btag')?.value||'',list=btagSugs(q);
+ box.innerHTML=list.length?`<span class="bcount" style="margin:0">${q?'Matching tags':'Common tags'}</span>`+list.map(x=>`<button type="button" class="chip" data-a="btag" data-tag="${esc(x.name)}">+ ${esc(x.name)}</button>`).join(''):'';
+ box.hidden=!list.length}
 const BSITES=[['Chub','https://chub.ai/search?search='],['CharacterHub','https://characterhub.org/search?search='],['JannyAI','https://jannyai.com/characters?search='],['JanitorAI','https://janitorai.com/search?search=']];
 const bSiteUrl=(base,q)=>q?base+encodeURIComponent(q):base.replace(/\?search=$/,'');
 function rememberSearch(q){q=String(q||'').trim();if(q.length<2)return;S.disc=S.disc||{recent:[]};S.disc.recent=[q,...(S.disc.recent||[]).filter(x=>String(x).toLowerCase()!==q.toLowerCase())].slice(0,6);save()}
 function chubUrl(B){
- const p=new URLSearchParams({first:'24',page:String(B.page||1),sort:B.sort||'relevance',asc:'false',nsfw:String(!!B.nsfw),nsfl:'false',include_forks:String(!!B.forks),venus:'false',chub:'true',min_tokens:String(B.min||50),count:'true'});
+ const p=new URLSearchParams({first:'24',page:String(B.page||1),asc:'false',nsfw:String(!!B.nsfw),nsfl:String(!!B.nsfw),include_forks:String(!!B.forks),venus:'false',chub:'true',min_tokens:String(B.min||50),count:'true'});
+ /* Chub's relevance ranking is the default when no sort field is sent.
+    The old `relevance` value is not a sort field, and `created_at` is not
+    accepted either; `id` is the documented creation-order field. */
+ const sort={relevance:'',created_at:'id'}[B.sort]??B.sort;
+ if(sort)p.set('sort',sort);
  if(B.q){if(B.exact)p.set('exact_search',B.q);else p.set('search',B.q)}
- if((B.tags||[]).length){p.set('tags',B.tags.join(','));p.set('inclusive_or',String(B.match==='any'))}
+ if((B.tags||[]).length){p.set('topics',B.tags.join(','));p.set('inclusive_or',String(B.match==='any'))}
  if(B.lore)p.set('require_lore','true');
  if(B.alt)p.set('require_alternate_greetings','true');
  return 'https://api.chub.ai/search?'+p.toString();
@@ -1110,7 +1134,7 @@ async function chubSearch(more,preserve,retried){const B=bState(),qi=$('#bq');if
   const j=await nfetch(chubUrl(B));let n=(j.data?.nodes||j.nodes||[]).map(x=>({...x,src:'chub'}));
   if(more){const seen=new Set(B.items.map(x=>x.fullPath));n=n.filter(x=>!seen.has(x.fullPath))}
   B.items=more?B.items.concat(n):n;B.more=n.length>=24;B.page++;
-  const total=Number(j.data?.total??j.total??0);B.total=Number.isFinite(total)&&total>=0?total:B.items.length;
+  const total=Number(j.data?.count??j.data?.total??j.count??j.total??0);B.total=Number.isFinite(total)&&total>=0?total:B.items.length;
  }catch(e){
   if(B.sort==='relevance'&&!retried&&!more){B.sort='download_count';B.busy=false;B.note='Relevance is not available right now, so these are the most downloaded characters.';return chubSearch(false,preserve,true)}
   B.err=e.message
@@ -1186,7 +1210,7 @@ function browseHtml(){const B=bState(),items=browseVisible(),tagCounts=browseTag
  const shown=items.length,loaded=B.items.length;
  return`<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="home" aria-label="Back">${I('back')}</button></header><main><h1 class="pt">Discover</h1><p class="ps">Search public characters on Chub, then open the same query on other sites or paste a character link.</p>
  <div class="rowh" style="gap:8px"><div class="bsearch"><input id="bq" value="${esc(B.q)}" placeholder="Search characters" autocomplete="off"><button class="bclear" data-a="bclear" aria-label="Clear search">${I('close','sm')}</button></div><button class="pill" data-a="bsearch">Search</button></div>
- <div class="rowh" style="margin:12px 0;gap:8px">${selBox('bs','',[['relevance','Most relevant'],['download_count','Most downloaded'],['star_count','Most starred'],['created_at','Newest']],B.sort,'Sort','sm')}<label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label><button class="lnk" data-a="bsurprise" style="white-space:nowrap">Surprise me</button></div>
+ <div class="rowh" style="margin:12px 0;gap:8px">${selBox('bs','',[['relevance','Most relevant'],['download_count','Most downloaded'],['star_count','Most starred'],['id','Newest']],B.sort,'Sort','sm')}<label class="chk" style="margin:0"><input type="checkbox" id="bn" ${B.nsfw?'checked':''}>Show NSFW</label><button class="lnk" data-a="bsurprise" style="white-space:nowrap">Surprise me</button></div>
  <details class="bfilters" ${filterCount?'open':''}><summary>Search options &amp; filters${filterCount?' ('+filterCount+')':''}</summary>
   <label class="chk"><input type="checkbox" id="bex" ${B.exact?'checked':''}>Exact phrase</label>
   <label class="chk"><input type="checkbox" id="bfl" ${B.forks?'checked':''}>Include forks</label>
@@ -1199,6 +1223,7 @@ function browseHtml(){const B=bState(),items=browseVisible(),tagCounts=browseTag
  <h2 class="h2" style="margin-top:18px">Filter by tag</h2>
  <div class="tags">${selected.map(t=>tag(t)).join('')}${tagCounts.filter(x=>!hasTag(x.name)).map(x=>tag(x.name)).join('')}${selected.length?`<button class="lnk" data-a="btagclear">Clear tags</button>`:''}</div>
  <div class="rowh" style="gap:8px;margin:8px 0"><input id="btag" placeholder="Add a tag, e.g. fantasy" autocomplete="off"><button class="pill" data-a="btagadd">Add tag</button></div>
+ <div id="btagsug" class="tags btagsug" aria-live="polite" hidden></div>
  ${recent.length?`<div class="rowh" style="margin:10px 0 2px"><span class="bcount" style="margin:0">Recent searches</span><button class="lnk" data-a="brecentclear">Clear</button></div><div class="tags">${recent.map(q=>`<button class="chip" data-a="brecent" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
  <div class="rowh" style="margin:14px 0 0;gap:8px"><span class="bcount bresult" style="margin:0"><b>${shown}</b> ${shown===1?'character':'characters'}${shown!==loaded?' of '+loaded+' loaded':''}${B.total>loaded?' · '+B.total+' matches':''}</span>${B.busy?'<span class="note" style="margin:0">Loading…</span>':''}</div>
  ${loaded?'<input id="bl" class="srch" style="margin:8px 0 10px" value="'+esc(B.local||'')+'" placeholder="Filter these results" autocomplete="off">':''}
@@ -1763,6 +1788,7 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
  else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
   const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}
   const bq=$('#bq');if(bq)bq.oninput=()=>{V.br.q=bq.value};
+  const bt=$('#btag');if(bt){bt.oninput=drawTagSugs;drawTagSugs()}
   const bl=$('#bl');if(bl)bl.oninput=()=>{V.br.local=bl.value;const at=bl.selectionStart;render();const n=$('#bl');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}}
  const sh=$('#sh'),hh=sheetHtml();if(sh.dataset.h!==hh){sh.innerHTML=hh;sh.dataset.h=hh;
   const gq=$('#gq');if(gq)gq.oninput=()=>{if(!V.sheet||V.sheet.t!=='gsearch')return;V.sheet.q=gq.value;V.sheet.res=gsearch(gq.value);const at=gq.selectionStart;render();const n=$('#gq');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}}

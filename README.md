@@ -108,14 +108,17 @@ old theme, text size and serif/sans choice into the new model automatically.
 Open **Characters → Discover** to search public character cards and import one
 with a tap.
 
-- **Sort** by relevance, downloads, stars or newest. Relevance is the default
-  for a new search; if the hub rejects that order, Hearth falls back to most
-  downloaded and says so.
-- **Tags** can be typed or picked from the results. Choose whether multiple
-  tags must all match or any one may match. Tag filters are sent to the hub and
-  also applied to results already on screen.
+- **Sort** by relevance, downloads, stars or newest. Relevance leaves the
+  sort field to the hub; Newest uses the hub's creation-order field. If the
+  relevance request fails, Hearth falls back to most downloaded and says so.
+- **Tags** can be typed, picked from the suggestions or picked from the
+  results. The tag box suggests common tags and tags already present in loaded
+  results as you type. Choose whether multiple tags must all match or any one
+  may match. Tag filters are sent to the hub and also applied to results
+  already on screen.
 - **Search options** cover exact phrase, forks, lorebooks, alternate greetings
-  and minimum card length. NSFW visibility stays next to the sort control.
+  and minimum card length. NSFW visibility stays next to the sort control and
+  includes NSFL results with the same toggle.
 - **QOL**: recent searches are saved per account, the search field has a clear
   button, loaded results can be narrowed further, the result count shows what
   is loaded, and **Surprise me** opens a random matching card.

@@ -41,7 +41,7 @@ let calls=[];
 W.fetch=async url=>{
  const u=String(url);calls.push(u);
  if(u.includes('api.chub.ai/search')){
-  const p=new URL(u),tags=(p.searchParams.get('tags')||'').split(',').filter(Boolean).map(x=>x.toLowerCase()),any=p.searchParams.get('inclusive_or')==='true';
+  const p=new URL(u),tags=(p.searchParams.get('topics')||p.searchParams.get('tags')||'').split(',').filter(Boolean).map(x=>x.toLowerCase()),any=p.searchParams.get('inclusive_or')==='true';
   let result=nodes;
   if(tags.length)result=nodes.filter(n=>any?tags.some(t=>n.topics.map(x=>x.toLowerCase()).includes(t)):tags.every(t=>n.topics.map(x=>x.toLowerCase()).includes(t)));
   return {status:200,ok:true,headers:{get:()=>null},json:async()=>({data:{nodes:result,total:result.length}}),text:async()=>''};
@@ -71,7 +71,7 @@ W.fetch=async url=>{
  await tab('chars');
  click(d.querySelector('[data-a="browse"]'));await wait(1000);
  ok('Discover opens',d.querySelector('h1.pt')?.textContent==='Discover');
- ok('default search is relevance',calls.some(u=>/api\.chub\.ai\/search/.test(u)&&/sort=relevance/.test(u)));
+ ok('default search uses server relevance',calls.some(u=>{try{return /api\.chub\.ai\/search/.test(u)&&!new URL(u).searchParams.has('sort')}catch(e){return false}}));
  ok('sort offers relevance',!!d.querySelector('#bs option[value="relevance"]'));
  ok('search options are available',!!d.querySelector('#bex')&&!!d.querySelector('#bfl')&&!!d.querySelector('#blore')&&!!d.querySelector('#balt'));
  ok('tag input is available',!!d.querySelector('#btag')&&!!d.querySelector('[data-a="btagadd"]'));
@@ -80,11 +80,31 @@ W.fetch=async url=>{
  ok('cards show tags',d.querySelectorAll('.bc .bctags .chip').length>=4);
  ok('recent searches start empty',(W.eval('S.disc.recent')||[]).length===0);
 
+ // sort and NSFW changes must reach the hub
+ function pickSort(label){
+  click(d.querySelector('[data-a="sel"][data-id="bs"]'));
+  const row=[...d.querySelectorAll('[data-a="pickv"]')].find(x=>new RegExp(label,'i').test(x.textContent));
+  click(row);
+ }
+ pickSort('Most starred');await wait(240);
+ ok('sort picker selects most starred',W.eval('V.br.sort')==='star_count');
+ ok('sort picker label updates',/Most starred/.test(d.querySelector('[data-a="sel"][data-id="bs"]')?.textContent||''));
+ ok('most starred is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('sort')==='star_count'}catch(e){return false}}));
+ pickSort('Newest');await wait(240);
+ ok('newest is sent as creation order',W.eval('V.br.sort')==='id'&&calls.some(u=>{try{return new URL(u).searchParams.get('sort')==='id'}catch(e){return false}}));
+ pickSort('Most relevant');await wait(240);
+ ok('relevance is sent by omitting sort',W.eval('V.br.sort')==='relevance'&&calls.some(u=>{try{const p=new URL(u);return /api\.chub\.ai\/search/.test(u)&&!p.searchParams.has('sort')}catch(e){return false}}));
+ const bn=d.querySelector('#bn');bn.checked=true;bn.dispatchEvent(new W.Event('change',{bubbles:true}));await wait(240);
+ ok('NSFW toggle is saved',W.eval('V.br.nsfw')===true);
+ ok('NSFW and NSFL are both requested',calls.some(u=>{try{const p=new URL(u);return p.searchParams.get('nsfw')==='true'&&p.searchParams.get('nsfl')==='true'}catch(e){return false}}));
+ const bn2=d.querySelector('#bn');bn2.checked=false;bn2.dispatchEvent(new W.Event('change',{bubbles:true}));await wait(240);
+ ok('NSFW toggle can be turned off',W.eval('V.br.nsfw')===false&&calls.some(u=>{try{const p=new URL(u);return p.searchParams.get('nsfw')==='false'&&p.searchParams.get('nsfl')==='false'}catch(e){return false}}));
+
  // tag filter (all)
 
  click(d.querySelector('.bc [data-a="btag"][data-tag="Fantasy"]'));await wait(220);
  ok('tag filter is selected',W.eval('V.br.tags').length===1&&W.eval('V.br.tags[0]')==='Fantasy');
- ok('tag filter is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('tags')==='Fantasy'}catch(e){return false}}));
+ ok('tag filter is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('topics')==='Fantasy'}catch(e){return false}}));
  ok('tag filter is marked active',!!d.querySelector('.chip.on[data-tag="Fantasy"]'));
  ok('tag filter narrows results',d.querySelectorAll('.bc').length===2);
  click(d.querySelector('.bc [data-a="btag"][data-tag="Adventure"]'));await wait(220);
@@ -97,6 +117,16 @@ W.fetch=async url=>{
  ok('any-tag matching is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('inclusive_or')==='true'}catch(e){return false}}));
  click(d.querySelector('[data-a="btagclear"]'));await wait(220);
  ok('tags can be cleared',W.eval('V.br.tags').length===0&&d.querySelectorAll('.bc').length===3);
+
+ // tag suggestions and autocomplete
+ ok('common tag suggestions are shown',!d.querySelector('#btagsug')?.hidden&&/Common tags/.test(d.querySelector('#btagsug')?.textContent||''));
+ const tagInput=d.querySelector('#btag');tagInput.value='fan';tagInput.dispatchEvent(new W.Event('input',{bubbles:true}));await wait(60);
+ const suggest=[...d.querySelectorAll('#btagsug [data-a="btag"]')].find(x=>x.dataset.tag==='Fantasy');
+ ok('tag suggestions match typed text',!!suggest&&/Matching tags/.test(d.querySelector('#btagsug')?.textContent||''));
+ click(suggest);await wait(220);
+ ok('tag suggestion adds the tag',W.eval('V.br.tags').includes('Fantasy'));
+ ok('suggested tag is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('topics')==='Fantasy'}catch(e){return false}}));
+ click(d.querySelector('[data-a="btagclear"]'));await wait(220);
 
  // query, recent history and exact phrase
  const bq=d.querySelector('#bq');bq.value='dragon';
@@ -129,7 +159,7 @@ W.fetch=async url=>{
  ok('recent search chip runs the search',W.eval('V.br.q')==='dragon'&&d.querySelector('#bq').value==='dragon');
  const tagbox=d.querySelector('#btag');tagbox.value='Mystery';click(d.querySelector('[data-a="btagadd"]'));await wait(220);
  ok('manual tag filters can be added',W.eval('V.br.tags').includes('Mystery'));
- ok('manual tag filter is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('tags')==='Mystery'}catch(e){return false}}));
+ ok('manual tag filter is sent to the hub',calls.some(u=>{try{return new URL(u).searchParams.get('topics')==='Mystery'}catch(e){return false}}));
  click(d.querySelector('[data-a="btagclear"]'));await wait(220);
 
  // more sites and QOL controls
