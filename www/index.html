@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en" data-motion="full"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hearth</title>
 <meta name="description" content="Hearth — a warm place for characters, stories and long conversations.">
@@ -23,6 +23,8 @@
   --dg:#ff758c;--ok:#63e6b0;
   --sh:0 18px 50px rgba(0,0,0,.5);--sh2:0 6px 22px rgba(0,0,0,.35);
   --glow:rgba(255,143,216,.22);
+  --ease-out:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.2,1.08,.3,1);
+  --dur-fast:.14s;--dur:.22s;--dur-slow:.34s;
   color-scheme:dark;
 }
 @media (prefers-color-scheme:light){
@@ -171,21 +173,58 @@ textarea,input,select{width:100%;font:16px inherit;font-family:inherit;color:var
 textarea:focus,input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 18%,transparent)}
 button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 textarea{resize:none}
-.sheet{position:fixed;inset:0;background:rgba(7,2,14,.72);display:flex;align-items:flex-end;z-index:20;animation:fade .2s}
+.sheet{position:fixed;inset:0;background:rgba(7,2,14,.72);display:flex;align-items:flex-end;z-index:20;animation:fade .18s var(--ease-out)}
 #sh2 .sheet{z-index:30;background:rgba(7,2,14,.5)}
-.sheet>div{position:relative;background:linear-gradient(180deg,var(--sf2),var(--sf) 38%);width:100%;max-width:680px;margin:0 auto;border-radius:28px 28px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:88%;overflow-y:auto;box-shadow:var(--sh);animation:up .22s ease-out;border-top:1px solid color-mix(in srgb,var(--ac) 28%,transparent)}
+.sheet>div{position:relative;background:linear-gradient(180deg,var(--sf2),var(--sf) 38%);width:100%;max-width:680px;margin:0 auto;border-radius:28px 28px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:88%;overflow-y:auto;box-shadow:var(--sh);animation:sheetUp .3s var(--ease-spring);border-top:1px solid color-mix(in srgb,var(--ac) 28%,transparent);transform-origin:50% 100%}
 .sheet>div::before{content:"";position:absolute;top:0;left:22%;right:22%;height:1px;background:linear-gradient(90deg,transparent,var(--ac),transparent);opacity:.8}
 .grab{display:block;width:42px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--ac2),var(--ac));margin:-6px auto 14px;opacity:.75}
 .sheet h2{font:700 26px/1.1 "Cormorant Garamond",Literata,Georgia,serif;margin:0 0 12px}
 label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
 .chk{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:16px;color:var(--ink);margin:0}
 .chk input{width:20px;height:20px;accent-color:var(--ac);flex:none}
+/* Chat options: compact, grouped rows instead of a wall of equal buttons. */
+.opt-head{display:flex;align-items:flex-start;gap:12px;margin:0 0 14px}
+.opt-head h2{margin:0;flex:1;min-width:0}
+.opt-head p{margin:4px 0 0;color:var(--mut);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt-head .ib{margin:-7px -7px 0 auto;color:var(--mut);width:40px;height:40px;display:grid;place-items:center}
+.optsec{margin-top:17px}
+.optsec h3{font:650 11px/1 Inter,system-ui;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);margin:0 4px 7px}
+.optrow{display:flex;align-items:center;gap:10px;width:100%;min-height:49px;padding:11px 13px;border:1px solid var(--ln);background:var(--sf);color:var(--ink);border-radius:14px;margin:0 0 7px;text-align:left;font-size:15px;font-family:inherit;box-shadow:0 1px 0 color-mix(in srgb,#fff 3%,transparent)}
+.optrow .ol{flex:1;min-width:0;color:var(--mut);font-weight:500}
+.optrow .ov{min-width:0;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;font-weight:600}
+.optrow .chev{color:var(--mut);width:18px;height:18px;display:grid;place-items:center;margin-left:1px;flex:none}.optrow .chev .i{width:16px;height:16px}
+.optrow:active{transform:scale(.988);background:color-mix(in srgb,var(--ac) 7%,var(--sf))}
+.optrow.danger{border-color:color-mix(in srgb,var(--dg) 40%,var(--ln));background:color-mix(in srgb,var(--dg) 6%,var(--sf))}
+.optrow.danger .ol,.optrow.danger .ov{color:var(--dg)}
+.optrow .av{width:32px;height:32px;font-size:13px;flex:none}
+.optgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.optbtn{display:flex;align-items:center;gap:8px;min-height:46px;padding:11px 12px;border:1px solid var(--ln);border-radius:14px;background:var(--sf);color:var(--ink);font-size:14px;font-weight:600;font-family:inherit;text-align:left}
+.optbtn .i{width:18px;height:18px;color:var(--ac);flex:none}
+.optbtn:active{background:color-mix(in srgb,var(--ac) 8%,var(--sf))}
+.optdanger{margin-top:19px;padding-top:15px;border-top:1px solid color-mix(in srgb,var(--dg) 24%,var(--ln))}
+.switch{width:42px;height:25px;border-radius:99px;background:var(--sf2);border:1px solid var(--ln);position:relative;flex:none;transition:background var(--dur),border-color var(--dur)}
+.switch i{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--mut);transition:left var(--dur) var(--ease-spring),background var(--dur)}
+.switch.on{background:linear-gradient(135deg,var(--g1),var(--g2));border-color:transparent}
+.switch.on i{left:19px;background:#fff}
+/* Content that is still loading gets a quiet shimmer instead of a blank row. */
+.bsk{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.bsk .brow{display:flex;gap:12px;align-items:center;background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:10px;overflow:hidden}
+.bsk .bthumb{width:64px;height:64px;border-radius:16px;flex:none;background:linear-gradient(90deg,var(--sf2),color-mix(in srgb,var(--ac) 9%,var(--sf2)),var(--sf2));background-size:220% 100%;animation:shimmer 1.5s linear infinite}
+.bsk .blines{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.bsk .blines i{display:block;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--sf2),color-mix(in srgb,var(--ac) 9%,var(--sf2)),var(--sf2));background-size:220% 100%;animation:shimmer 1.5s linear infinite}
+.bsk .blines i:nth-child(2){width:72%}
+.bsk .blines i:nth-child(3){width:48%;height:8px}
+/* A gentle way back to the newest message, shown only after scrolling up. */
+.jump{position:absolute;right:17px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:7;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid color-mix(in srgb,var(--ac) 30%,var(--ln));background:color-mix(in srgb,var(--sf) 92%,transparent);color:var(--ac);box-shadow:var(--sh2);opacity:0;transform:translateY(8px) scale(.96);pointer-events:none;transition:opacity var(--dur) var(--ease-out),transform var(--dur) var(--ease-spring)}
+.jump.show{opacity:1;transform:none;pointer-events:auto}
+.jump .i{width:18px;height:18px}
+.msg.anim{animation:msgIn .24s var(--ease-out)}
 .acts{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
 .note{font-size:13px;color:var(--mut);margin:8px 0;line-height:1.45}
-.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:11px 18px;border-radius:22px;font-size:14px;z-index:40;max-width:90%;text-align:center;animation:up .22s ease-out;box-shadow:var(--sh)}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:11px 18px;border-radius:22px;font-size:14px;z-index:40;max-width:90%;text-align:center;animation:toastIn .24s var(--ease-out);box-shadow:var(--sh)}
 #sn{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column-reverse;gap:8px;z-index:42;width:max-content;max-width:92%;pointer-events:none}
 #sn>*{pointer-events:auto}
-#sn .snack{display:flex;align-items:center;gap:10px;background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:8px 10px 8px 16px;border-radius:22px;box-shadow:var(--sh);font-size:14px;animation:up .22s ease-out;max-width:100%;touch-action:pan-y;will-change:transform}
+#sn .snack{display:flex;align-items:center;gap:10px;background:var(--sf2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ac) 32%,var(--ln));padding:8px 10px 8px 16px;border-radius:22px;box-shadow:var(--sh);font-size:14px;animation:snackIn .24s var(--ease-out);max-width:100%;touch-action:pan-y;will-change:transform}
 #sn .snack span{min-width:0}
 #sn .snack .btn{padding:7px 14px;border-radius:16px;font-size:14px}
 #sn .savewarn{border-color:color-mix(in srgb,var(--dg) 55%,var(--ln))}
@@ -483,14 +522,46 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 .hcard b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hcard small{color:var(--mut);font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hcard time{color:var(--mut);font-size:11px}
-.pg{animation:pg .26s ease-out}
-@keyframes pg{from{opacity:0;transform:translateY(10px)}}
+/* Cold-start splash. It loads behind the app and is removed as soon as the
+   account is ready, so it never holds up a chat. */
+#boot{position:fixed;inset:0;z-index:100;display:grid;place-items:center;overflow:hidden;animation:bootAway .01s 1.8s forwards;background:
+  radial-gradient(70% 48% at 50% 34%,color-mix(in srgb,var(--ac) 19%,transparent),transparent 70%),
+  radial-gradient(120% 82% at 50% -18%,#2a1044,#0a0314 72%);
+  transition:opacity .3s var(--ease-out),visibility .3s}
+#boot::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 50%,transparent 45%,rgba(3,1,8,.48));pointer-events:none}
+#boot.bootout{opacity:0;visibility:hidden}
+#boot .bootin{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:17px;padding:30px;text-align:center}
+#boot img{width:136px;height:136px;border-radius:34px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 24px 70px rgba(0,0,0,.55),0 0 74px var(--glow);animation:bootLogo .6s var(--ease-out) both}
+#boot .boottag{font:600 10px/1 Inter,system-ui;letter-spacing:.24em;text-transform:uppercase;color:rgba(247,233,255,.72);animation:bootTag .45s .16s var(--ease-out) both}
+#boot .petal{position:absolute;z-index:1;width:12px;height:17px;border-radius:74% 26% 70% 30%;background:linear-gradient(135deg,#ffd1ec,#ff8fd8);opacity:.62;filter:blur(.2px);animation:petalFall 2.8s ease-in-out infinite}
+#boot .p1{left:19%;top:-24px;animation-delay:.12s}
+#boot .p2{right:17%;top:-38px;width:9px;height:13px;opacity:.48;animation-delay:.28s}
+.pg{animation:pg .24s var(--ease-out)}
+@keyframes pg{from{opacity:0;transform:translateY(8px)}}
+@keyframes sheetUp{from{opacity:.4;transform:translateY(36px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes snackIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}}
+@keyframes bootLogo{from{opacity:0;transform:scale(.9);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes bootAway{to{opacity:0;visibility:hidden;pointer-events:none}}
+@keyframes bootTag{from{opacity:0;transform:translateY(7px)}}
+@keyframes petalFall{0%{opacity:0;transform:translate3d(0,-20px,0) rotate(18deg)}18%{opacity:.62}100%{opacity:0;transform:translate3d(26px,72vh,0) rotate(175deg)}}
+@keyframes shimmer{to{background-position:-120% 0}}
+html[data-motion="subtle"] #boot .petal,html[data-motion="off"] #boot .petal{display:none}
+html[data-motion="subtle"] .pg,html[data-motion="subtle"] .msg.anim{animation-duration:.18s}
+html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="off"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  #boot .petal{display:none!important}
 }
-</style></head><body><div id="app"></div>
+</style></head><body>
+<div id="boot" aria-hidden="true">
+  <i class="petal p1"></i><i class="petal p2"></i>
+  <div class="bootin"><img src="icon-192.png" alt=""><div class="boottag">A warm place for stories</div></div>
+</div>
+<div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=44,PUB='0.1';try{
+<script>var VER=45,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -563,6 +634,7 @@ const idbGet=()=>idbRaw(kS(ACCT_ID)),idbSet=v=>idbRaw(kS(ACCT_ID),v),saveAccount
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false;clearSaveWarn()}catch(e){saveErr=true;saveWarn()}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false;clearSaveWarn()}).catch(()=>{saveErr=true;saveWarn()}),250)};
 let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,limit:0};
+const BOOT_AT=Date.now();let BOOT_DONE=false;
 const CHATWIN=80;
 let lastUpd=0;
 const CFG0={repo:'WiktorWojno/Hearth',gh:'',auto:true,autoc:true,html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40,ctx:0,stop:'',anote:'',andepth:4,mem:{on:false,every:10,per:10,keep:100,model:''},termux:true};S.cfg=Object.assign({},CFG0,S.cfg);
@@ -578,6 +650,13 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:45,when:'25 November 2026',title:'A calmer chat menu and a livelier Hearth',items:[
+  "Chat options are grouped into chat settings, this chat, tools and character actions. Selectors are compact rows, and Delete character sits apart from everyday controls.",
+  "The lorebook checklist is gone from Chat options. Attach lorebooks where they belong, in Edit character → Lorebooks. The Lorebooks tab can be hidden without deleting anything.",
+  "A short cold-start splash uses the Hearth icon, with a soft glow and a pair of drifting petals. Tap to skip it, and it never delays loading.",
+  "New Appearance → Chat → Motion choice: Full, Subtle or Off. Hearth also respects Android's reduced-motion setting.",
+  "Page changes, sheets, toasts, new messages and the jump-to-latest button now move with a gentle, warm motion. Loading search results use a quiet shimmer instead of an empty screen."
+ ]},
  {v:44,when:'21 November 2026',title:'Discover fixes and tag suggestions',items:[
   "Sort choices now reach the hub correctly: relevance omits the sort field, Newest uses creation order, and downloads and stars keep their own order.",
   "Show NSFW now also asks the hub for NSFL results, so the toggle changes the result set.",
@@ -663,7 +742,7 @@ const FONTS=[
  ['firacode','Fira Code','Monospace','"Fira Code",ui-monospace,monospace'],
  ['system','Device','System default','system-ui,-apple-system,sans-serif']
 ];
-const LOOK0={theme:'sakura',appfs:16,chatfs:18,font:'inter',chatfont:'literata',fontStack:'Inter,system-ui,sans-serif',chatStack:'Literata,Georgia,serif',fmt:{b:700,i:400,c:500,l:600},msgUser:'',msgBot:'',bubUser:'',bubBot:'',av:'circle',avr:22,opt:'top',width:'standard',align:'lr',avplace:'bottom',whoW:650,whoOp:1,speed:'normal',stopKeep:true,effect:'classic',comp:'pill',picker:'comfortable',home:'rails',times:true,customFont:null};
+const LOOK0={theme:'sakura',appfs:16,chatfs:18,font:'inter',chatfont:'literata',fontStack:'Inter,system-ui,sans-serif',chatStack:'Literata,Georgia,serif',fmt:{b:700,i:400,c:500,l:600},msgUser:'',msgBot:'',bubUser:'',bubBot:'',av:'circle',avr:22,opt:'top',width:'standard',align:'lr',avplace:'bottom',whoW:650,whoOp:1,speed:'normal',stopKeep:true,effect:'classic',comp:'pill',picker:'comfortable',home:'rails',times:true,customFont:null,motion:'full',loreTab:true};
 S.look=Object.assign({},LOOK0,S.look||{});S.look.fmt=Object.assign({},LOOK0.fmt,(S.look&&S.look.fmt)||{});S.themes=Array.isArray(S.themes)?S.themes:[];
 const hexRGB=h=>{let x=String(h||'#000000').replace('#','');if(x.length===3)x=x.split('').map(c=>c+c).join('');const n=parseInt(x,16);return Number.isFinite(n)?[(n>>16)&255,(n>>8)&255,n&255]:[0,0,0]};
 const rgbHex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
@@ -760,6 +839,7 @@ const strip=t=>t.replace(/<[^>]*>/g,'').replace(/[*`]/g,'');
 function applyLook(){
  const L=S.look||LOOK0,T=activeTheme(),st=document.documentElement.style,root=document.documentElement,dark=T.mode==='dark';
  root.dataset.theme=dark?'dark':'light';root.dataset.scheme=T.mode;
+ root.dataset.motion=['full','subtle','off'].includes(L.motion)?L.motion:'full';
  const panel2=mixc(T.panel,dark?'#ffffff':'#000000',.075);
  const set=(k,v)=>{try{st.setProperty(k,v)}catch(e){}};
  set('--bg',T.bg);set('--bg2',T.bg2||T.bg);set('--sf',T.panel);set('--sf2',panel2);
@@ -1226,6 +1306,7 @@ function browseHtml(){const B=bState(),items=browseVisible(),tagCounts=browseTag
  <div id="btagsug" class="tags btagsug" aria-live="polite" hidden></div>
  ${recent.length?`<div class="rowh" style="margin:10px 0 2px"><span class="bcount" style="margin:0">Recent searches</span><button class="lnk" data-a="brecentclear">Clear</button></div><div class="tags">${recent.map(q=>`<button class="chip" data-a="brecent" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
  <div class="rowh" style="margin:14px 0 0;gap:8px"><span class="bcount bresult" style="margin:0"><b>${shown}</b> ${shown===1?'character':'characters'}${shown!==loaded?' of '+loaded+' loaded':''}${B.total>loaded?' · '+B.total+' matches':''}</span>${B.busy?'<span class="note" style="margin:0">Loading…</span>':''}</div>
+ ${B.busy&&!loaded?'<div class="bsk" aria-hidden="true">'+[1,2,3].map(()=>'<div class="brow"><span class="bthumb"></span><span class="blines"><i></i><i></i><i></i></span></div>').join('')+'</div>':''}
  ${loaded?'<input id="bl" class="srch" style="margin:8px 0 10px" value="'+esc(B.local||'')+'" placeholder="Filter these results" autocomplete="off">':''}
  ${B.note?`<p class="note">${esc(B.note)}</p>`:''}
  ${B.err?`<p class="note">Couldn’t reach the hub (${esc(B.err)}). <button class="lnk" data-a="bsearch">Try again</button> — the Android app usually can reach it; you can also paste a link below.</p>`:''}
@@ -1334,7 +1415,7 @@ function openChat(id){V.chat=id;V.fq='';V.fcur=0;V.limit=CHATWIN;V.edit=null;V.s
 async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(!g){toast('Add a provider and a model first');V.chat=null;V.tab='providers';return render()}
  let m,base='',hist;
- if(mode==='new'){m={r:'c',t:'',s:[''],i:0,ts:Date.now()};h.push(m);hist=h.slice(0,-1)}
+ if(mode==='new'){m={r:'c',t:'',s:[''],i:0,ts:Date.now()};h.push(m);V.animMsg={cid:c.id,i:h.length-1};hist=h.slice(0,-1)}
  else if(mode==='swipe'){m=h[h.length-1];m.s=m.s||[m.t];m.s.push('');m.i=m.s.length-1;m.t='';hist=h.slice(0,-1)}
  else{m=h[h.length-1];base=m.t;hist=h}
  V.busy=true;V.lastTok=Date.now();V.stick=true;V.ctl=new AbortController();render(true);
@@ -1546,7 +1627,9 @@ function apBody(T){
    apSec('Stop button','What happens to the part of a reply that already streamed.')+apRow('stopKeep',[[true,'Keep partial','Default'],[false,'Delete on stop','Discard']],L.stopKeep)+
    apSec('Writing effect')+apRow('effect',[['classic','Classic','Typewriter'],['instant','Instant','No animation']],L.effect)+
    apSec('Composer shape')+apRow('comp',[['pill','Pill / Capsule','Rounded'],['squircle','Squircle','Soft corners'],['boxy','Boxy','Small corners'],['sharp','Sharp','Square']],L.comp,'four')+
-   apSec('Persona picker layout','How the persona list is drawn when you pick one.')+apRow('picker',[['compact','Compact','2 lines'],['comfortable','Comfortable','4 lines'],['dense','Dense','6 lines'],['gallery','Gallery','Grid of cards']],L.picker,'four')]}
+   apSec('Persona picker layout','How the persona list is drawn when you pick one.')+apRow('picker',[['compact','Compact','2 lines'],['comfortable','Comfortable','4 lines'],['dense','Dense','6 lines'],['gallery','Gallery','Grid of cards']],L.picker,'four')+
+   apSec('Motion','How lively Hearth feels. Android reduce-motion settings are always respected.')+apRow('motion',[['full','Full','Glow and petals'],['subtle','Subtle','Soft fades'],['off','Off','Still']],L.motion||'full','four')+
+   apSec('Lorebooks','Hide the Lorebooks tab and the attachment list in the character editor. Lorebook data stays safely stored.')+apRow('loreTab',[[true,'Show','Tab and attachments'],[false,'Hide','Keep stored data']],L.loreTab!==false)]}
  if(T==='apHome'){
   const art=(g)=>`<span style="height:66px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--ln);border-radius:11px">${g}</span>`;
   return['Home layout','How your conversations are arranged on the home screen.'+
@@ -1608,10 +1691,20 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';
    `<div class="row"><div class="t"><b>${esc(active)}</b><small>Current · ${cur.length} message${cur.length===1?'':'s'}</small></div><span class="badge ok">Current</span></div>`+
    (o.length?o.map(row).join(''):'<p class="note">No other branches yet. Tap a message and choose Branch here, or Regenerate a reply.</p>')+
    `<div class="acts"><button class="btn" data-a="close">Done</button></div>`}
- if(s.t==='set'){const c=C();h=`<h2>${esc(c.name)}</h2>`+selBox('ps','Persona for this chat',[['','Default ('+(S.personas.find(p=>p.id===S.persona)?.name||'You')+')'],...S.personas.map(p=>[p.id,p.name])],S.cp?.[c.id]||'','Persona')+
-  selBox('rm','Reply model',[['','Default'],...S.models.map(m=>[m.id,m.name||m.mid])],c.model||'','Reply model')+selBox('bgs','Chat background',[['','None'],['dusk','Dusk'],['forest','Forest'],['ember','Ember'],['avatar','Avatar blur'],['img','Custom image']],c.bg||'','Background')+`<label>Lorebooks for this character</label>${S.books.length?S.books.map(b=>`<label class="chk"><input type="checkbox" data-b="${b.id}" ${(S.links[c.id]||[]).includes(b.id)?'checked':''}>${esc(b.name)} <span class="note">${b.entries.length} entries</span></label>`).join(''):'<p class="note">No lorebooks yet. Import one in the Lore tab.</p>'}
-  <div class="acts"><button class="btn s" data-a="retitle">${I('pen')} ${S.title?.[c.id]?'Rename chat':'Name this chat'}</button><button class="btn s" data-a="pinchat">${I('pin')} ${S.pin?.[c.id]?'Unpin chat':'Pin chat'}</button></div>
-  <div class="acts"><button class="btn" data-a="close">Done</button><button class="btn s" data-a="prompt">View prompt</button><button class="btn s" data-a="editc">Edit</button><button class="btn s" data-a="chfind">${I('search')} Find in chat</button><button class="btn s" data-a="mems">${I('brain')} Memories</button><button class="btn s" data-a="find">Search all</button><button class="btn s" data-a="exp">Export chat</button><button class="btn s" data-a="newchat">New chat</button><button class="btn s" data-a="chats">Branches (${(S.old[c.id]||[]).length+1})</button><button class="btn d" data-a="delchar">Delete character</button></div>`}
+ if(s.t==='set'){const c=C(),pinned=!!S.pin?.[c.id],branches=(S.old[c.id]||[]).length+1,tool=(a,ic,label)=>`<button class="optbtn" data-a="${a}">${I(ic,'sm')}<span>${label}</span></button>`;
+  h=`<div class="opt-head"><div style="flex:1;min-width:0"><h2>Chat options</h2><p>${esc(c.name)}</p></div><button class="ib" data-a="close" aria-label="Close">${I('close')}</button></div>`+
+  `<div class="optsec"><h3>Chat settings</h3>`+
+  optSelect('ps','Persona',[['','Default ('+(S.personas.find(p=>p.id===S.persona)?.name||'You')+')'],...S.personas.map(p=>[p.id,p.name])],S.cp?.[c.id]||'','Persona')+
+  optSelect('rm','Reply model',[['','Default'],...S.models.map(m=>[m.id,m.name||m.mid])],c.model||'','Reply model')+
+  optSelect('bgs','Chat background',[['','None'],['dusk','Dusk'],['forest','Forest'],['ember','Ember'],['avatar','Avatar blur'],['img','Custom image']],c.bg||'','Background')+
+  `</div><div class="optsec"><h3>This chat</h3>`+
+  `<button class="optrow" data-a="retitle"><span class="ol">Name</span><span class="ov">${esc(S.title?.[c.id]||c.name)}</span><span class="chev">${I('next','sm')}</span></button>`+
+  `<button class="optrow" data-a="pinchat"><span class="ol">Pin</span><span class="ov">${pinned?'Pinned':'Off'}</span><span class="switch ${pinned?'on':''}" aria-hidden="true"><i></i></span></button>`+
+  `<button class="optrow" data-a="chats"><span class="ol">Branches &amp; chats</span><span class="ov">${branches}</span><span class="chev">${I('next','sm')}</span></button>`+
+  `<button class="optrow" data-a="newchat"><span class="ol">New chat</span><span class="ov">Start fresh</span><span class="chev">${I('next','sm')}</span></button>`+
+  `</div><div class="optsec"><h3>Tools</h3><div class="optgrid">${tool('prompt','book','View prompt')}${tool('chfind','search','Find in chat')}${tool('mems','brain','Memories')}${tool('exp','download','Export chat')}</div></div>`+
+  `<div class="optsec"><h3>Character</h3><button class="optrow" data-a="editc">${av(c,'sm')}<span class="ol">Edit character</span><span class="chev">${I('next','sm')}</span></button></div>`+
+  `<div class="optdanger"><button class="optrow danger" data-a="delchar"><span class="ol">Delete character</span><span class="chev">${I('next','sm')}</span></button></div>`}
  if(s.t==='persona'){const p=s.p;h=`<h2>${p.id?'Edit':'New'} persona</h2><label>Name</label><input id="pn" value="${esc(p.name)}"><label>Description</label><textarea id="pd" rows="5" placeholder="Who are you in the story?">${esc(p.desc)}</textarea>
   <div class="acts"><button class="btn" data-a="savep">Save</button><button class="btn s" data-a="close">Cancel</button>${p.id?'<button class="btn s" data-a="usep">Use</button><button class="btn d" data-a="delp">Delete</button>':''}</div>`}
  if(s.t==='book'){const b=S.books.find(b=>b.id===s.id);h=`<h2>${esc(b.name)}</h2>`+b.entries.map((e,i)=>`<label class="chk"><input type="checkbox" data-e="${i}" ${e.on?'checked':''}><span><b>${esc(e.name||e.keys[0]||'Entry')}</b><small class="note" style="display:block">${e.constant?'Always on':esc(e.keys.join(', '))}</small></span></label>`).join('')+
@@ -1619,12 +1712,12 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';
  return`<div class="sheet" data-a="bg"><div><i class="grab"></i>${h}</div></div>`}
 function ctxBar(c,h){const e=ctxEst(c,h);if(!e)return'';
  return`<div class="ctxbar" data-a="prompt" title="See what gets sent"><i style="width:${e.pct}%;${e.pct>85?'background:var(--dg)':''}"></i></div>`}
-const msgHtml=(x,i,m,c)=>{
+const msgHtml=(x,i,m,c,anim)=>{
  const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
  const gp=i>0&&m[i-1].r===x.r,nm=x.r==='u'?P().name:c.name,who=(+S.look.whoOp>0&&!gp)?`<div class="who">${esc(nm)}</div>`:'';
  const mt=x.ts?new Date(+x.ts):null,time=mt&&!isNaN(mt.getTime())?mt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'',et=x.et?new Date(+x.et):null,edited=!!(et&&!isNaN(et.getTime()));
  const meta=S.look.times===false||(!time&&!edited)?'':`<div class="mmeta">${time?`<time datetime="${mt.toISOString()}" title="${esc(mt.toLocaleString())}">${time}</time>`:''}${time&&edited?'<span aria-hidden="true">·</span>':''}${edited?`<span title="${esc(et.toLocaleString())}">edited</span>`:''}</div>`;
- return `<div class="msg ${x.r}${gp?' gp':''}" data-i="${i}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw">${who}<div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${meta}</div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="branch" data-i="${i}" title="Copy this conversation up to here into a new branch">Branch here</button><button data-a="regenat" data-i="${i}" title="Write a fresh reply from here in a new branch">${x.r==='c'?'Regenerate':'Reply from here'}</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
+ return `<div class="msg ${x.r}${gp?' gp':''}${anim?' anim':''}" data-i="${i}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw">${who}<div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${meta}</div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="branch" data-i="${i}" title="Copy this conversation up to here into a new branch">Branch here</button><button data-a="regenat" data-i="${i}" title="Write a fresh reply from here in a new branch">${x.r==='c'?'Regenerate':'Reply from here'}</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
 async function img2(file,w,h){const an=file.size<1.5e6&&(/gif|webp/.test(file.type)||(file.type==='image/png'&&new TextDecoder('latin1').decode(new Uint8Array(await file.arrayBuffer())).includes('acTL')));if(an)return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});return new Promise(r=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/i.width,h/i.height),dw=i.width*k,dh=i.height*k;x.drawImage(i,(w-dw)/2,(h-dh)/2,dw,dh);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.8))};i.onerror=()=>r('');i.src=u})}
 function syncEd(){if(!V.ed)return;const o=V.ed.o;document.querySelectorAll('[id^="f_"]').forEach(e=>{const k=e.id.slice(2);o[k]=e.type==='checkbox'?e.checked:e.type==='number'?(+e.value||0):e.value});
  const g=[...document.querySelectorAll('[id^="gr_"]')];if(g.length)o.greets=g.map(e=>e.value)}
@@ -1647,14 +1740,14 @@ function edHtml(){const{k,o,isNew}=V.ed,N={c:'Character',p:'Persona',l:'Lorebook
  if(k==='c')h+=photos+box('Chat background','bgimg')+'<p class="ps">Shown behind the messages of every chat with this character.</p>'+inp('name','Character Name','Enter character name...')+ta('about','About','What other people see on the character page.',4)+ta('desc','Description','Who this character is',4)+ta('pers','Personality','Traits and temperament',3)+ta('scen','Scenario','Where and when this takes place',3)+tags('tags','Tags','What is this character into? Press Enter to add.','Add a tag...')
   +`<label>Greeting Messages</label><p class="ps" style="margin:0 0 8px">Users can swipe between these alternative greetings on the first message.</p>`+o.greets.map((g,i)=>`<div class="rowh"><label style="margin:12px 0 5px">Greeting Variation #${i+1}</label><span><button class="ib" data-a="gmv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="gmv" data-i="${i}" data-d="1">${I('dn','sm')}</button><button class="ib" data-a="grm" data-i="${i}">${I('close','sm')}</button></span></div><textarea id="gr_${i}" rows="4" placeholder="Greeting Variation #${i+1}...">${esc(g)}</textarea>`).join('')+`<button class="dash" data-a="gadd">+ Add Greeting Variation</button>`
   +ta('ex','Definition','Describe your character’s voice, syntax, rules, behaviors, and example dialogue.',8)+`<details><summary>System prompt override</summary><textarea id="f_sys" rows="3">${esc(o.sys)}</textarea></details>`+ta('rag','RAG Definition','World facts, history, and relationships, one paragraph per topic. Retrieved as needed.',8)
-  +`<label>Lorebooks</label><p class="ps" style="margin:0 0 8px">Attach worlds you wrote once and reuse everywhere. Entries only enter a chat when the conversation calls for them.</p><p class="ps"><b>${o.links.length} attached</b></p>`+S.books.map(b=>`<label class="card2 lbk"><input type="checkbox" data-lk="${b.id}" ${o.links.includes(b.id)?'checked':''}>${b.cover?`<img src="${b.cover}" alt="">`:'<span class="lph">📖</span>'}<span><b>${esc(b.name)}</b><small>${b.entries.length} entries</small></span></label>`).join('');
+  +(S.look?.loreTab!==false?`<label>Lorebooks</label><p class="ps" style="margin:0 0 8px">Attach worlds you wrote once and reuse everywhere. Entries only enter a chat when the conversation calls for them.</p><p class="ps"><b>${o.links.length} attached</b></p>`+S.books.map(b=>`<label class="card2 lbk"><input type="checkbox" data-lk="${b.id}" ${o.links.includes(b.id)?'checked':''}>${b.cover?`<img src="${b.cover}" alt="">`:'<span class="lph">📖</span>'}<span><b>${esc(b.name)}</b><small>${b.entries.length} entries</small></span></label>`).join(''):'');
  if(k==='p')h+=photos+inp('name','Name','Who are you in this story?')+ta('desc','Description','How this persona talks and acts.',4)+ta('lore','Lore','Backstory and facts the AI should know about you.',8)+ta('rag','RAG lore','Facts to look up mid-chat, one paragraph per topic.',8)+chk('active','Use this persona','Sets it as your active persona.');
  if(k==='l')h+=box('Cover','cover')+inp('name','Name','The Ashfall Reaches')+ta('desc','Description','What world does this cover?',4)+tags('tags','Tags','Up to 10 tags.','Add a tag...');
  if(k==='e')h+=inp('name','Title','The Iron Citadel')+tags('keys','Keywords',`${o.keys.length} of 24. A keyword in the conversation forces this entry in.`,'Add a keyword...')+ta('content','Content','What the AI should know when this entry fires.',10)+chk('constant','Always on','Injects this entry every turn without needing a keyword.')
   +`<div class="three"><div><label>Delay</label><input id="f_delay" type="number" value="${o.delay||0}"></div><div><label>Cooldown</label><input id="f_cooldown" type="number" value="${o.cooldown||0}"></div><div><label>Sticky</label><input id="f_sticky" type="number" value="${o.sticky||0}"></div></div><p class="ps" style="margin-top:10px">Delay: turns to wait after keyword first appears. Cooldown: turns it stays silent after firing. Sticky: turns it lingers after keyword disappears.</p>`+chk('on','Enabled','Disabled entries never fire.');
  return h+`<div class="foot"><button class="lnk big" data-a="edback">Cancel</button><button class="btn wide" data-a="edsave">${isNew?'Create':'Save'} ${N}</button></div>${isNew?'':'<button class="btn d" style="width:100%;margin-top:12px" data-a="eddel">Delete</button>'}<div style="height:40px"></div></main>`}
-function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab='lore';return listHtml()}
- return `<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="tab" data-id="lore" aria-label="Back">${I('back')}</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings">${I('gear')}</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">${I('pen','sm')} Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">${I('dn','sm')}</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
+function bookHtml(){const b=S.books.find(x=>x.id===V.bk);if(!b){V.tab=S.look?.loreTab!==false?'lore':'home';return listHtml()}
+ return `<header><button class="ib big" data-a="home" aria-label="Home">${I('home')}</button><button class="ib big" data-a="${S.look?.loreTab!==false?'tab':'home'}" data-id="lore" aria-label="Back">${I('back')}</button><span style="flex:1"></span><button class="ib big" data-a="api" aria-label="Settings">${I('gear')}</button></header><main>${b.cover?`<img class="cov" src="${b.cover}" alt="">`:''}<h1 class="pt" style="margin-top:16px">${esc(b.name)}</h1><p class="ps" style="margin-bottom:12px">${esc(b.desc||'')}</p><div class="tags">${(b.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}</div><div class="acts" style="margin:18px 0"><button class="btn" style="flex:1" data-a="newentry">+ New Entry</button><button class="btn s" style="flex:1" data-a="editbook">${I('pen','sm')} Edit</button></div><h2 class="h2">Entries <span class="ps">${b.entries.length}</span></h2>`+b.entries.map((e,i)=>`<div class="card2 pad" data-a="editentry" data-i="${i}" style="${e.on?'':'opacity:.5'}"><div class="rowh"><div style="min-width:0"><b>${esc(e.name||e.keys[0]||'Entry')}</b><div class="ps" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.constant?'Always on':esc(e.keys.slice(0,3).join(', ')+(e.keys.length>3?' +'+(e.keys.length-3):''))}</div></div><span style="white-space:nowrap"><button class="ib" data-a="emv" data-i="${i}" data-d="-1">${I('up','sm')}</button><button class="ib" data-a="emv" data-i="${i}" data-d="1">${I('dn','sm')}</button><span class="chev">›</span></span></div></div>`).join('')+'<div style="height:40px"></div></main>'}
 const PG2=['providers','import','memory','appr','apTheme','apText','apAv','apChat','apHome','apNew','instr','lim','upd','sec','accounts','news'];
 const WL='apple anchor arrow atlas autumn badge bamboo basket beach berry bridge brook cabin candle canyon castle cedar cherry circle cliff cloud clover coast comet coral cotton crane crystal dawn delta desert diamond dragon dream eagle ember falcon feather field flame forest fossil garden garnet glacier grove harbor hazel heron honey island ivory jade jungle kettle lagoon lantern lemon lily lotus lunar maple marble meadow mirror moss mountain nectar ocean olive onyx orchid otter oyster panda pearl pebble pepper pine planet plum prairie quartz quill rabbit raven reef river robin saffron sage sand shadow silver sketch spruce stone storm summer sunset swan thistle thunder tiger timber topaz tulip valley velvet violet walnut willow winter wolf zephyr acorn alder amber aspen aurora basil beacon birch blossom boulder breeze cactus canoe cascade cinder citrus compass copper cove cricket cypress dune dusk echo elm fern fjord flint fog frost galaxy ginger granite gust harvest haven horizon hollow iris juniper kayak lark lavender ledge lichen lilac lynx magnet mango mesa mint mist monsoon nebula nutmeg oak oasis opal orbit pasture petal pier pollen poppy quail rapids ridge ripple rose rowan rune salmon sequoia shore skylark slate sparrow spring sterling stream sundial tundra turtle twilight vine vista wander warbler wheat whisper wren yarrow yew zenith almond bronze cobalt dahlia ebony fable glen hickory indigo jasmine laurel linen magnolia marigold mulberry nimbus orchard paddle peony pewter quince reed sable sienna tamarind teal thyme umber vanilla wisp wisteria zinnia ash bay bluff brisk cairn clay dell drift ferry gale gorge heath inlet knoll loam'.split(' '),normPh=t=>String(t||'').toLowerCase().trim().split(/\s+/).join(' ');
 async function verifyAuth(lk,inp){if(!lk?.hash)return true;inp=String(inp||'');if(await hsh(inp,lk.salt)===lk.hash)return true;if(lk.rhash){const n=normPh(inp);if(n.split(' ').length>=12&&await hsh(n,lk.rsalt)===lk.rhash)return true}return false}
@@ -1676,6 +1769,11 @@ function selBox(id,label,opts,val,title,cls=''){
  const pv=id==='ps'?S.personas.find(x=>x.id===val):null;
  const lead=pv?(pv.img?`<img class="sw" src="${pv.img}" alt="">`:`<span class="sw" style="display:grid;place-items:center;background:var(--sf2);color:var(--ac);font-weight:700;font-size:12px">${esc(first(pv.name))}</span>`):(id==='bgs'&&BG[val]?`<span class="sw" style="background:${BG[val]},var(--bg)"></span>`:'');
  return (label?`<label>${label}</label>`:'')+`<select id="${id}" class="nsel" tabindex="-1" aria-hidden="true">${o}</select><button type="button" class="selbtn ${cls}" data-a="sel" data-id="${id}" data-title="${esc(title||label||'Choose')}">${lead}<span class="lb">${esc(cur)}</span><span class="chev">›</span></button>`}
+/* A quiet one-line selector for the chat options sheet. */
+function optSelect(id,label,opts,val,title){
+ const o=opts.map(x=>{const p=Array.isArray(x)?x:[x,x];return`<option value="${esc(String(p[0]))}" ${String(p[0])===String(val??'')?'selected':''}>${esc(String(p[1]))}</option>`}).join('');
+ const cur=optText(opts,val)||'Choose…';
+ return`<select id="${id}" class="nsel" tabindex="-1" aria-hidden="true">${o}</select><button type="button" class="optrow" data-a="sel" data-id="${id}" data-title="${esc(title||label||'Choose')}"><span class="ol">${esc(label)}</span><span class="ov">${esc(cur)}</span><span class="chev">${I('next','sm')}</span></button>`}
 function pickRows(id){
  const el=document.getElementById(id);if(!el)return[];
  const rows=[...el.options].map(o=>({v:o.value,t:(o.textContent||'').trim()}));
@@ -1753,7 +1851,7 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  ${nb}${ub}${S.models.length?'':'<div class="banner" data-a="tab" data-id="providers">Connect a model to start chatting ›</div>'}
  ${(S.look.home==='grid'&&chats.length?`<div class="hgrid">${cards}</div>`:rows)||empty}</main>`}const NAVMAP={home:'home',chars:'chars',lore:'lore',me:'me',settings:'me',pers:'me'};
 const NAVI=[['home','Chats','<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.5-4.6A8 8 0 1 1 21 12z"/></svg>'],['chars','Characters','<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.4 3.4 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.3 3.5 5.2"/></svg>'],['lore','Lorebooks','<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19V5.5M8 7h7"/></svg>'],['me','Profile','<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></svg>']];
-const navHtml=()=>{const a=NAVMAP[V.tab];if(!a)return'';return`<nav class="tb">${NAVI.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
+const navHtml=()=>{const a=NAVMAP[V.tab],items=NAVI.filter(([k])=>k!=='lore'||S.look?.loreTab!==false);if(!a||!items.length)return'';return`<nav class="tb">${items.map(([k,l,ic])=>`<button data-a="tab" data-id="${k}" class="${a===k?'on':''}" aria-label="${l}">${ic}<span>${l}</span></button>`).join('')}</nav>`};
 let RERR=0;
 function recoverUI(e){
  try{console.error('Hearth render error',e)}catch(_){}
@@ -1765,7 +1863,15 @@ function recoverUI(e){
 /* Every draw goes through here, so a bad record cannot leave half a screen
    with controls missing. */
 function render(s){try{renderRaw(s);RERR=0}catch(e){recoverUI(e)}}
-function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();return}
+/* Let the splash finish its short entrance, then fade it out. The app is
+   already drawing behind it, so this never adds a loading delay. */
+function bootFinish(force){
+ if(BOOT_DONE)return;BOOT_DONE=true;
+ const b=document.getElementById('boot');if(!b)return;
+ const wait=force?0:Math.max(0,620-(Date.now()-BOOT_AT));
+ setTimeout(()=>{b.classList.add('bootout');setTimeout(()=>b.remove(),340)},wait);
+}
+function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();if(!V.loading)bootFinish();return}
  if(!V.chat&&V.fq){V.fq='';V.fcur=0}
  if(!$('#v'))a.innerHTML='<div id="v"></div><div id="sh"></div><div id="sh2"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
@@ -1773,15 +1879,18 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
  if(V.chat){const c=C(),m=S.chats[c.id]||[],tt=S.title?.[c.id];
   const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm')}<div class="ttl"><h1>${esc(tt||c.name)}</h1><small>${tt?esc(c.name)+' · ':''}${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
    from=Math.max(0,m.length-(V.limit||CHATWIN)),
+   animAt=V.animMsg?.cid===c.id?V.animMsg.i:-1,
    earlier=from>0?`<div class="morebar"><button class="btn s" data-a="earlier">${I('up','sm')} Show earlier messages <span class="note" style="margin:0">${from} older</span></button></div>`:'',
-   body=earlier+m.slice(from).map((x,j)=>msgHtml(x,from+j,m,c)).join(''),
+   body=earlier+m.slice(from).map((x,j)=>msgHtml(x,from+j,m,c,from+j===animAt)).join(''),
    optBtn=S.look.opt==='composer'?'<button class="ib" data-a="set" aria-label="Options">'+I('more')+'</button>':'',
    cb=optBtn+(V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>');
-  if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
+  if(animAt>=0)V.animMsg=null;
+  if(!same){pg(v);v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><button class="jump" id="jump" data-a="jump" aria-label="Jump to latest message">${I('dn')}</button><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
    const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
   else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
-  const mn=$('main');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90};
+  const mn=$('main'),jb=$('#jump');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90;jb?.classList.toggle('show',!V.stick)};
   mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
+  if(jb)jb.classList.toggle('show',!V.stick);
   mn.querySelectorAll('.bub').forEach(b=>b.onclick=e=>{if(Date.now()<swipeClick||e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
   mn.querySelectorAll('.msg.c .bub').forEach(wireReplySwipe);
   if(V.fq)applyFind()}
@@ -1794,17 +1903,18 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
   const gq=$('#gq');if(gq)gq.oninput=()=>{if(!V.sheet||V.sheet.t!=='gsearch')return;V.sheet.q=gq.value;V.sheet.res=gsearch(gq.value);const at=gq.selectionStart;render();const n=$('#gq');if(n){n.focus();try{n.setSelectionRange(at,at)}catch(e){}}}}
  const s2=$('#sh2');if(s2){const ph=pickHtml();if(s2.dataset.p!==ph){s2.innerHTML=ph;s2.dataset.p=ph;
   const pq=$('#pq');if(pq)pq.oninput=()=>{const q=pq.value.toLowerCase().trim();s2.querySelectorAll('.prow').forEach(e=>e.style.display=!q||(e.dataset.q||'').includes(q)?'':'none')}}}
- syncHist()}
+ syncHist();bootFinish()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,id=t.dataset.id,i=+t.dataset.i;
  if(a==='bg'&&e.target!==t)return;if(a==='bg'&&V.sheet?.t==='rphrase')return;if(a==='bg'||a==='close'){const wasFind=V.sheet?.t==='find';V.sheet=null;V.prev=null;V.pq=null;V.llai=null;if(wasFind){V.fq='';V.fcur=0}return render()}
  if(a==='pickbg'&&e.target!==t)return;if(a==='pickbg'||a==='pickx'){V.pick=null;return render()}
- if(V.busy&&!['stop','back'].includes(a)&&!['info'].includes(V.sheet?.t))return;
+ if(V.busy&&!['stop','back','jump'].includes(a)&&!['info'].includes(V.sheet?.t))return;
  const c=V.chat&&C();
  ({imp:pick,
   sel:()=>{const el=document.getElementById(id);if(!el)return;V.pick={id,title:t.dataset.title||'Choose',cur:el.value,rows:pickRows(id)};render()},
   pickv:()=>{const p=V.pick;if(!p?.rows)return;const r=p.rows[i],el=document.getElementById(p.id);V.pick=null;if(el&&r){el.value=r.v;el.dispatchEvent(new Event('change',{bubbles:true}))}render()},
   tab:()=>{V.tab=id;V.form=null;V.ed=null;if(id==='news'&&S.seen!==VER){S.seen=VER;save()}render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;V.sheet=null;V.fq='';V.fcur=0;V.limit=0;render()},
   earlier:()=>{const mn=$('main'),h=mn?.scrollHeight||0,top=mn?.scrollTop||0;V.limit=(V.limit||CHATWIN)+CHATWIN;render();const n=$('main');if(n){n.scrollTop=n.scrollHeight-h+top;V.stick=false}},
+  jump:()=>{const mn=$('main');if(!mn)return;V.stick=true;const still=(S.look?.motion||'full')==='off'||matchMedia?.('(prefers-reduced-motion: reduce)').matches;if(mn.scrollTo)mn.scrollTo({top:mn.scrollHeight,behavior:still?'auto':'smooth'});else mn.scrollTop=mn.scrollHeight;$('#jump')?.classList.remove('show')},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
   rgen:async()=>{if(!S.lock?.hash||await hsh($('#s_cur')?.value||'',S.lock.salt)!==S.lock.hash)return toast('Enter your current password above first');await mkPhrase();render()},
   rcopy:()=>{navigator.clipboard?.writeText(V.rphrase||'').then(()=>toast('Copied')).catch(()=>toast('Copy failed'))},
@@ -1873,7 +1983,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    if(k==='l'){const bk=S.books.find(x=>x.id===id),idx=S.books.indexOf(bk),links=clone(S.links);
     S.books=S.books.filter(x=>x.id!==id);for(const q in S.links)S.links[q]=S.links[q].filter(x=>x!==id);
     restore=()=>{S.books.splice(Math.min(idx,S.books.length),0,bk);S.links=links};
-    save();V.ed=null;V.tab='lore';render();if(restore)undoable(label+' deleted',()=>{restore();save();render()});return}
+    save();V.ed=null;V.tab=S.look?.loreTab!==false?'lore':'home';render();if(restore)undoable(label+' deleted',()=>{restore();save();render()});return}
    if(k==='e'){const bk=S.books.find(x=>x.id===V.bk),e=bk.entries.splice(id,1)[0];restore=()=>bk.entries.splice(Math.min(id,bk.entries.length),0,e)}
    save();V.ed=null;V.tab=b.tab;render();if(restore)undoable(label+' deleted',()=>{restore();save();render()})},
   addprov:()=>{V.form={k:'prov',p:{name:'',key:'',url:'',fmt:'openai'}};render()},
@@ -2017,7 +2127,6 @@ document.addEventListener('change',e=>{const t=e.target;
  if(t.id==='mem_on'){S.cfg.mem.on=t.value==='On';save()}
  if(t.id==='mem_m'){S.cfg.mem.model=t.value;save()}
  if(t.id==='prov'){readCfg();if(PRE[t.value])S.cfg.url=PRE[t.value];V.sheet={t:'prov'};render()}
- if(t.dataset.b){const c=C(),l=new Set(S.links[c.id]||[]);t.checked?l.add(t.dataset.b):l.delete(t.dataset.b);S.links[c.id]=[...l];save()}
  if(t.dataset.e!==undefined){S.books.find(b=>b.id===V.sheet.id).entries[+t.dataset.e].on=t.checked;save()}});
 async function flushSave(){clearTimeout(tm);if(!idbOK)return;S.ts=Date.now();await idbSet(S)}
 async function loadAcct(id,tab){try{V.ctl?.abort()}catch(e){}await new Promise(r=>setTimeout(r,60));ACCT_ID=id;try{localStorage.setItem('hearth_acct',id)}catch(e){}
@@ -2084,5 +2193,7 @@ if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.se
    write-my-line and retry buttons come back instead of leaving only Stop. */
 setInterval(()=>{if(!V.busy)return;if(Date.now()-(V.lastTok||Date.now())<180000)return;
  try{V.ctl?.abort()}catch(e){}V.busy=false;V.ctl=null;toast('That reply stalled. Tap send to try again.');render()},20000);
+document.addEventListener('click',e=>{if(e.target.closest('#boot'))bootFinish(true)},true);
+setTimeout(()=>bootFinish(true),1400);
 render();
 </script></body></html>

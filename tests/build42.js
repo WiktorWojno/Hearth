@@ -93,7 +93,7 @@ async function openChats(){
  // branch switcher
  click(d.querySelector('[data-a="set"]'));await wait(140);
  const branchBtn=d.querySelector('[data-a="chats"]');
- ok('branch switcher is available',/Branches \(2\)/.test(branchBtn?.textContent||''));
+ ok('branch switcher is available',/Branches & chats/.test(branchBtn?.textContent||'')&&branchBtn?.querySelector('.ov')?.textContent==='2');
  click(branchBtn);await wait(140);
  const sheet=d.querySelector('#sh')?.textContent||'';
  ok('branch switcher shows the current branch',/Current/.test(sheet)&&/Branch at message 3/.test(sheet));

@@ -58,7 +58,7 @@ const noParam=name=>calls.some(u=>{try{const p=new URL(u);return /api\.chub\.ai\
  await wait(800);
  ok('boots clean',errors.length===0);
  const VER=W.eval('VER');
- ok('build is 44',VER===44&&new RegExp('build '+VER).test(d.body.textContent));
+ ok('build is at least 44',VER>=44&&new RegExp('build '+VER).test(d.body.textContent));
 
  // release notes
  ok('catalog banner appears on Home',!!d.querySelector('main .banner[data-a="tab"][data-id="news"]'));

@@ -15,7 +15,8 @@ The workflow builds a debug APK with versionName **0.1** and the Sakura Night
 icon/theme. Before packaging, it runs `npm test`, a headless-browser smoke test
 that boots the app and checks the release catalog, long-chat windowing, find,
 delete and undo history, reply swipes, message branches and regeneration,
-message times, preview greetings, and Discover search filters and tags.
+message times, preview greetings, Discover search filters and tags, the
+compact chat options, the motion setting and lorebook visibility.
 
 ## Signing
 
@@ -38,7 +39,7 @@ update appears as a banner; restart the app to apply it.
 Web changes can be delivered this way. Native changes — the Android back
 button, the app icon, the Termux bridge — need a new APK installed once.
 
-**Profile → Updates** also prints the running build (`v0.1 · build 43`).
+**Profile → Updates** also prints the running build (`v0.1 · build 45`).
 Check that line after an update: if the build number did not change, the
 update was not applied yet.
 
@@ -54,6 +55,10 @@ the stored copy disappears, the next launch downloads it again instead of
 waiting for the six-hour check.
 
 ## What changed
+
+Build 45 reorganises chat options, adds a short launch animation and a Motion
+setting, and gives page changes, sheets, toasts, new messages and loading
+results a gentle, warm movement.
 
 **Profile → What's new** is the release-notes catalog. It lists every public
 build with a short, dated summary, newest first, and marks the build you are
@@ -95,9 +100,15 @@ saved per account the moment you tap it.
 - **Chat** — the options button can sit in the header or in the composer; chat
   window width; avatar placement; message alignment; sender name weight and
   visibility; streaming speed; whether Stop keeps or deletes the partial reply;
-  typewriter or instant writing; composer shape; and the persona picker layout
-  (compact, comfortable, dense or gallery).
+  typewriter or instant writing; composer shape; the persona picker layout
+  (compact, comfortable, dense or gallery); motion (Full, Subtle or Off); and
+  whether the Lorebooks tab and attachment fields are shown. Hiding
+  lorebooks never deletes their data.
 - **Home** — conversations as full-width rails or a two-column grid.
+
+A short cold-start splash uses the Hearth icon and a pair of drifting petals.
+It is skipped by tapping and never delays loading. Android reduced-motion
+settings always override the in-app choice.
 
 Themes are plain objects in the account's saved state (`look` and `themes`), so
 a backup carries the appearance with it. Upgrading from an older build maps the
@@ -161,6 +172,11 @@ In a **Discover** preview, the greeting arrows page through every alternate
 greeting, not just the first.
 
 ## Working with a chat
+
+Chat options are grouped into **Chat settings**, **This chat**, **Tools** and
+**Character**. Selectors are compact rows, destructive actions sit apart, and
+the duplicate lorebook checklist has moved back to **Edit character →
+Lorebooks**.
 
 - **Pin** a conversation in chat options to keep it at the top of Home. Pinned
   chats carry a small pin marker and sort before the rest.
