@@ -56,6 +56,10 @@ waiting for the six-hour check.
 
 ## What changed
 
+Build 46 lengthens the cold-start splash to roughly three seconds and fills it
+with ten drifting petals, a slower icon entrance and a soft halo. A tap still
+skips it, and reduced motion keeps it brief.
+
 Build 45 reorganises chat options, adds a short launch animation and a Motion
 setting, and gives page changes, sheets, toasts, new messages and loading
 results a gentle, warm movement.

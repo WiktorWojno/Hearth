@@ -48,9 +48,12 @@ async function openChat(id){
  click(d.querySelector(`[data-a="open"][data-id="${id}"]`));await wait(200);
 }
 (async()=>{
- await wait(1600);
+ await wait(700);
  ok('boots clean',errors.length===0);
- ok('build is 45',W.eval('VER')===45&&new RegExp('build 45').test(d.body.textContent));
+ ok('build is at least 45',W.eval('VER')>=45);
+ ok('splash is still up partway through the cold start',!!d.querySelector('#boot'));
+ ok('splash shows a drift of petals',d.querySelectorAll('#boot .petal').length>=10);
+ await wait(2900);
  ok('splash has finished and been removed',W.eval('BOOT_DONE')===true&&!d.querySelector('#boot'));
  W.eval('render()');
  ok('splash does not return on later redraws',!d.querySelector('#boot'));

@@ -522,32 +522,50 @@ html.avHide .msg>.av,html.avHide .msg>.avs{display:none}
 .hcard b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hcard small{color:var(--mut);font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hcard time{color:var(--mut);font-size:11px}
-/* Cold-start splash. It loads behind the app and is removed as soon as the
-   account is ready, so it never holds up a chat. */
-#boot{position:fixed;inset:0;z-index:100;display:grid;place-items:center;overflow:hidden;animation:bootAway .01s 1.8s forwards;background:
+/* Cold-start splash. It loads behind the app, so it never holds up a chat.
+   It lingers long enough to watch the petals drift, and any tap skips it. */
+#boot{position:fixed;inset:0;z-index:100;display:grid;place-items:center;overflow:hidden;animation:bootAway .6s 2.55s forwards;background:
   radial-gradient(70% 48% at 50% 34%,color-mix(in srgb,var(--ac) 19%,transparent),transparent 70%),
   radial-gradient(120% 82% at 50% -18%,#2a1044,#0a0314 72%);
-  transition:opacity .3s var(--ease-out),visibility .3s}
+  transition:opacity .6s var(--ease-out),visibility .6s}
 #boot::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 50%,transparent 45%,rgba(3,1,8,.48));pointer-events:none}
 #boot.bootout{opacity:0;visibility:hidden}
-#boot .bootin{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:17px;padding:30px;text-align:center}
-#boot img{width:136px;height:136px;border-radius:34px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 24px 70px rgba(0,0,0,.55),0 0 74px var(--glow);animation:bootLogo .6s var(--ease-out) both}
-#boot .boottag{font:600 10px/1 Inter,system-ui;letter-spacing:.24em;text-transform:uppercase;color:rgba(247,233,255,.72);animation:bootTag .45s .16s var(--ease-out) both}
-#boot .petal{position:absolute;z-index:1;width:12px;height:17px;border-radius:74% 26% 70% 30%;background:linear-gradient(135deg,#ffd1ec,#ff8fd8);opacity:.62;filter:blur(.2px);animation:petalFall 2.8s ease-in-out infinite}
-#boot .p1{left:19%;top:-24px;animation-delay:.12s}
-#boot .p2{right:17%;top:-38px;width:9px;height:13px;opacity:.48;animation-delay:.28s}
+#boot .bootin{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:21px;padding:30px;text-align:center}
+#boot .bootin::before{content:"";position:absolute;z-index:-1;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 68%);opacity:.38;animation:bootHalo 2.6s .5s ease-in-out infinite}
+#boot img{width:136px;height:136px;border-radius:34px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 24px 70px rgba(0,0,0,.55),0 0 74px var(--glow);animation:bootLogo 1s var(--ease-out) both}
+#boot .boottag{font:600 10px/1 Inter,system-ui;letter-spacing:.24em;text-transform:uppercase;color:rgba(247,233,255,.72);animation:bootTag .9s .6s var(--ease-out) both}
+#boot .petal{position:absolute;top:0;z-index:1;width:var(--pw,12px);height:var(--ph,17px);border-radius:74% 26% 70% 30%;background:linear-gradient(135deg,var(--pc1,#ffd6ef),var(--pc2,#ff8fd8));opacity:0;filter:blur(.15px);animation:petalFall var(--pd,3.6s) linear infinite;animation-delay:var(--pdl,0s);will-change:transform,opacity}
+#boot .petal:nth-of-type(1){left:7%;--pw:13px;--ph:18px;--pd:4.1s;--pdl:-2.9s;--drift:30px;--po:.6}
+#boot .petal:nth-of-type(2){left:16%;--pw:9px;--ph:13px;--pd:3.3s;--pdl:-.7s;--drift:-22px;--po:.45;--pc1:#f3e2ff;--pc2:#d7a8ff}
+#boot .petal:nth-of-type(3){left:27%;--pw:15px;--ph:21px;--pd:4.6s;--pdl:-3.8s;--drift:38px;--po:.5}
+#boot .petal:nth-of-type(4){left:38%;--pw:10px;--ph:14px;--pd:3.5s;--pdl:-1.9s;--drift:-18px;--po:.55;--pc1:#ffe4f3;--pc2:#ffb0e0}
+#boot .petal:nth-of-type(5){left:48%;--pw:12px;--ph:17px;--pd:4.3s;--pdl:-3.3s;--drift:24px;--po:.42;--pc1:#efe0ff;--pc2:#c79cff}
+#boot .petal:nth-of-type(6){left:58%;--pw:8px;--ph:12px;--pd:3.1s;--pdl:-.4s;--drift:-26px;--po:.6}
+#boot .petal:nth-of-type(7){left:68%;--pw:14px;--ph:19px;--pd:4.4s;--pdl:-2.2s;--drift:32px;--po:.48}
+#boot .petal:nth-of-type(8){left:78%;--pw:11px;--ph:15px;--pd:3.7s;--pdl:-3.5s;--drift:-20px;--po:.58;--pc1:#ffe0f2;--pc2:#ff9dd8}
+#boot .petal:nth-of-type(9){left:87%;--pw:9px;--ph:13px;--pd:3.9s;--pdl:-1.3s;--drift:26px;--po:.4;--pc1:#f2e4ff;--pc2:#cf9dff}
+#boot .petal:nth-of-type(10){left:94%;--pw:12px;--ph:16px;--pd:4.8s;--pdl:-3.9s;--drift:-30px;--po:.5}
+html[data-motion="subtle"] #boot .petal:nth-of-type(n+5){display:none}
+html[data-motion="subtle"] #boot .bootin::before{animation:none}
 .pg{animation:pg .24s var(--ease-out)}
 @keyframes pg{from{opacity:0;transform:translateY(8px)}}
 @keyframes sheetUp{from{opacity:.4;transform:translateY(36px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,12px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 @keyframes snackIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}}
-@keyframes bootLogo{from{opacity:0;transform:scale(.9);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes bootLogo{from{opacity:0;transform:scale(.88);filter:blur(7px)}to{opacity:1;transform:none;filter:blur(0)}}
 @keyframes bootAway{to{opacity:0;visibility:hidden;pointer-events:none}}
-@keyframes bootTag{from{opacity:0;transform:translateY(7px)}}
-@keyframes petalFall{0%{opacity:0;transform:translate3d(0,-20px,0) rotate(18deg)}18%{opacity:.62}100%{opacity:0;transform:translate3d(26px,72vh,0) rotate(175deg)}}
+@keyframes bootTag{from{opacity:0;transform:translateY(9px)}}
+@keyframes bootHalo{0%,100%{opacity:.32;transform:scale(.94)}50%{opacity:.6;transform:scale(1.06)}}
+@keyframes petalFall{
+  0%{opacity:0;transform:translate3d(0,-34px,0) rotate(-10deg)}
+  10%{opacity:var(--po,.55)}
+  50%{opacity:var(--po,.55);transform:translate3d(calc(var(--drift,26px) * -.4),46vh,0) rotate(96deg)}
+  88%{opacity:var(--po,.55)}
+  100%{opacity:0;transform:translate3d(var(--drift,26px),106vh,0) rotate(208deg)}
+}
 @keyframes shimmer{to{background-position:-120% 0}}
-html[data-motion="subtle"] #boot .petal,html[data-motion="off"] #boot .petal{display:none}
+html[data-motion="off"] #boot .petal{display:none}
 html[data-motion="subtle"] .pg,html[data-motion="subtle"] .msg.anim{animation-duration:.18s}
 html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="off"] *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 @media (prefers-reduced-motion:reduce){
@@ -556,12 +574,12 @@ html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="of
 }
 </style></head><body>
 <div id="boot" aria-hidden="true">
-  <i class="petal p1"></i><i class="petal p2"></i>
+  <i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i>
   <div class="bootin"><img src="icon-192.png" alt=""><div class="boottag">A warm place for stories</div></div>
 </div>
 <div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=45,PUB='0.1';try{
+<script>var VER=46,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -634,7 +652,7 @@ const idbGet=()=>idbRaw(kS(ACCT_ID)),idbSet=v=>idbRaw(kS(ACCT_ID),v),saveAccount
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false;clearSaveWarn()}catch(e){saveErr=true;saveWarn()}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false;clearSaveWarn()}).catch(()=>{saveErr=true;saveWarn()}),250)};
 let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,limit:0};
-const BOOT_AT=Date.now();let BOOT_DONE=false;
+const BOOT_AT=Date.now();let BOOT_DONE=false,BOOT_TIMER=0;
 const CHATWIN=80;
 let lastUpd=0;
 const CFG0={repo:'WiktorWojno/Hearth',gh:'',auto:true,autoc:true,html:true,theme:'auto',prov:'openai',url:'https://api.openai.com/v1',key:'',model:'',temp:0.9,max:600,top:1,sys:'',fs:16,ff:'serif',hist:40,ctx:0,stop:'',anote:'',andepth:4,mem:{on:false,every:10,per:10,keep:100,model:''},termux:true};S.cfg=Object.assign({},CFG0,S.cfg);
@@ -650,6 +668,12 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:46,when:'25 November 2026',title:'A slower, softer hello',items:[
+  "The cold-start splash now lingers for about three seconds: the Hearth icon eases in, the tagline follows, and ten petals drift down the screen instead of two.",
+  "Petals fall the full height of the screen at different speeds and widths, with a soft glow behind the icon.",
+  "Tap anywhere to skip. Motion → Off and Android's reduced-motion setting keep the splash brief and still.",
+  "The splash still draws behind the app, so it never delays opening a chat."
+ ]},
  {v:45,when:'25 November 2026',title:'A calmer chat menu and a livelier Hearth',items:[
   "Chat options are grouped into chat settings, this chat, tools and character actions. Selectors are compact rows, and Delete character sits apart from everyday controls.",
   "The lorebook checklist is gone from Chat options. Attach lorebooks where they belong, in Edit character → Lorebooks. The Lorebooks tab can be hidden without deleting anything.",
@@ -1863,13 +1887,19 @@ function recoverUI(e){
 /* Every draw goes through here, so a bad record cannot leave half a screen
    with controls missing. */
 function render(s){try{renderRaw(s);RERR=0}catch(e){recoverUI(e)}}
-/* Let the splash finish its short entrance, then fade it out. The app is
-   already drawing behind it, so this never adds a loading delay. */
+/* The splash is already drawing behind a ready app, so this only sets how
+   long the petals get to fall. Any tap skips it, and reduced motion keeps
+   the hold brief instead of leaving a still frame on screen. */
 function bootFinish(force){
- if(BOOT_DONE)return;BOOT_DONE=true;
- const b=document.getElementById('boot');if(!b)return;
- const wait=force?0:Math.max(0,620-(Date.now()-BOOT_AT));
- setTimeout(()=>{b.classList.add('bootout');setTimeout(()=>b.remove(),340)},wait);
+ const b=document.getElementById('boot');
+ if(!b){BOOT_DONE=true;return}
+ if(BOOT_DONE&&!force)return;
+ BOOT_DONE=true;
+ if(BOOT_TIMER){clearTimeout(BOOT_TIMER);BOOT_TIMER=0}
+ const calm=document.documentElement.dataset.motion==='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+ const hold=force?0:(calm?420:2500);
+ const wait=Math.max(0,hold-(Date.now()-BOOT_AT));
+ BOOT_TIMER=setTimeout(()=>{BOOT_TIMER=0;b.classList.add('bootout');setTimeout(()=>b.remove(),660)},wait);
 }
 function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=lockHtml();if(!V.loading)bootFinish();return}
  if(!V.chat&&V.fq){V.fq='';V.fcur=0}
@@ -2194,6 +2224,6 @@ if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.se
 setInterval(()=>{if(!V.busy)return;if(Date.now()-(V.lastTok||Date.now())<180000)return;
  try{V.ctl?.abort()}catch(e){}V.busy=false;V.ctl=null;toast('That reply stalled. Tap send to try again.');render()},20000);
 document.addEventListener('click',e=>{if(e.target.closest('#boot'))bootFinish(true)},true);
-setTimeout(()=>bootFinish(true),1400);
+setTimeout(()=>bootFinish(true),3800);
 render();
 </script></body></html>
