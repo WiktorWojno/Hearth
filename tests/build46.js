@@ -29,7 +29,7 @@ function makeDom(reduced){
 
 (async()=>{
  // Splash copy and style: ten petals that cross the whole screen.
- ok('build 46 is current',/var VER=46\b/.test(html));
+ ok('build 46 shipped',/var VER=(?:4[6-9]|[5-9]\d)/.test(html)&&/v:46,when/.test(html));
  ok('splash markup carries ten petals',(html.match(/<i class="petal"><\/i>/g)||[]).length===10);
  ok('petals have individual fall timing',(html.match(/--pdl:/g)||[]).length===10);
  ok('petal drift spans the screen',/106vh/.test(html)&&/petalFall/.test(html));

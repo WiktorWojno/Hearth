@@ -56,6 +56,10 @@ waiting for the six-hour check.
 
 ## What changed
 
+Build 47 adds ambient petals and a time-of-day glow to the account picker and
+library screens, a staggered first-paint entrance for rows and cards, and a
+countdown line on undo snackbars.
+
 Build 46 lengthens the cold-start splash to roughly three seconds and fills it
 with ten drifting petals, a slower icon entrance and a soft halo. A tap still
 skips it, and reduced motion keeps it brief.
