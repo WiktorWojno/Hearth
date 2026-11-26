@@ -1,12 +1,16 @@
 # Roadmap
 
-## Build 48 — Navigation delight
-- View Transitions for page and theme changes, with instant fallback where unsupported
-- Shared-element expansion from a character card to the chat header, reversed on back
-- Scroll-aware headers (title compression and shadow)
+## Build 49 — Depth and touch
+- Scroll-aware headers (title compression and shadow as content moves)
 - Haptic feedback on send, receive and swipe thresholds (needs VIBRATE permission, so it ships with a new APK)
+- Pull-to-refresh petal puff on Home and Discover
 
 ## Later
 - Settings search
 - Discover filter-sheet redesign
 - Optional independent "Ambient petals" toggle under Appearance → Chat
+
+## Shipped
+- Build 48 — View Transitions for themes and the character-to-chat morph
+- Build 47 — ambient petals, time-of-day glow, staggered entrances, undo countdown
+- Build 46 — longer splash with a full drift of petals

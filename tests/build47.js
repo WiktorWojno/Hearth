@@ -28,7 +28,7 @@ const d=dom.window.document,W=dom.window;
 
 (async()=>{
  // Static pieces.
- ok('build 47 is current',/var VER=47\b/.test(html));
+ ok('build 47 shipped',/var VER=(?:4[7-9]|[5-9]\d)/.test(html)&&/v:47,when/.test(html));
  ok('release notes describe the ambiance',/v:47,when/.test(html)&&/Ambient petals and a livelier Hearth/.test(html));
  ok('ambient layer has its own slow fall',/ambFall/.test(html)&&/#amb \.ap\{/.test(html));
  ok('time-of-day glow exists',/todColor/.test(html)&&/@keyframes todIn/.test(html));

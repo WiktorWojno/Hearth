@@ -568,6 +568,16 @@ html[data-motion="subtle"] #boot .bootin::before{animation:none}
 #v.enter main.stagger>*:nth-child(12){animation-delay:.275s}
 html[data-motion="subtle"] #v.enter main.stagger>*{animation-duration:.26s}
 @keyframes riseIn{from{opacity:0;transform:translateY(7px)}}
+/* View Transitions: theme switches crossfade and a character card can expand
+   into its chat header. Unsupported browsers fall back to the normal swap. */
+@supports (view-transition-name: none){
+ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation-duration:.4s;animation-timing-function:var(--ease-out)}
+ ::view-transition-image-pair(*){isolation:isolate}
+ ::view-transition-group(root){animation-duration:.28s}
+ ::view-transition-old(root),::view-transition-new(root){animation-duration:.28s}
+}
+html[data-motion="subtle"] ::view-transition-old(root),html[data-motion="subtle"] ::view-transition-new(root){animation-duration:.18s}
+html[data-motion="off"] ::view-transition-old(root),html[data-motion="off"] ::view-transition-new(root){animation-duration:.01ms}
 @keyframes sheetUp{from{opacity:.4;transform:translateY(36px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,12px) scale(.97)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 @keyframes snackIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
@@ -627,7 +637,7 @@ html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="of
 </div>
 <div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=47,PUB='0.1';try{
+<script>var VER=48,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -699,7 +709,7 @@ const kS=id=>id==='default'?'S':'S_'+id,fresh=()=>({chars:[],books:[],personas:[
 const idbGet=()=>idbRaw(kS(ACCT_ID)),idbSet=v=>idbRaw(kS(ACCT_ID),v),saveAccountsTo=a=>idbRaw('accounts',a),saveAccounts=()=>saveAccountsTo(ACCOUNTS);
 let idbOK=false,tm;
 const save=()=>{S.ts=Date.now();if(!idbOK){try{localStorage.setItem('hearth',JSON.stringify(S));saveErr=false;clearSaveWarn()}catch(e){saveErr=true;saveWarn()}return}clearTimeout(tm);tm=setTimeout(()=>idbSet(S).then(()=>{saveErr=false;clearSaveWarn()}).catch(()=>{saveErr=true;saveWarn()}),250)};
-let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,limit:0};
+let V={loading:true,stick:true,tab:'home',chat:null,sheet:null,busy:false,edit:null,ctl:null,updReady:0,updChecking:false,fq:'',fcur:0,limit:0,vt:false};
 const BOOT_AT=Date.now();let BOOT_DONE=false,BOOT_TIMER=0;
 /* The picker renders before any account is loaded, so remember the last
    Motion choice to keep its ambiance honest. */
@@ -719,6 +729,12 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:48,when:'26 November 2026',title:'Transitions that carry you',items:[
+  "Switching themes now crossfades the whole app instead of snapping to the new colours.",
+  "Opening a chat from a character card expands its portrait into the chat header, and going back reverses it.",
+  "Where View Transitions are unavailable, Hearth uses the existing page change, so nothing breaks on older Android WebViews.",
+  "Motion → Off and Android's reduced-motion setting skip these transitions and keep the screen still."
+ ]},
  {v:47,when:'25 November 2026',title:'Ambient petals and a livelier Hearth',items:[
   "The account picker, unlock screen and library tabs now have a quiet layer of drifting petals behind the content, with a soft glow that shifts from dawn pink to dusk coral with the time of day.",
   "Rows and cards ease in one after another when you open a screen, instead of appearing all at once.",
@@ -854,6 +870,15 @@ let M=[],hd=0,pop=false;
 const BG={dusk:'linear-gradient(160deg,rgba(90,80,220,.2),rgba(220,80,160,.15))',forest:'linear-gradient(160deg,rgba(40,170,110,.2),rgba(40,120,200,.14))',ember:'linear-gradient(160deg,rgba(240,140,60,.22),rgba(220,60,90,.15))'};
 const bgOf=c=>(c.bg==='avatar'&&c.img||c.bg==='img'&&c.bgimg)?`linear-gradient(color-mix(in srgb,var(--bg) 86%,transparent),color-mix(in srgb,var(--bg) 86%,transparent)),url(${c.bg==='img'?c.bgimg:c.img}) center/cover`:BG[c.bg]?BG[c.bg]+',var(--bg)':'';
 const pg=v=>{v.classList.remove('pg');void v.offsetWidth;v.classList.add('pg')};
+const vt=(fn)=>{
+ const off=document.documentElement.dataset.motion==='off'||!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+ if(off||typeof document.startViewTransition!=='function'){V.vt=false;return fn()}
+ V.vt=true;
+ let t;try{t=document.startViewTransition(()=>{fn()})}catch(e){V.vt=false;return fn()}
+ const done=()=>{V.vt=false};
+ t.finished.finally(done).catch(()=>{});
+ return t;
+};
 const tmo=ms=>{const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal};
 const toast=m=>{document.querySelector('.toast')?.remove();const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.setAttribute('aria-live','polite');d.textContent=m;document.body.append(d);setTimeout(()=>d.remove(),2200)};
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -1494,7 +1519,7 @@ function ctxEst(c,h){const lim=ctxLim();if(!lim)return null;
  const recent=h.filter(y=>!y.mm).slice(-(S.cfg.hist||40));
  const used=recent.reduce((a,x)=>a+tkn(x.t),0)+360+maxOut;
  return{pct:Math.min(100,Math.round(used/lim*100)),used,lim}}
-function openChat(id){V.chat=id;V.fq='';V.fcur=0;V.limit=CHATWIN;V.edit=null;V.stick=true;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0,ts:Date.now()}]:[];save()}render(true)}
+function openChat(id){vt(()=>{V.chat=id;V.fq='';V.fcur=0;V.limit=CHATWIN;V.edit=null;V.stick=true;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0,ts:Date.now()}]:[];save()}render(true)})}
 async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(!g){toast('Add a provider and a model first');V.chat=null;V.tab='providers';return render()}
  let m,base='',hist;
@@ -1608,7 +1633,8 @@ function findStep(d){
 function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t,ts:Date.now()});(S.act=S.act||{})[V.chat]=Date.now();i.value='';i.style.height='auto';save();gen()}
 
 /* ---------- views ---------- */
-const av=(c,cls='')=>c.img?`<img class="av ${cls}" src="${c.img}" alt="">`:`<div class="av ${cls}">${esc(first(c.name))}</div>`;
+const av=(c,cls='',vn='')=>c.img?`<img class="av ${cls}" ${vn?`style="view-transition-name:${vn}"`:''} src="${c.img}" alt="">`:`<div class="av ${cls}" ${vn?`style="view-transition-name:${vn}"`:''}>${esc(first(c.name))}</div>`;
+const vtId=id=>'c'+String(id??'').replace(/[^a-zA-Z0-9_-]/g,'');
 /* ---------- appearance pages ---------- */
 const GFONTS=['42dot Sans','ABeeZee','Abel','Alegreya','Anton','Archivo','Arimo','Asap','Barlow','Bebas Neue','Bitter','Cabin','Cardo','Catamaran','Caveat','Chivo','Comfortaa','Cormorant','Crimson Pro','DM Sans','DM Serif Display','Domine','EB Garamond','Exo 2','Figtree','Fira Sans','Fraunces','Gelasio','Heebo','IBM Plex Sans','IBM Plex Serif','Inconsolata','Inter','Josefin Sans','Jost','Karla','Lato','Lexend','Libre Baskerville','Libre Franklin','Literata','Lora','Manrope','Merriweather','Montserrat','Mulish','Nunito','Open Sans','Oswald','Outfit','Playfair Display','Plus Jakarta Sans','Poppins','PT Serif','Quicksand','Raleway','Roboto','Roboto Mono','Rubik','Source Serif 4','Space Grotesk','Spectral','Spline Sans','Syne','Tinos','Ubuntu','Work Sans','Zilla Slab'];
 const apOpt=(k,v,label,sub,cur)=>`<button class="ap-opt${String(cur)===String(v)?' on':''}" data-a="look" data-k="${k}" data-v="${esc(String(v))}">${label}${sub?`<small>${sub}</small>`:''}</button>`;
@@ -1907,7 +1933,7 @@ function pageHtml(T){const F=V.form,backTo=/^ap/.test(T)&&T!=='appr'?'appr':'set
  h+=S.models.map(m=>`<div class="card2 pad ${m.id===S.cfg.am?'act':''}" data-a="usem" data-id="${m.id}"><b>${esc(m.name||m.mid)}</b><span class="ps" style="margin:0">${esc(pn(m.pid))}</span><code>${esc(m.mid)}</code><div class="rowh"><span class="badge ok">${m.emb?'Embedding':m.id===S.cfg.am?'Active':'Ready'}</span><span>${ib('editmodel',m.id,I('gear','sm'))}${ib('delmodel',m.id,'🗑','dg')}</span></div></div>`).join('')||'<p class="ps">No models yet. Tap Add model after adding a provider.</p>';
  return h+'<div style="height:40px"></div></main>'}
 function card(k,x){const last=S.chats[x.id]?.slice(-1)[0]?.t;
- if(k==='c')return`<div class="hc" data-a="cview" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(first(x.name))}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
+ if(k==='c')return`<div class="hc" data-a="cview" data-id="${x.id}" data-n="${esc(x.name.toLowerCase())}">${x.img?`<img src="${x.img}" alt="" style="view-transition-name:${vtId(x.id)}">`:`<div class="ph" style="view-transition-name:${vtId(x.id)}">${esc(first(x.name))}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${esc(x.creator?'By '+x.creator:strip(last||x.desc||''))}</small></div></div>`;
  if(k==='p')return`<div class="hc" data-a="editp" data-id="${x.id}">${x.img?`<img src="${x.img}" alt="">`:`<div class="ph">${esc(first(x.name))}</div>`}<div class="cap"><b>${esc(x.name)}</b><small>${x.id===S.persona?'Active':esc(strip(x.desc).slice(0,30)||'Persona')}</small></div></div>`;
  return`<div class="hc" data-a="book" data-id="${x.id}">${x.cover?`<img src="${x.cover}" alt="">`:'<div class="ph">📖</div>'}<div class="cap"><b>${esc(x.name)}</b><small>${x.entries.length} entries</small></div></div>`}
 const nc=(a,l,ic='+')=>`<div class="hc nc" data-a="${a}"><i>${ic}</i><b>${l}</b></div>`;
@@ -1940,8 +1966,8 @@ function listHtml(){const T=V.tab,hr=new Date().getHours(),gr=hr<12?'Good mornin
  const ttl=c=>S.title?.[c.id]||'';
  const pin=c=>S.pin?.[c.id]?`<span class="pinmark">${I('pin')}</span>`:'';
  const sub=(c,l)=>`${ttl(c)?esc(c.name)+' · ':''}${l?.r==='u'?'You: ':''}${esc(strip(String(l?.t||'')))}`;
- const rows=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="row" data-a="open" data-id="${c.id}">${av(c)}<div class="t"><b>${pin(c)}${esc(ttl(c)||c.name)}</b><small>${sub(c,l)}</small></div><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
- const cards=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="hcard" data-a="open" data-id="${c.id}">${av(c)}<b>${pin(c)}${esc(ttl(c)||c.name)}</b><small>${sub(c,l)}</small><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
+ const rows=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="row" data-a="open" data-id="${c.id}">${av(c,'',vtId(c.id))}<div class="t"><b>${pin(c)}${esc(ttl(c)||c.name)}</b><small>${sub(c,l)}</small></div><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
+ const cards=chats.map(c=>{const m=S.chats[c.id],l=m[m.length-1];return`<div class="hcard" data-a="open" data-id="${c.id}">${av(c,'',vtId(c.id))}<b>${pin(c)}${esc(ttl(c)||c.name)}</b><small>${sub(c,l)}</small><time>${ago(S.act?.[c.id])}</time></div>`}).join('');
  const empty=`<div class="empty" style="padding:28px 20px;text-align:center"><b style="font-size:18px">No conversations yet</b><p class="ps" style="margin:8px 0 16px">Pick a character to start chatting.</p><div class="acts" style="justify-content:center"><button class="btn" data-a="tab" data-id="chars">Choose a character</button><button class="btn s" data-a="browse">Discover</button></div></div>`;
  return topbar('Hearth',`<button class="ib big" data-a="find" aria-label="Search">${I('search')}</button><button class="ib big" data-a="tab" data-id="chars" aria-label="New chat">${I('pen')}</button><button class="ib" data-a="tab" data-id="me" aria-label="Profile" style="padding:0">${av(S.persona?P():{name:'H'},'sm')}</button>`)+`<main class="stagger">
  <p class="ps" style="margin:2px 2px 12px">${gr}${pn?', '+esc(pn):''}</p>
@@ -1980,7 +2006,7 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(!same&&v.dataset.k&&/^l(home|chars|lore|pers|browse)$/.test(v.dataset.k))(V.sy=V.sy||{})[v.dataset.k]=st||0;
  if(V.chat){const c=C(),m=S.chats[c.id]||[],tt=S.title?.[c.id];
-  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm')}<div class="ttl"><h1>${esc(tt||c.name)}</h1><small>${tt?esc(c.name)+' · ':''}${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
+  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm',vtId(c.id))}<div class="ttl"><h1>${esc(tt||c.name)}</h1><small>${tt?esc(c.name)+' · ':''}${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
    from=Math.max(0,m.length-(V.limit||CHATWIN)),
    animAt=V.animMsg?.cid===c.id?V.animMsg.i:-1,
    earlier=from>0?`<div class="morebar"><button class="btn s" data-a="earlier">${I('up','sm')} Show earlier messages <span class="note" style="margin:0">${from} older</span></button></div>`:'',
@@ -1988,7 +2014,7 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
    optBtn=S.look.opt==='composer'?'<button class="ib" data-a="set" aria-label="Options">'+I('more')+'</button>':'',
    cb=optBtn+(V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>');
   if(animAt>=0)V.animMsg=null;
-  if(!same){pg(v);v.classList.remove('enter');v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><button class="jump" id="jump" data-a="jump" aria-label="Jump to latest message">${I('dn')}</button><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
+  if(!same){if(!V.vt)pg(v);v.classList.remove('enter');v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><button class="jump" id="jump" data-a="jump" aria-label="Jump to latest message">${I('dn')}</button><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
    const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
   else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
   const mn=$('main'),jb=$('#jump');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90;jb?.classList.toggle('show',!V.stick)};
@@ -1997,7 +2023,7 @@ function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a
   mn.querySelectorAll('.bub').forEach(b=>b.onclick=e=>{if(Date.now()<swipeClick||e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
   mn.querySelectorAll('.msg.c .bub').forEach(wireReplySwipe);
   if(V.fq)applyFind()}
- else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;v.classList.toggle('enter',!same);if(!same)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
+ else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;v.classList.toggle('enter',!same&&!V.vt);if(!same&&!V.vt)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
   const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}
   const bq=$('#bq');if(bq)bq.oninput=()=>{V.br.q=bq.value};
   const bt=$('#btag');if(bt){bt.oninput=drawTagSugs;drawTagSugs()}
@@ -2155,14 +2181,14 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    inp.addEventListener('change',()=>setTimeout(()=>inp.remove(),400));
    inp.click()},
   lookreset:()=>{for(const k of ['msgUser','msgBot','bubUser','bubBot'])S.look[k]='';lookSave();render();toast('Colours reset to theme')},
-  aptheme:()=>{if(!allThemes().some(x=>x.id===id))return;S.look.theme=id;lookSave();render()},
+  aptheme:()=>{if(!allThemes().some(x=>x.id===id))return;vt(()=>{S.look.theme=id;lookSave();render()})},
   apnew:()=>{V.tmpTheme=Object.assign({},activeTheme(),{id:'',name:'My Theme',custom:true});V.tab='apNew';render()},
   apedit:()=>{const th=(S.themes||[]).find(x=>x.id===id);if(!th)return;V.tmpTheme=Object.assign({},th);V.tab='apNew';render()},
-  apdel:()=>{S.themes=(S.themes||[]).filter(x=>x.id!==id);if(S.look.theme===id)S.look.theme='sakura';lookSave();render();toast('Theme deleted')},
+  apdel:()=>{vt(()=>{S.themes=(S.themes||[]).filter(x=>x.id!==id);if(S.look.theme===id)S.look.theme='sakura';lookSave();render();toast('Theme deleted')})},
   apsave:()=>{const d=V.tmpTheme;if(!d)return;const name=(d.name||'').trim();if(!name)return toast('Give the theme a name');
    const thId=d.id||('th'+Date.now().toString(36)),th=Object.assign({},d,{id:thId,name,custom:true});
    S.themes=(S.themes||[]).filter(x=>x.id!==thId).concat([th]);
-   S.look.theme=thId;V.tmpTheme=null;V.tab='apTheme';lookSave();render();toast('Theme saved')},
+   vt(()=>{S.look.theme=thId;V.tmpTheme=null;V.tab='apTheme';lookSave();render();toast('Theme saved')})},
   apcancel:()=>{V.tmpTheme=null;V.tab='apTheme';render()},
   apfield:()=>{if(!V.tmpTheme)return;V.tmpTheme[t.dataset.k]=t.dataset.v;render()},
   fontpick:()=>{if(!document.getElementById('fontlic')?.checked)return toast('Tick the licence box first');document.getElementById('fontfile')?.click()},

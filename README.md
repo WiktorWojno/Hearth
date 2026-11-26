@@ -56,6 +56,10 @@ waiting for the six-hour check.
 
 ## What changed
 
+Build 48 adds View Transitions: themes crossfade, and a conversation row's
+portrait expands into the chat header when you open it. Older WebViews keep
+the existing page change.
+
 Build 47 adds ambient petals and a time-of-day glow to the account picker and
 library screens, a staggered first-paint entrance for rows and cards, and a
 countdown line on undo snackbars.
