@@ -167,7 +167,7 @@ with a tap.
   produces a line such as `{{user}}:`.
 - **Author's note** (Profile → Instructions) injects steering a few messages
   back rather than at the top, where models ignore it.
-- **Write my line** (the ✎ button beside send) drafts your next message in
+- **Write my line** (under **+ → Writing tools**) drafts your next message in
   your persona's voice, then leaves it in the composer to edit or discard.
 - **Search** (⌕ on the home screen) searches every chat, character and
   lorebook entry, not just the open chat.
@@ -188,6 +188,12 @@ In a **Discover** preview, the greeting arrows page through every alternate
 greeting, not just the first.
 
 ## Working with a chat
+
+Each conversation has three tabs. **Chat** is for writing and browsing replies.
+**Reader** shows the same exchange as prose, with adjustable line spacing.
+**Notebook** brings together memories, branches, search and export. Switching
+tabs keeps the text currently in the composer. Under **Profile → Appearance →
+Chat → Composer shortcut**, you can pin a writing action beside Send.
 
 Chat options are grouped into **Chat settings**, **This chat**, **Tools** and
 **Character**. Selectors are compact rows, destructive actions sit apart, and
@@ -219,9 +225,9 @@ Lorebooks**.
   undone too. Undo snackbars stack, so a second delete or edit no longer
   replaces the first; swipe a snackbar left or right to dismiss it without
   restoring.
-- **Reply versions** can be swiped directly on the message: swipe right for the
-  previous version and left for the next. At the last version of the newest
-  reply, swipe left to write a new one.
+- **Reply versions** can be swiped directly on the message. Swipe right for the
+  previous version and left for the next. Choose **New reply** under the latest
+  response to generate another version.
 - **Message details** show the send time under each new message and add an
   **edited** marker after a manual edit. Hide both in **Profile → Appearance →
   Chat**.

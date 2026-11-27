@@ -37,7 +37,7 @@ class FakeFile{constructor(parts,name,opts){this._u=parts[0];this.name=name;this
 
 (async()=>{
  // Static wiring.
- ok('build 49 is current',/var VER=49\b/.test(html));
+ ok('build 49 shipped',W.eval('VER')>=49&&/v:49,when/.test(html));
  ok('release notes mention linked lorebooks',/v:49,when/.test(html)&&/Lorebooks come along/.test(html)&&/links to/.test(html));
  ok('Chub related lorebooks are read',/related_lorebooks/.test(html)&&/hubBookList/.test(html));
  ok('preview import attaches linked books',/attachHubBooks\(nid,p\.node,p\.fp\)/.test(html));

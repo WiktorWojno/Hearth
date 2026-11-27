@@ -145,7 +145,9 @@ async function swipeEl(el,dx){
  ok('swipe left advances the newest reply',W.eval('S.chats.c1')[2].i===1&&W.eval('S.chats.c1')[2].t==='Latest');
  W.eval("window.__swipeGen='';gen=function(m){window.__swipeGen=m}");
  await swipeEl(d.querySelector('.msg[data-i="2"] .bub'),-80);
- ok('swipe left at the end asks for a new reply',W.eval('window.__swipeGen')==='swipe');
+ ok('swiping past the final version keeps the current reply',W.eval('window.__swipeGen')==='');
+ click(d.querySelector('.reply-versions [data-a="regen"]'));
+ ok('New reply explicitly requests generation',W.eval('window.__swipeGen')==='swipe');
 
  // alternate greetings in a Discover preview
  await leaveChat();

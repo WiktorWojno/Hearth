@@ -630,6 +630,51 @@ html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="of
   #boot .petal{display:none!important}
   #amb{display:none!important}
 }
+/* Conversation navigation and reading surfaces */
+.conversation-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:0 16px;background:var(--bg);border-bottom:1px solid var(--ln)}
+.conversation-tabs button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:5px 0;position:relative;background:none;border:0;color:var(--mut);font:600 .86em var(--ff,system-ui)}
+.conversation-tabs button[aria-selected=true]{color:var(--ink)}
+.conversation-tabs button[aria-selected=true]::after{content:"";position:absolute;inset:auto 12% -1px;height:3px;border-radius:3px 3px 0 0;background:var(--ac)}
+.conversation-tabs button:disabled{cursor:default;opacity:.55}
+.conversation-tabs .i{width:16px;height:16px}
+#hd header{border-bottom:0}
+.comp textarea{min-width:0}
+.comp .send{color:var(--acT)}
+.comp .writing-tools{width:44px;height:44px;color:var(--mut);padding:0}
+.reply-versions{align-items:center;gap:4px;color:var(--mut)}
+.reply-versions span{font-size:12px;font-variant-numeric:tabular-nums}
+.reply-versions button{display:inline-flex;align-items:center;justify-content:center;min-width:42px;min-height:42px;box-shadow:none}
+.reply-versions button:disabled{opacity:.4;cursor:default}
+.message-footer{display:flex;align-items:center;gap:3px}.message-footer .mmeta{margin-block:0}.message-menu{display:inline-grid;place-items:center;width:38px;min-height:30px;border:0;background:none;color:var(--mut);border-radius:10px}
+.message-menu[aria-expanded=true],.message-menu:focus-visible{color:var(--ac);background:var(--sf2)}
+.message-menu .i{width:17px;height:17px}
+#v[data-view=reader] main{max-width: min(100%, 64ch);padding:14px clamp(16px,5vw,36px) 48px}
+.reader-settings{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--ln);margin-bottom:22px}
+.reader-settings label{font-size:.85em;color:var(--mut)}
+.reader-settings select{width:auto;max-width:100%;min-height:40px;padding:6px 12px;font-size:.9em}
+.reader-passage{margin:0 0 1.25em;overflow-wrap:anywhere}
+.reader-passage h2{margin:0 0 5px;font:650 .8em var(--ff,system-ui);color:var(--ac)}
+.reader-passage.u h2{color:var(--mut)}
+.reader-passage .bub{color:var(--ink);background:none;border:0;box-shadow:none;border-radius:0;max-width:none;padding:0;line-height:var(--reader-leading,1.75)}
+#v[data-view=notebook] main{padding-top:24px}
+.notebook-title{margin:0 0 16px;font:600 clamp(27px,6vw,38px)/1.1 var(--cff,Georgia,serif);overflow-wrap:anywhere}
+.notebook-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.notebook-summary button{min-height:100px;display:grid;grid-template-columns:1fr auto;align-content:space-between;gap:10px;padding:14px;text-align:left;border:1px solid var(--ln);border-radius:17px;background:linear-gradient(130deg,var(--sf2),var(--sf));color:var(--ink);font:600 .9em var(--ff,system-ui)}
+.notebook-summary strong{font:600 1.85em/1 var(--cff,Georgia,serif)}
+.notebook-summary .i{color:var(--ac);align-self:center}
+.notebook-summary span{grid-column:1/-1}
+.notebook-notes{margin:26px 0}
+.notebook-notes h3{margin:0;font:650 1.06em var(--ff,system-ui)}
+.notebook-notes p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;padding:12px 0;margin:0;border-bottom:1px solid var(--ln)}
+.notebook-notes .note{color:var(--mut);border-bottom:0}
+.notebook-actions{display:grid;gap:8px}
+.notebook-actions button,.writing-action{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:46px;text-align:left;border:1px solid var(--ln);border-radius:12px;background:var(--sf);color:var(--ink);font:600 .9em var(--ff,system-ui)}
+.notebook-actions button .i:last-child,.writing-action .i:last-child{margin-left:auto;color:var(--mut)}
+.writing-action+.writing-action{margin-top:8px}
+#v[data-view=reader] .comp,#v[data-view=notebook] .comp,#v[data-view=notebook] #jump{display:none}
+#v[data-view=reader] #jump{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+@media(max-width:370px){.comp,#cb{gap:3px}.comp{padding-inline:6px}.comp .ib{padding-inline:5px}.comp textarea{padding-inline:10px}.conversation-tabs{padding-inline:4px}}
+
 </style></head><body>
 <div id="boot" aria-hidden="true">
   <i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal"></i>
@@ -637,7 +682,7 @@ html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="of
 </div>
 <div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=49,PUB='0.1';try{
+<script>var VER=50,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -729,6 +774,12 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:50,when:'27 November 2026',title:'A place to read and write',items:[
+  "Switch between Chat, Reader and Notebook inside a conversation.",
+  "Reader keeps your place and lets you adjust line spacing.",
+  "Notebook brings memory notes and branches together.",
+  "Browse existing replies with a swipe. Choose New reply when you want another version."
+ ]},
  {v:49,when:'26 November 2026',title:'Lorebooks come along',items:[
   "Discover imports now bring the lorebooks a Chub character links to, not just the one packed inside its card.",
   "Books are compared by their entries, so a linked copy of a book you already have is not duplicated.",
@@ -845,7 +896,7 @@ const FONTS=[
  ['firacode','Fira Code','Monospace','"Fira Code",ui-monospace,monospace'],
  ['system','Device','System default','system-ui,-apple-system,sans-serif']
 ];
-const LOOK0={theme:'sakura',appfs:16,chatfs:18,font:'inter',chatfont:'literata',fontStack:'Inter,system-ui,sans-serif',chatStack:'Literata,Georgia,serif',fmt:{b:700,i:400,c:500,l:600},msgUser:'',msgBot:'',bubUser:'',bubBot:'',av:'circle',avr:22,opt:'top',width:'standard',align:'lr',avplace:'bottom',whoW:650,whoOp:1,speed:'normal',stopKeep:true,effect:'classic',comp:'pill',picker:'comfortable',home:'rails',times:true,customFont:null,motion:'full',loreTab:true};
+const LOOK0={theme:'sakura',appfs:16,chatfs:18,font:'inter',chatfont:'literata',fontStack:'Inter,system-ui,sans-serif',chatStack:'Literata,Georgia,serif',fmt:{b:700,i:400,c:500,l:600},msgUser:'',msgBot:'',bubUser:'',bubBot:'',av:'circle',avr:22,opt:'top',width:'standard',align:'lr',avplace:'bottom',whoW:650,whoOp:1,speed:'normal',stopKeep:true,effect:'classic',comp:'pill',picker:'comfortable',home:'rails',readerSpacing:'relaxed',composerShortcut:'none',times:true,customFont:null,motion:'full',loreTab:true};
 S.look=Object.assign({},LOOK0,S.look||{});S.look.fmt=Object.assign({},LOOK0.fmt,(S.look&&S.look.fmt)||{});S.themes=Array.isArray(S.themes)?S.themes:[];
 const hexRGB=h=>{let x=String(h||'#000000').replace('#','');if(x.length===3)x=x.split('').map(c=>c+c).join('');const n=parseInt(x,16);return Number.isFinite(n)?[(n>>16)&255,(n>>8)&255,n&255]:[0,0,0]};
 const rgbHex=(r,g,b)=>'#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
@@ -1555,7 +1606,7 @@ function ctxEst(c,h){const lim=ctxLim();if(!lim)return null;
  const recent=h.filter(y=>!y.mm).slice(-(S.cfg.hist||40));
  const used=recent.reduce((a,x)=>a+tkn(x.t),0)+360+maxOut;
  return{pct:Math.min(100,Math.round(used/lim*100)),used,lim}}
-function openChat(id){vt(()=>{V.chat=id;V.fq='';V.fcur=0;V.limit=CHATWIN;V.edit=null;V.stick=true;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0,ts:Date.now()}]:[];save()}render(true)})}
+function openChat(id){vt(()=>{V.chat=id;V.chatView='chat';V.readAnchor=null;V.viewAtEnd=false;V.fq='';V.fcur=0;V.limit=CHATWIN;V.edit=null;V.stick=true;const c=C();if(!S.chats[id]?.length){const g=[c.first,...(c.alts||[])].filter(Boolean).map(x=>rep(x,c));S.chats[id]=g.length?[{r:'c',t:g[0],s:g,i:0,ts:Date.now()}]:[];save()}render(true)})}
 async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
  if(!g){toast('Add a provider and a model first');V.chat=null;V.tab='providers';return render()}
  let m,base='',hist;
@@ -1575,17 +1626,16 @@ async function gen(mode='new',depth=0){const c=C(),h=S.chats[c.id],g=resolve(c);
   if(mode==='new'){const k=h.indexOf(m);if(k>=0)h.splice(k,1)}
   else if(mode==='cont'){m.t=base;m.s&&(m.s[m.i||0]=m.t)}
   else if(mode==='swipe'&&m.s&&m.s.length>1){m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]||''}}
- if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
+ else if(!m.t&&mode!=='cont'){if(mode==='new')h.pop();else{m.s.pop();m.i=m.s.length-1;m.t=m.s[m.i]}}
  V.busy=false;V.ctl=null;save();render(V.stick);summarize(c);
  if(cut==='length'&&S.cfg.autoc!==false&&depth<2)return gen('cont',depth+1);
  if(cut==='length')toast(`Reply hit the ${g.max}-token limit. Raise Max reply tokens in Settings → Limits${/think|reason|r1/i.test(g.model)?' (thinking models need 2000 or more)':''}.`);
  if(cut==='early')toast('The connection ended early. Tap Continue to finish the reply.')}
 function swp(d){const h=S.chats[V.chat],m=h[h.length-1];if(!m||m.r!=='c'||V.busy)return;m.s=m.s||[m.t];m.i=m.i||0;
- if(d>0&&m.i===m.s.length-1)return gen('swipe');const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
+ const n=m.i+d;if(n<0||n>=m.s.length)return;m.i=n;m.t=m.s[n];save();render()}
 function swipeMsg(i,d){
  const c=V.chat&&C(),h=c&&S.chats[c.id],m=h&&h[i];if(!m||m.r!=='c'||V.busy)return;
  m.s=m.s||[m.t];m.i=m.i||0;
- if(d>0&&m.i===m.s.length-1){if(i===h.length-1)return gen('swipe');return}
  const n=m.i+d;if(n<0||n>=m.s.length)return;
  m.i=n;m.t=m.s[n];save();render();
 }
@@ -1604,9 +1654,12 @@ function wireReplySwipe(b){
   b.style.transition='transform .16s ease, opacity .16s ease';b.style.transform='';b.style.opacity='1';setTimeout(()=>{b.style.transition=''},180);
   if(move){swipeClick=Date.now()+350;swipeMsg(idx,dir)}
  };
- b.addEventListener('touchend',end);b.addEventListener('touchcancel',end);
+ b.addEventListener('touchend',end);b.addEventListener('touchcancel',()=>{on=false;b.style.transform='';b.style.opacity='';b.style.transition=''});
 }
-const swb=x=>`<div class="tools"><button data-a="sl">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${(x.s||[x.t]).length}</span><button data-a="sr">${I('right','sm')}</button><button data-a="cont">Continue</button></div>`;
+const swb=x=>{
+ const index=x.i||0,count=(x.s||[x.t]).length;
+ return `<div class="tools reply-versions">${count>1?`<button data-a="sl" aria-label="Previous reply" ${index===0?'disabled':''}>${I('left','sm')}</button><span aria-label="Reply version">${index+1} / ${count}</span><button data-a="sr" aria-label="Next reply" ${index>=count-1?'disabled':''}>${I('right','sm')}</button>`:''}<button data-a="regen">New reply</button><button data-a="cont">Continue</button></div>`;
+};
 function upd(){const h=S.chats[V.chat]||[],idx=h.length-1,b=document.querySelector(`.msg[data-i="${idx}"] .bub`);if(!b)return;
  if(V.shown==null){const now=performance.now();if(now-lastUpd<40)return;lastUpd=now}
  const t=V.shown!=null?V.shown:(h[idx]?.t||'');if(!t)return;b.innerHTML=rich(t);
@@ -1666,6 +1719,21 @@ function findStep(d){
  applyFind();
  const c=$('#fcount');if(c)c.textContent=findLabel();
 }
+document.addEventListener('keydown',event=>{
+ const tab=event.target.closest('[role="tab"][data-a="chatview"]');
+ if(!tab||V.busy)return;
+ const keys=['ArrowLeft','ArrowRight','Home','End'];
+ if(!keys.includes(event.key))return;
+ event.preventDefault();
+ const index=chatViews.findIndex(view=>view.id===tab.dataset.id),last=chatViews.length-1;
+ const next=event.key==='Home'?0:event.key==='End'?last:(index+(event.key==='ArrowLeft'?last:1))%chatViews.length;
+ switchChatView(chatViews[next].id);
+});
+document.addEventListener('change',event=>{
+ if(event.target.id!=='reader-spacing')return;
+ S.look.readerSpacing=event.target.value;save();render();
+ $('#reader-spacing')?.focus({preventScroll:true});
+});
 function send(){const i=$('#in'),t=i.value.trim();if(!t||V.busy)return;S.chats[V.chat].push({r:'u',t,ts:Date.now()});(S.act=S.act||{})[V.chat]=Date.now();i.value='';i.style.height='auto';save();gen()}
 
 /* ---------- views ---------- */
@@ -1771,6 +1839,7 @@ function apBody(T){
    apSec('Streaming speed','How fast incoming replies are drawn.')+apRow('speed',[['slow','Slow','1 char'],['normal','Normal','3 chars'],['fast','Fast','8 chars'],['instant','Instant','No delay']],L.speed,'four')+
    apSec('Stop button','What happens to the part of a reply that already streamed.')+apRow('stopKeep',[[true,'Keep partial','Default'],[false,'Delete on stop','Discard']],L.stopKeep)+
    apSec('Writing effect')+apRow('effect',[['classic','Classic','Typewriter'],['instant','Instant','No animation']],L.effect)+
+   apSec('Composer shortcut','Pin one action beside Writing tools.')+apRow('composerShortcut',[['none','None'],['mine','Write my line'],['regen','New reply']],L.composerShortcut)+
    apSec('Composer shape')+apRow('comp',[['pill','Pill / Capsule','Rounded'],['squircle','Squircle','Soft corners'],['boxy','Boxy','Small corners'],['sharp','Sharp','Square']],L.comp,'four')+
    apSec('Persona picker layout','How the persona list is drawn when you pick one.')+apRow('picker',[['compact','Compact','2 lines'],['comfortable','Comfortable','4 lines'],['dense','Dense','6 lines'],['gallery','Gallery','Grid of cards']],L.picker,'four')+
    apSec('Motion','How lively Hearth feels. Android reduce-motion settings are always respected.')+apRow('motion',[['full','Full','Glow and petals'],['subtle','Subtle','Soft fades'],['off','Off','Still']],L.motion||'full','four')+
@@ -1799,6 +1868,7 @@ function sheetHtml(){const s=V.sheet;if(!s)return'';
     the hardware back button fires while one is still open). */
  if(!V.chat&&['edit','set','mems','rename','chats','find','prompt'].includes(s.t))return'';
  let h='';
+ if(s.t==='writingtools')h=`<div class="opt-head"><h2>Writing tools</h2><button class="ib" data-a="close" aria-label="Close">${I('close')}</button></div><button class="writing-action" data-a="mine">${I('pen')}Write my line${I('next','sm')}</button><button class="writing-action" data-a="regen">${I('retry')}Generate another reply${I('next','sm')}</button>`;
  if(s.t==='info')h=`<p style="white-space:pre-wrap;margin:0 0 4px">${esc(s.m)}</p><div class="acts"><button class="btn" data-a="close">OK</button></div>`;
  if(s.t==='edit')h=`<h2>Edit message</h2><textarea id="em" rows="8">${esc(S.chats[V.chat][s.i].t)}</textarea><div class="acts"><button class="btn" data-a="savem">Save</button><button class="btn s" data-a="close">Cancel</button></div>`;
  if(s.t==='char'){const c=C(),f=(k,l,r)=>`<label>${l}</label><textarea id="c_${k}" rows="${r}">${esc(c[k])}</textarea>`;
@@ -1861,8 +1931,8 @@ const msgHtml=(x,i,m,c,anim)=>{
  const last=i===m.length-1,vn=x.s&&x.s.length>1&&!(last&&x.r==='c');
  const gp=i>0&&m[i-1].r===x.r,nm=x.r==='u'?P().name:c.name,who=(+S.look.whoOp>0&&!gp)?`<div class="who">${esc(nm)}</div>`:'';
  const mt=x.ts?new Date(+x.ts):null,time=mt&&!isNaN(mt.getTime())?mt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'',et=x.et?new Date(+x.et):null,edited=!!(et&&!isNaN(et.getTime()));
- const meta=S.look.times===false||(!time&&!edited)?'':`<div class="mmeta">${time?`<time datetime="${mt.toISOString()}" title="${esc(mt.toLocaleString())}">${time}</time>`:''}${time&&edited?'<span aria-hidden="true">·</span>':''}${edited?`<span title="${esc(et.toLocaleString())}">edited</span>`:''}</div>`;
- return `<div class="msg ${x.r}${gp?' gp':''}${anim?' anim':''}" data-i="${i}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw">${who}<div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div>${meta}</div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="branch" data-i="${i}" title="Copy this conversation up to here into a new branch">Branch here</button><button data-a="regenat" data-i="${i}" title="Write a fresh reply from here in a new branch">${x.r==='c'?'Regenerate':'Reply from here'}</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
+ const meta=S.look.times===false||(!time&&!edited)?'':`<span class="mmeta">${time?`<time datetime="${mt.toISOString()}" title="${esc(mt.toLocaleString())}">${time}</time>`:''}${time&&edited?'<span aria-hidden="true">·</span>':''}${edited?`<span title="${esc(et.toLocaleString())}">edited</span>`:''}</span>`;
+ return `<div class="msg ${x.r}${gp?' gp':''}${anim?' anim':''}" data-i="${i}">${x.r==='c'?(gp?'<span class="avs"></span>':av(c)):''}<div class="mw">${who}<div class="bub ${V.busy&&last&&!x.t?'dots':''}">${rich(x.t)}</div><div class="message-footer">${meta}${V.busy?'':`<button class="message-menu" data-a="msgmenu" data-i="${i}" aria-label="Message actions" aria-expanded="${V.edit===i}">${I('more','sm')}</button>`}</div></div></div>${last&&x.r==='c'&&!V.busy?`<div class="trow">${swb(x)}</div>`:''}${V.edit===i?`<div class="trow ${x.r}"><div class="tools"><button data-a="copy" data-i="${i}">Copy</button><button data-a="say" data-i="${i}">Speak</button><button data-a="edit" data-i="${i}">Edit</button><button data-a="branch" data-i="${i}" title="Copy this conversation up to here into a new branch">Branch here</button><button data-a="regenat" data-i="${i}" title="Write a fresh reply from here in a new branch">${x.r==='c'?'Regenerate':'Reply from here'}</button><button data-a="del" data-i="${i}">Delete</button>${vn?`<button data-a="vsw" data-i="${i}" data-d="-1">${I('left','sm')}</button><span class="note" style="align-self:center;margin:0">${(x.i||0)+1}/${x.s.length}</span><button data-a="vsw" data-i="${i}" data-d="1">${I('right','sm')}</button>`:''}</div></div>`:''}`};
 async function img2(file,w,h){const an=file.size<1.5e6&&(/gif|webp/.test(file.type)||(file.type==='image/png'&&new TextDecoder('latin1').decode(new Uint8Array(await file.arrayBuffer())).includes('acTL')));if(an)return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(file)});return new Promise(r=>{const i=new Image(),u=URL.createObjectURL(file);i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),k=Math.max(w/i.width,h/i.height),dw=i.width*k,dh=i.height*k;x.drawImage(i,(w-dw)/2,(h-dh)/2,dw,dh);URL.revokeObjectURL(u);r(c.toDataURL('image/jpeg',.8))};i.onerror=()=>r('');i.src=u})}
 function syncEd(){if(!V.ed)return;const o=V.ed.o;document.querySelectorAll('[id^="f_"]').forEach(e=>{const k=e.id.slice(2);o[k]=e.type==='checkbox'?e.checked:e.type==='number'?(+e.value||0):e.value});
  const g=[...document.querySelectorAll('[id^="gr_"]')];if(g.length)o.greets=g.map(e=>e.value)}
@@ -2036,30 +2106,90 @@ function bootFinish(force){
  const wait=Math.max(0,hold-(Date.now()-BOOT_AT));
  BOOT_TIMER=setTimeout(()=>{BOOT_TIMER=0;b.classList.add('bootout');setTimeout(()=>b.remove(),660)},wait);
 }
+const chatViews = [
+ {id:'chat',label:'Chat',icon:'pen'},
+ {id:'reader',label:'Reader',icon:'book'},
+ {id:'notebook',label:'Notebook',icon:'inbox'}
+];
+function chatTabs(view){
+ return '<div class="conversation-tabs" role="tablist" aria-label="Conversation views">'+chatViews.map(({id,label,icon})=>
+  `<button type="button" id="tab-${id}" role="tab" data-a="chatview" data-id="${id}" aria-controls="chat-panel" aria-selected="${id===view}" tabindex="${id===view?0:-1}" ${V.busy&&id!==view?'disabled':''}>${I(icon)}${label}</button>`).join('')+'</div>';
+}
+function readerBody(c,messages,from,earlier){
+ const spacing=S.look.readerSpacing||'relaxed';
+ const choices=[['compact','Compact'],['relaxed','Relaxed'],['airy','Airy']];
+ const settings=`<div class="reader-settings"><label for="reader-spacing">Line spacing</label><select id="reader-spacing">${choices.map(([id,label])=>`<option value="${id}" ${id===spacing?'selected':''}>${label}</option>`).join('')}</select></div>`;
+ const passages=messages.slice(from).map((message,index)=>{
+  const user=message.r==='u';
+  return `<article class="msg-reader reader-passage ${user?'u':'c'}" data-i="${from+index}"><h2>${esc(user?P().name:c.name)}</h2><div class="bub">${rich(message.t)}</div></article>`;
+ }).join('');
+ return settings+earlier+(passages||'<p class="empty">Your conversation will appear here after the first message.</p>');
+}
+function notebookBody(c){
+ const memories=memList(c.id),branches=(S.old[c.id]||[]).length+1;
+ const tile=(action,icon,total,label)=>`<button data-a="${action}"><strong>${total}</strong>${I(icon)}<span>${label}</span></button>`;
+ const row=(action,icon,label)=>`<button data-a="${action}">${I(icon)}${label}${I('next','sm')}</button>`;
+ return `<h2 class="notebook-title">Story notebook</h2><div class="notebook-summary">${tile('mems','brain',memories.length,'Memories')}${tile('chats','book',branches,'Branches &amp; chats')}</div>
+ <section class="notebook-notes"><h3>Memory notes</h3>${memories.length?memories.slice(-3).map(note=>`<p>${esc(note.t)}</p>`).join(''):'<p class="note">Save a detail you want the character to remember.</p>'}</section>
+ <div class="notebook-actions">${row('mems','pen',memories.length?'Edit memories':'Add a memory')}${row('chfind','search','Find in conversation')}${row('exp','download','Export chat')}</div>`;
+}
+function switchChatView(next,focusTab=true){
+ if(V.busy||!V.chat||!chatViews.some(view=>view.id===next))return;
+ const main=$('#chat-panel'),prev=V.chatView||'chat';
+ if(!main||prev===next)return;
+ if(prev!=='notebook'){
+  const top=main.getBoundingClientRect().top;
+  const firstVisible=[...main.querySelectorAll('[data-i].msg,[data-i].reader-passage')].find(el=>el.getBoundingClientRect().bottom>top);
+  V.readAnchor=firstVisible?{index:firstVisible.dataset.i,offset:firstVisible.getBoundingClientRect().top-top}:null;
+  V.viewAtEnd=main.scrollHeight>main.clientHeight && main.scrollHeight-main.clientHeight-main.scrollTop<6;
+ }
+ V.chatView=next;V.edit=null;render();
+ if(next==='notebook')main.scrollTop=0;
+ else if(V.viewAtEnd)main.scrollTop=main.scrollHeight;
+ else if(V.readAnchor){
+  const el=main.querySelector(`[data-i="${V.readAnchor.index}"]`);
+  if(el)main.scrollTop+=el.getBoundingClientRect().top-main.getBoundingClientRect().top-V.readAnchor.offset;
+ }
+ if(focusTab)document.getElementById('tab-'+next)?.focus({preventScroll:true});
+}
+function composerActions(){
+ const actions={mine:['pen','Write my line'],regen:['retry','Generate another reply']};
+ const action=(id,icon,label)=>`<button class="ib writing-tools" data-a="${id}" aria-label="${label}" title="${label}">${I(icon)}</button>`;
+ if(V.busy)return `<button class="btn send" data-a="stop" aria-label="Stop">${I('stop')}</button>`;
+ const pinned=Object.hasOwn(actions,S.look.composerShortcut)?actions[S.look.composerShortcut]:null;
+ return action('writingtools','plus','Writing tools')+(pinned?action(S.look.composerShortcut,...pinned):'')+
+  (S.look.opt==='composer'?action('set','more','Chat options'):'')+
+  `<button class="btn send" data-a="send" aria-label="Send">${I('send')}</button>`;
+}
+
 function renderRaw(scroll){const a=$('#app');if(V.loading||V.locked||V.picker){a.innerHTML=ambLock()+lockHtml();if(!V.loading)bootFinish();return}
+ if(!V.chat){V.chatView='chat';V.readAnchor=null;V.viewAtEnd=false}
  if(!V.chat&&V.fq){V.fq='';V.fcur=0}
  if(!$('#v'))a.innerHTML='<div id="amb" aria-hidden="true"></div><div id="v"></div><div id="sh"></div><div id="sh2"></div>';
  const v=$('#v'),st=$('main')?.scrollTop,key=V.chat?'c'+V.chat:'l'+V.tab,same=v.dataset.k===key;
  if(!same&&v.dataset.k&&/^l(home|chars|lore|pers|browse)$/.test(v.dataset.k))(V.sy=V.sy||{})[v.dataset.k]=st||0;
- if(V.chat){const c=C(),m=S.chats[c.id]||[],tt=S.title?.[c.id];
-  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm',vtId(c.id))}<div class="ttl"><h1>${esc(tt||c.name)}</h1><small>${tt?esc(c.name)+' · ':''}${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
+ if(V.chat){const c=C(),m=S.chats[c.id]||[],tt=S.title?.[c.id],view=V.chatView||'chat';
+  v.dataset.view=view;
+  const hd=`<header><button class="ib big" data-a="back" aria-label="Back">${I('back')}</button>${av(c,'sm',vtId(c.id))}<div class="ttl"><h1>${esc(tt||c.name)}</h1><small>${tt?esc(c.name)+' · ':''}${esc(P().name)}${resolve(c)?' · '+esc(resolve(c).model):''}</small></div>${S.look.opt==='composer'&&view==='chat'?'':`<button class="ib big" data-a="set" aria-label="Options">${I('more')}</button>`}</header>`,
    from=Math.max(0,m.length-(V.limit||CHATWIN)),
    animAt=V.animMsg?.cid===c.id?V.animMsg.i:-1,
    earlier=from>0?`<div class="morebar"><button class="btn s" data-a="earlier">${I('up','sm')} Show earlier messages <span class="note" style="margin:0">${from} older</span></button></div>`:'',
-   body=earlier+m.slice(from).map((x,j)=>msgHtml(x,from+j,m,c,from+j===animAt)).join(''),
-   optBtn=S.look.opt==='composer'?'<button class="ib" data-a="set" aria-label="Options">'+I('more')+'</button>':'',
-   cb=optBtn+(V.busy?'<button class="btn send" data-a="stop" aria-label="Stop">'+I('stop')+'</button>':'<button class="ib big" data-a="mine" aria-label="Write my line" title="Write my line">'+I('pen')+'</button><button class="ib big" data-a="regen" aria-label="Retry">'+I('retry')+'</button><button class="btn send" data-a="send" aria-label="Send">'+I('send')+'</button>');
+   body=view==='reader'?readerBody(c,m,from,earlier):view==='notebook'?notebookBody(c):earlier+m.slice(from).map((x,j)=>msgHtml(x,from+j,m,c,from+j===animAt)).join(''),
+   cb=composerActions(),header=hd+chatTabs(view)+(view==='chat'?ctxBar(c,m):'');
   if(animAt>=0)V.animMsg=null;
-  if(!same){if(!V.vt)pg(v);v.classList.remove('enter');v.innerHTML=`<div id="hd">${hd}${ctxBar(c,m)}</div><main>${body}</main><button class="jump" id="jump" data-a="jump" aria-label="Jump to latest message">${I('dn')}</button><div class="comp"><textarea id="in" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
+  if(!same){if(!V.vt)pg(v);v.classList.remove('enter');v.innerHTML=`<div id="hd">${header}</div><main id="chat-panel" role="tabpanel" tabindex="0">${body}</main><button class="jump" id="jump" data-a="jump" aria-label="Jump to latest message">${I('dn')}</button><div class="comp"><textarea id="in" aria-label="Message" rows="1" placeholder="Write a message…"></textarea><span id="cb">${cb}</span></div>`;v.dataset.k=key;
    const i=$('#in');i.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};i.oninput=()=>{i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}}
-  else{$('#hd').innerHTML=hd+ctxBar(c,m);$('main').innerHTML=body;$('#cb').innerHTML=cb}
-  const mn=$('main'),jb=$('#jump');mn.style.background=bgOf(c);mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90;jb?.classList.toggle('show',!V.stick)};
+  else{$('#hd').innerHTML=header;$('main').innerHTML=body;$('#cb').innerHTML=cb}
+  const mn=$('main'),jb=$('#jump');mn.setAttribute('aria-labelledby','tab-'+view);
+  mn.style.background=view==='chat'?bgOf(c):'';
+  mn.style.setProperty('--reader-leading',({compact:1.5,relaxed:1.75,airy:2})[S.look.readerSpacing]||1.75);
+  mn.onscroll=()=>{V.stick=mn.scrollHeight-mn.scrollTop-mn.clientHeight<90;jb?.classList.toggle('show',!V.stick)};
   mn.scrollTop=scroll||!same?mn.scrollHeight:(st||0);
   if(jb)jb.classList.toggle('show',!V.stick);
-  mn.querySelectorAll('.bub').forEach(b=>b.onclick=e=>{if(Date.now()<swipeClick||e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
+  mn.querySelectorAll('.msg .bub').forEach(b=>b.onclick=e=>{if(Date.now()<swipeClick||e.target.closest('a'))return;const idx=+b.closest('.msg').dataset.i;V.edit=V.edit===idx?null:idx;render()});
   mn.querySelectorAll('.msg.c .bub').forEach(wireReplySwipe);
   if(V.fq)applyFind()}
- else{v.innerHTML=listHtml()+navHtml();v.dataset.k=key;v.classList.toggle('enter',!same&&!V.vt);if(!same&&!V.vt)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
+ else{delete v.dataset.view;v.innerHTML=listHtml()+navHtml();v.dataset.k=key;v.classList.toggle('enter',!same&&!V.vt);if(!same&&!V.vt)pg(v);const mn=$('main');if(same&&st)mn.scrollTop=st;else if(!same&&V.sy?.[key])mn.scrollTop=V.sy[key];
   const q=$('#q');if(q)q.oninput=()=>{const t=q.value.toLowerCase();document.querySelectorAll('.hc[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(t)?'':'none')}
   const bq=$('#bq');if(bq)bq.oninput=()=>{V.br.q=bq.value};
   const bt=$('#btag');if(bt){bt.oninput=drawTagSugs;drawTagSugs()}
@@ -2080,6 +2210,9 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   tab:()=>{V.tab=id;V.form=null;V.ed=null;if(id==='news'&&S.seen!==VER){S.seen=VER;save()}render()},open:()=>openChat(id),back:()=>{V.ctl?.abort();V.chat=null;V.edit=null;V.sheet=null;V.fq='';V.fcur=0;V.limit=0;render()},
   earlier:()=>{const mn=$('main'),h=mn?.scrollHeight||0,top=mn?.scrollTop||0;V.limit=(V.limit||CHATWIN)+CHATWIN;render();const n=$('main');if(n){n.scrollTop=n.scrollHeight-h+top;V.stick=false}},
   jump:()=>{const mn=$('main');if(!mn)return;V.stick=true;const still=(S.look?.motion||'full')==='off'||matchMedia?.('(prefers-reduced-motion: reduce)').matches;if(mn.scrollTo)mn.scrollTo({top:mn.scrollHeight,behavior:still?'auto':'smooth'});else mn.scrollTop=mn.scrollHeight;$('#jump')?.classList.remove('show')},
+  chatview:()=>switchChatView(id),
+  msgmenu:()=>{V.edit=V.edit===i?null:i;render();document.querySelector(`.message-menu[data-i="${i}"]`)?.focus({preventScroll:true})},
+  writingtools:()=>{V.sheet={t:'writingtools'};render();$('#sh .writing-action')?.focus()},
   set:()=>{V.sheet={t:'set'};render()},send,stop:()=>V.ctl?.abort(),sl:()=>swp(-1),
   rgen:async()=>{if(!S.lock?.hash||await hsh($('#s_cur')?.value||'',S.lock.salt)!==S.lock.hash)return toast('Enter your current password above first');await mkPhrase();render()},
   rcopy:()=>{navigator.clipboard?.writeText(V.rphrase||'').then(()=>toast('Copied')).catch(()=>toast('Copy failed'))},
@@ -2171,7 +2304,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
    if(g.char){V.chat=null;V.charBack=V.tab;V.cd=g.char;V.cdt='story';V.gi=0;V.tab='char';return render()}
    if(g.chat){openChat(g.chat);return setTimeout(()=>{const e=document.querySelectorAll('main .msg')[g.msg];e?.scrollIntoView({block:'center'});e?.classList.add('hl');setTimeout(()=>e?.classList.remove('hl'),2000)},120)}
    render()},
-  goto:()=>{V.sheet=null;render();const e=document.querySelectorAll('main .msg')[i];e?.scrollIntoView({block:'center'});e?.classList.add('hl')},
+  goto:()=>{V.sheet=null;switchChatView('chat',false);ensureHit(i);render();const e=document.querySelector(`main .msg[data-i="${i}"]`);e?.scrollIntoView({block:'center'});e?.classList.add('hl')},
   say:()=>{if(!window.speechSynthesis)return toast('Speech not available on this device');if(speechSynthesis.speaking){speechSynthesis.cancel();return}speechSynthesis.speak(new SpeechSynthesisUtterance(strip(S.chats[c.id][i].t)));V.edit=null;render()},upd:()=>{readCfg();save();checkUpdate(true)},
   vsw:()=>{const m=S.chats[c.id][i],n=(m.i||0)+(+t.dataset.d);if(m.s&&n>=0&&n<m.s.length){m.i=n;m.t=m.s[n];save();render()}},
   newchat:()=>{const cur=S.chats[c.id];if(cur?.length&&(cur.some(m=>m.r==='u')||S.title?.[c.id]))(S.old[c.id]=S.old[c.id]||[]).unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id],title:S.title?.[c.id]||previewOf(cur)});delete S.chats[c.id];delete S.cp?.[c.id];delete S.title?.[c.id];V.sheet=null;save();openChat(c.id);toast('New chat started')},
@@ -2187,12 +2320,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   memdel:()=>{if(!c)return;const L=memList(c.id),x=L[+t.dataset.j];if(!x)return;
    if(x.k==='m'){const m=S.chats[c.id][x.i],old=m.mt;delete m.mt;save();render();undoable('Memory forgotten',()=>{m.mt=old;save();render()})}
    else{const a=S.memo[c.id],old=a.splice(x.j,1)[0];save();render();undoable('Memory forgotten',()=>{a.splice(x.j,0,old);save();render()})}},
-  chfind:()=>{V.sheet={t:'find'};V.fq='';V.fcur=0;render();setTimeout(()=>$('#fq')?.focus(),80)},
+  chfind:()=>{switchChatView('chat',false);V.sheet={t:'find'};V.fq='';V.fcur=0;render();setTimeout(()=>$('#fq')?.focus(),80)},
   fnext:()=>findStep(1),fprev:()=>findStep(-1),
   undo:()=>{const id=+t.dataset.u,i=id?UNDO.findIndex(x=>x.id===id):UNDO.length-1;if(i<0)return;const u=UNDO.splice(i,1)[0];clearTimeout(u.timer);u.el.remove();try{u.fn()}catch(e){}toast('Restored')},
   savewarnx:()=>clearSaveWarn(),
   persist:async()=>{await askPersist();render();toast(persistState?'Storage protection is on':'Android did not grant persistent storage')},
-  sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.length)o.unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id],title:S.title?.[c.id]||previewOf(cur)});S.chats[c.id]=it.msgs;if(it.pid)(S.cp=S.cp||{})[c.id]=it.pid;else delete S.cp?.[c.id];if(it.title)S.title[c.id]=it.title;else delete S.title?.[c.id];V.sheet=null;V.edit=null;V.fq='';V.fcur=0;V.limit=CHATWIN;save();render(true)},
+  sw:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const it=o.splice(k,1)[0],cur=S.chats[c.id];if(cur?.length)o.unshift({id:uid(),t:Date.now(),msgs:cur,pid:S.cp?.[c.id],title:S.title?.[c.id]||previewOf(cur)});S.chats[c.id]=it.msgs;V.chatView='chat';V.readAnchor=null;if(it.pid)(S.cp=S.cp||{})[c.id]=it.pid;else delete S.cp?.[c.id];if(it.title)S.title[c.id]=it.title;else delete S.title?.[c.id];V.sheet=null;V.edit=null;V.fq='';V.fcur=0;V.limit=CHATWIN;save();render(true)},
   delold:()=>{const o=S.old[c.id]||[],k=o.findIndex(x=>x.id===id);if(k<0)return;const gone=o.splice(k,1)[0];save();V.sheet={t:'chats'};render();
    undoable('Chat deleted',()=>{o.splice(Math.min(k,o.length),0,gone);save();V.sheet={t:'chats'};render()})},copy:()=>{navigator.clipboard?.writeText(S.chats[c.id][i].t).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));V.edit=null;render()},
   branch:()=>{if(!c)return;const h=S.chats[c.id];if(!h||i<0||i>=h.length)return;const msgs=clone(h.slice(0,i+1));if(branchChat(c.id,msgs,branchName(c.id,'Branch at message '+(i+1)),i))toast('Branched at message '+(i+1))},
@@ -2234,7 +2367,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   bak:backupNow,rest:pick,
   termux:async()=>{toast('Starting the Termux backup server…');const ok=await startBackupServer(true);toast(ok?'Backup server is running on 127.0.0.1:8765':'Could not start it. In Termux run: bash native/termux-setup.sh')},
   updnow:()=>checkUpdate(true),
-  regen:()=>{const h=S.chats[c.id],l=h[h.length-1];gen(l&&l.r==='c'?'swipe':'new')},
+  regen:()=>{V.sheet=null;const h=S.chats[c.id],l=h[h.length-1];gen(l&&l.r==='c'?'swipe':'new')},
   del:()=>{const cid=c.id,idx=i,a=S.chats[cid],prev=a[idx-1]||null,next=a[idx+1]||null,gone=a.splice(idx,1)[0];V.edit=null;save();render();
    undoable('Message deleted',()=>{const h=a;if(!h)return;let at=h.length;const p=prev?h.indexOf(prev):-1;if(p>=0)at=p+1;else{const n=next?h.indexOf(next):-1;at=n>=0?n:Math.min(idx,h.length)}h.splice(at,0,gone);save();render()})},
   edit:()=>{V.sheet={t:'edit',i};V.edit=null;render()},
@@ -2267,7 +2400,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   applyupd:async()=>{await flushSave();location.reload()},
   prompt:promptPreview,
   pcopy:()=>{const s=V.sheet;if(!s)return;const t=s.sys+'\n\n'+s.msgs.map(m=>m.role.toUpperCase()+':\n'+m.content).join('\n\n');navigator.clipboard?.writeText(t).then(()=>toast('Copied the whole request')).catch(()=>toast('Copy failed'))},
-  mine:()=>{if(V.busy)return;impersonate()},
+  mine:()=>{if(V.busy)return;V.sheet=null;render();impersonate()},
   use:()=>setPersona(id),
   savep:()=>{const p=V.sheet.p,n=$('#pn').value.trim();if(!n)return;p.name=n;p.desc=$('#pd').value;if(!p.id){p.id=uid();S.personas.push(p);if(!S.persona)S.persona=p.id}V.sheet=null;regenAllOpeners();save();render()},
   delp:()=>{const p=V.sheet.p;S.personas=S.personas.filter(x=>x!==p);if(S.persona===p.id)S.persona=null;V.sheet=null;save();render()}
