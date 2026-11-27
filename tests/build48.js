@@ -28,7 +28,7 @@ const click=el=>{if(!el)throw new Error('missing click target');el.dispatchEvent
 
 (async()=>{
  // Static wiring.
- ok('build 48 is current',/var VER=48\b/.test(html));
+ ok('build 48 shipped',/var VER=(?:4[89]|[5-9]\d)/.test(html)&&/v:48,when/.test(html));
  ok('release notes describe the transitions',/v:48,when/.test(html)&&/Transitions that carry you/.test(html));
  ok('view transition styles exist',/@supports \(view-transition-name: none\)/.test(html)&&/::view-transition-old\(root\)/.test(html));
  ok('transitions have a safe fallback',/typeof document\.startViewTransition!=='function'/.test(html));

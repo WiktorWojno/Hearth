@@ -637,7 +637,7 @@ html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="of
 </div>
 <div id="app"></div>
 <input type="file" id="f" accept=".png,.json,image/png,application/json" multiple hidden><input type="file" id="fa" accept="image/*" hidden><input type="file" id="fi" accept="image/*" hidden>
-<script>var VER=48,PUB='0.1';try{
+<script>var VER=49,PUB='0.1';try{
  const L=localStorage,o=L.getItem('hearth_ota'),m=o&&o.match(/var VER=(\d+)/),ov=m?+m[1]:0;
  /* A truncated download must never be written over the running app: that is
     how you get a half-rendered screen with pieces missing. */
@@ -729,6 +729,12 @@ const THEMES=[
 /* Release notes under Profile → What's new. Newest first; items are plain
    text and are escaped when the catalog renders them. */
 const CHANGELOG=[
+ {v:49,when:'26 November 2026',title:'Lorebooks come along',items:[
+  "Discover imports now bring the lorebooks a Chub character links to, not just the one packed inside its card.",
+  "Books are compared by their entries, so a linked copy of a book you already have is not duplicated.",
+  "Older lorebook files that use the entry field instead of content now import correctly.",
+  "A character card that stores its lorebook outside the usual data block is read too."
+ ]},
  {v:48,when:'26 November 2026',title:'Transitions that carry you',items:[
   "Switching themes now crossfades the whole app instead of snapping to the new colours.",
   "Opening a chat from a character card expands its portrait into the chat header, and going back reverses it.",
@@ -1180,15 +1186,17 @@ function thumb(file){return new Promise(r=>{const i=new Image(),url=URL.createOb
  i.onload=()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d'),m=Math.min(i.width,i.height);
   x.drawImage(i,(i.width-m)/2,(i.height-m)/4>0?(i.height-m)/4:0,m,m,0,0,256,256);URL.revokeObjectURL(url);r(c.toDataURL('image/jpeg',.8))};
  i.onerror=()=>r('');i.src=url})}
-function normBook(j,name){const raw=j.entries||[],list=Array.isArray(raw)?raw:Object.values(raw);
+const bookCount=b=>{const e=b&&b.entries;return Array.isArray(e)?e.length:e&&typeof e==='object'?Object.keys(e).length:0};
+function normBook(j,name){const raw=j.entries||[],list=(Array.isArray(raw)?raw:Object.values(raw)).filter(e=>e&&typeof e==='object');
  return{id:uid(),name:j.name||name||'Lorebook',desc:j.description||'',tags:j.tags||[],cover:'',entries:list.map(e=>({
-  name:e.comment||e.name||'',keys:[].concat(e.keys||e.key||[]).filter(Boolean),content:e.content||'',
+  name:e.comment||e.name||'',keys:[].concat(e.keys||e.key||[]).filter(Boolean),content:e.content||e.entry||'',
   constant:!!e.constant,sticky:e.sticky||0,delay:e.delay||0,cooldown:e.cooldown||0,on:e.enabled!==false&&!e.disable})).filter(e=>e.content)}}
 function addChar(j,img,fname,about){const d=j.data||j;if(!d.name)throw Error('No character data found');
  const c={id:uid(),name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',
   first:d.first_mes||'',alts:d.alternate_greetings||[],creator:d.creator||'',about:cleanNote(about||d.creator_notes),tags:d.tags||[],created:Date.now(),updated:Date.now(),src:'Imported',ex:d.mes_example||'',sys:d.system_prompt||'',img};
  S.chars.push(c);
- if(d.character_book&&(d.character_book.entries||[]).length){const b=normBook(d.character_book,d.name+' lore');S.books.push(b);S.links[c.id]=[b.id]}
+ const cb=d.character_book||j.character_book;
+ if(bookCount(cb)){const b=normBook(cb,d.name+' lore');S.books.push(b);S.links[c.id]=[b.id]}
  return c.name}
 async function importFiles(files){const msg=[];
  for(const f of files){try{
@@ -1272,9 +1280,37 @@ async function firstCard(urls){let err;for(const u of urls){try{const b=await nf
 async function scrape(url){const b=await nfetch(url,{},true),h=new TextDecoder().decode(b),og=(h.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)/i)||[])[1];
  return[...new Set([og,...(h.match(/https?:\/\/[^"'\s<>)]+\.png[^"'\s<>)]*/gi)||[])].filter(Boolean).map(x=>x.replace(/&amp;/g,'&')))].slice(0,8)}
 async function hubCard(fp){return firstCard([`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`])}
+const bookSig=b=>{const raw=(b&&b.entries)||[],es=(Array.isArray(raw)?raw:Object.values(raw)).filter(e=>e&&(e.content||e.entry)),s=es.map(e=>e.content||e.entry).join('\u0000');let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return es.length+':'+h};
+async function hubBookList(node,fp){
+ let ids=((node&&node.related_lorebooks)||[]).map(Number).filter(x=>x>0);
+ const out=[];
+ if(!ids.length&&fp){try{const j=await nfetch(`https://api.chub.ai/api/characters/${fp}?full=true`,{signal:tmo(8000)}),n=j.node||j;ids=(n.related_lorebooks||[]).map(Number).filter(x=>x>0);
+  const emb=(n.definition||{}).embedded_lorebook;if(bookCount(emb))out.push({b:emb,name:n.name||emb.name})}catch(e){}}
+ await Promise.all([...new Set(ids)].slice(0,6).map(async id=>{
+  try{const j=await nfetch(`https://api.chub.ai/api/lorebooks/${id}?full=true`,{signal:tmo(8000)}),n=j.node||j,def=n.definition||{},b=def.embedded_lorebook||(def.entries?def:null);
+   if(bookCount(b))out.push({b,name:n.name||b.name})}catch(e){}
+ }));
+ return out;
+}
+/* Chub cards can link lorebooks that are not inside the card PNG. Import those
+   too, skipping any book whose entries are already attached to the character. */
+async function attachHubBooks(cid,node,fp){
+ if(!cid)return 0;
+ S.books=S.books||[];S.links=S.links||{};
+ const found=await hubBookList(node,fp);if(!found.length)return 0;
+ const bySig=new Map();
+ for(const b of S.books)bySig.set(bookSig(b),b);
+ const links=S.links[cid]=S.links[cid]||[];
+ let n=0,changed=false;
+ for(const x of found){const s=bookSig(x.b),have=bySig.get(s);
+  if(have){if(!links.includes(have.id)){links.push(have.id);changed=true}continue}
+  const b=normBook(x.b,x.name);S.books.push(b);links.push(b.id);bySig.set(bookSig(b),b);n++;changed=true}
+ if(changed)save();
+ return n;
+}
 function prevFrom(p){const d=p.j.data||p.j,n=p.node||{},nt=cleanNote(d.creator_notes),fp=p.fp,
  c={name:d.name,desc:d.description||'',pers:d.personality||'',scen:d.scenario||'',ex:d.mes_example||'',first:d.first_mes||'',alts:d.alternate_greetings||[],tags:d.tags||n.topics||[],creator:d.creator||(fp?fp.split('/')[0]:''),about:nt.length>15?nt:cleanNote(n.tagline||n.description)||nt,img:p.img,created:n.createdAt?Date.parse(n.createdAt):0,updated:n.lastActivityAt?Date.parse(n.lastActivityAt):0,src:'Imported'};
- return{...p,c,lore:(d.character_book?.entries||[]).length,stars:n.starCount||0,dl:n.downloadCount||0}}
+ return{...p,c,lore:bookCount(d.character_book||p.j.character_book),linked:(n.related_lorebooks||[]).filter(x=>+x>0).length,stars:n.starCount||0,dl:n.downloadCount||0}}
 function openPrev(p){V.prevBack=V.tab==='prev'?V.prevBack:V.tab;V.prev=p;V.gi=0;V.cdt='story';V.sheet=null;V.tab='prev';render()}
 function closePrev(){V.prev=null;V.pq=null;V.tab=V.prevBack||'home';render()}
 function nextPrev(){const q=V.pq;if(!q?.length)return closePrev();openPrev(prevFrom({src:'file',j:q[0].j,img:q[0].img}))}
@@ -1329,7 +1365,7 @@ async function chubSearch(more,preserve,retried){const B=bState(),qi=$('#bq');if
  }
  B.busy=false;render()
 }
-async function chubImport(fp,about){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);IMPOPT={direct:true,about};await importFiles([new File([b],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){if(V.br)V.br.done[fp]=1;goDetail(LASTC)}else toast('That card had no character data')}catch(e){IMPOPT=null;toast('Import failed: '+e.message)}}
+async function chubImport(fp,about){toast('Importing…');try{const n=S.chars.length,b=await nfetch(`https://avatars.charhub.io/avatars/${fp}/chara_card_v2.png`,{},true);IMPOPT={direct:true,about};await importFiles([new File([b],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){if(V.br)V.br.done[fp]=1;const extra=await attachHubBooks(LASTC,null,fp);goDetail(LASTC);if(extra)toast('Added '+extra+' linked lorebook'+(extra===1?'':'s'))}else toast('That card had no character data')}catch(e){IMPOPT=null;toast('Import failed: '+e.message)}}
 async function previewFp(fp,src,node){toast('Loading preview…');try{const r=await hubCard(fp,src);openPrev(prevFrom({src:'hub',site:src,fp,bytes:r.bytes,j:r.j,node:node||{},img:node?.max_res_url||node?.avatar_url||`https://avatars.charhub.io/avatars/${fp}/avatar.webp`}))}catch(e){toast('Couldn’t load preview: '+e.message)}}
 async function urlImport(u){u=(u||'').trim();if(!u)return toast('Paste a link first');
  const jm=u.match(/janitorai\.com\/characters\/([^?#\s/]+)/i);if(jm)u='https://jannyai.com/characters/'+jm[1].split('_')[0];
@@ -1389,7 +1425,7 @@ function charView(c,pv){
  ${pv?`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="pback">${V.pq?.length>1?'Skip':'Cancel'}</button></div>`:`<div class="acts" style="margin-top:10px"><button class="btn s" style="flex:1" data-a="editc">${I('pen','sm')} Edit</button><button class="btn s" style="flex:1" data-a="cnew" data-id="${c.id}">＋ New chat</button></div>`}
  ${pv?`<div class="card2 stats" style="margin-top:18px"><div><b>${fmt(tk)}</b><span>tokens</span></div><div><b>${gs.length}</b><span>greetings</span></div><div><b>${pv.lore}</b><span>lore entries</span></div></div>${c.creator?`<div class="card2 pad" style="flex-direction:row;align-items:center;gap:14px"><div class="av">${esc(c.creator[0]||'?')}</div><div><b>${esc(c.creator)}</b><div class="note" style="margin:0">${[pv.stars?'⭐ '+pv.stars:'',pv.dl?pv.dl+' downloads':''].filter(Boolean).join(' · ')||'Creator'}</div></div></div>`:''}`:`<div class="card2 stats" style="margin-top:18px"><div><b>${chats}</b><span>chats</span></div><div><b>${fmt(msgs)}</b><span>messages</span></div></div>`}
  <p class="note" style="text-align:center">${fmt(tk)} tokens · Updated ${dt(c.updated)}</p>
- <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card+(pv&&pv.lore?`<h2 class="h2">Lorebook</h2><p class="body">Includes ${pv.lore} lorebook entries.</p>`:''):story}<div style="height:40px"></div></main>`}
+ <div class="tabs"><button class="${V.cdt==='card'?'':'on'}" data-a="cdtab" data-id="story">Story</button><button class="${V.cdt==='card'?'on':''}" data-a="cdtab" data-id="card">Card</button></div>${V.cdt==='card'?card+(pv&&pv.lore?`<h2 class="h2">Lorebook</h2><p class="body">Includes ${pv.lore} lorebook entries.</p>`:'')+(pv&&pv.linked?`<p class="body">Also links ${pv.linked} lorebook${pv.linked===1?'':'s'} on Chub. They come along when you import.</p>`:''):story}<div style="height:40px"></div></main>`}
 function browseHtml(){const B=bState(),items=browseVisible(),tagCounts=browseTagCounts(),recent=S.disc?.recent||[],selected=B.tags||[];
  const hasTag=t=>selected.some(x=>String(x).toLowerCase()===String(t).toLowerCase());
  const tag=t=>`<button type="button" class="chip ${hasTag(t)?'on':''}" data-a="btag" data-tag="${esc(t)}">${esc(t)}${hasTag(t)?I('close','sm'):''}</button>`;
@@ -2056,7 +2092,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
   
   pback:()=>{if(V.pq?.length){V.pq.shift();return nextPrev()}closePrev()},
   pimp:async()=>{const p=V.prev,st=t.dataset.s,gi=+t.dataset.i||0;let nid=null;
-   if(p.src==='hub'){const n=S.chars.length;IMPOPT={direct:true,about:p.c.about};await importFiles([new File([p.bytes],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){nid=LASTC;if(V.br)V.br.done[p.fp]=1}}
+   if(p.src==='hub'){const n=S.chars.length;IMPOPT={direct:true,about:p.c.about};await importFiles([new File([p.bytes],'card.png',{type:'image/png'})]);IMPOPT=null;if(S.chars.length>n){nid=LASTC;if(V.br)V.br.done[p.fp]=1;const extra=await attachHubBooks(nid,p.node,p.fp);if(extra)toast('Added '+extra+' linked lorebook'+(extra===1?'':'s'))}}
    else{const it=V.pq.shift();addChar(it.j,it.img,'',p.c.about);nid=S.chars[S.chars.length-1].id}
    const c=S.chars.find(x=>x.id===nid);if(c&&p.fp){c.fp=p.fp;c.site=p.site}save();
    if(V.pq?.length)return nextPrev();V.prev=null;V.pq=null;if(!nid)return closePrev();if(st)startWith(nid,gi);else goDetail(nid)},

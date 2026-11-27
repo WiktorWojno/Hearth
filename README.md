@@ -56,6 +56,10 @@ waiting for the six-hour check.
 
 ## What changed
 
+Build 49 makes Discover imports bring linked Chub lorebooks too, and skips
+duplicates by comparing entry text. It also reads older lorebook files that use
+an `entry` field, and cards whose book sits outside the usual `data` block.
+
 Build 48 adds View Transitions: themes crossfade, and a conversation row's
 portrait expands into the chat header when you open it. Older WebViews keep
 the existing page change.
